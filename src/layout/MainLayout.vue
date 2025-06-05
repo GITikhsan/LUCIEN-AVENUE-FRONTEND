@@ -12,7 +12,8 @@ const items = [
   { to: '/Skills', name: 'Home' },
   { to: '/Experience', name: 'Kontak' },
   { to: '/fashion', name: 'Fashion' },
-  
+  { to: '/product', name: 'Product' },
+  { to: '/viewmore', name: 'View More' },
 ]
 </script>
 
