@@ -1,4 +1,3 @@
-<script src="https://cdn.tailwindcss.com"></script>
 
 <template>
  <section class="bg-gray-100 py-16 text-center">

@@ -10,6 +10,7 @@ const items = [
   { to: '/aboutus', name: 'About Us' },
   { to: '/fashion', name: 'Fashion' },
   { to: '/Skills', name: 'Home' },
+  { to: '/Product', name: 'Product' },
   { to: '/Experience', name: 'Kontak' },
   { to: '/fashion', name: 'Fashion' },
   { to: '/product', name: 'Product' },

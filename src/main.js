@@ -1,5 +1,6 @@
 //import './assets/main.css'
 import './assets/input.css'
+import './index.css'
 //import './assets/global.css'
 
 
