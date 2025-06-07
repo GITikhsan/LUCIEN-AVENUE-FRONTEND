@@ -4,8 +4,8 @@ const items = [
   { to: '/',          name: 'Fashion' },
   { to: '/login', name: 'Login' },
   { to: '/register',name: 'Register' },
-  { to: '/portofolio', name: 'Portofolio' },
-  { to: '/skills',    name: 'Keahlian' },
+  { to: '/userProfile', name: 'Profile' },
+  { to: '/userSetting',    name: 'Setting' },
   { to: '/AboutUs',   name: 'About Us' }
 ]
 </script>
