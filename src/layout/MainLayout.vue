@@ -4,7 +4,7 @@ const items = [
   { to: '/',          name: 'Fashion' },
   { to: '/login', name: 'Login' },
   { to: '/register',name: 'Register' },
-  { to: '/portfolio', name: 'Portofolio' },
+  { to: '/portofolio', name: 'Portofolio' },
   { to: '/skills',    name: 'Keahlian' },
   { to: '/AboutUs',   name: 'About Us' }
 ]
