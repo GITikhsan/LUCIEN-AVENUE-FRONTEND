@@ -1,30 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import Home       from '@/views/Home.vue'
-import AboutUs  from '@/views/AboutUs.vue'
-<<<<<<< Updated upstream
-import ViewMore from '@/views/ViewMore.vue'
-=======
-import Experience from '@/views/Experience.vue'
->>>>>>> Stashed changes
-import Product  from '@/views/Product.vue'
+import Register from '@/views/auth/Register.vue'
+import Login from '@/views/auth/Login.vue'
+import Portfolio  from '@/views/Portfolio.vue'
 import Skills     from '@/views/Skills.vue'
-import Contact    from '@/views/Contact.vue'
-import Fashion    from '@/views/Fashion.vue'
+import AboutUs    from '@/views/AboutUs.vue'
 
 const routes = [
-  { path: '/',          name: 'Tentang',    component: Home },
-  { path: '/aboutus', name: 'aboutus', component: AboutUs },
-<<<<<<< Updated upstream
-  { path: '/viewmore',name: 'viewmore', component: ViewMore },
-  { path: '/product', name: 'Product', component: Product },
-=======
-  { path: '/experience',name: 'Pengalaman', component: Experience },
-  { path: '/product', name: 'product', component: Product },
->>>>>>> Stashed changes
+  { path: '/',          name: 'Fashion',    component: Home },
+  { path: '/login', name: 'Login', component: Login },
+  { path: '/register',name: 'Register', component: Register },
+  { path: '/portfolio', name: 'Portofolio', component: Portfolio },
   { path: '/skills',    name: 'Keahlian',   component: Skills },
-  { path: '/contact',   name: 'Kontak',     component: Contact },
-  { path: '/Fashion',   name: 'Fashion',     component: Fashion },
+  { path: '/AboutUs',   name: 'About Us',     component: AboutUs }
 ]
 
 export default createRouter({
@@ -32,4 +21,3 @@ export default createRouter({
   routes,
   scrollBehavior: () => ({ top: 0 })
 })
-

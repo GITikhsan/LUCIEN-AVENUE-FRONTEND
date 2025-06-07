@@ -1,24 +1,16 @@
-//import './assets/main.css'
-import './assets/input.css'
-import './index.css'
-//import './assets/global.css'
-
-
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
-// import 'animate.css'
-// import 'aos/dist/aos.css'
-//import AOS from 'aos'
 
-// Buat dulu instance app
-const app = createApp(App)
 
-// Pasang plugin/router
-app.use(router)
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap-icons/font/bootstrap-icons.css'
+import 'animate.css'
+import 'aos/dist/aos.css'
+import './assets/global.css'
 
-// Mount ke elemen root
-app.mount('#app')
+import AOS from 'aos'
 
-// Inisialisasi AOS setelah mounting (jika digunakan)
-//AOS.init({ duration: 800, once: true })
+createApp(App).use(router).mount('#app')
+
+AOS.init({ duration: 800, once: true })
