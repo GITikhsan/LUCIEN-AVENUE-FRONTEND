@@ -1,50 +1,48 @@
+
+<script setup>
+const userName = 'Nama Pengguna'
+
+const menuItems = [
+  { to: '/mydata', label: 'My data' },
+  { to: '/myPurchases',  label: 'My Purchases' },
+  {  to: '/address', label: 'Address' },
+  { to: '/help', label: 'Help' },
+]
+</script>
+
+<style scoped>
+.font-serif {
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+</style>
+
 <template>
-  <div class="d-flex flex-column flex-md-row h-100">
-    <!-- Sidebar -->
-    <div :class="['bg-white border-end', sidebarOpen ? 'd-block' : 'd-none d-md-block']" style="width: 250px; min-height: 100vh;">
-      <div class="text-center py-4 border-bottom">
-        <h5>Your Profile</h5>
+  <div class="container py-5 text-center">
+    <!-- Nama Pengguna -->
+    <h1 class="display-4 fw-normal font-serif mb-5">{{ userName }}</h1>
+
+    <!-- Bantuan Singkat -->
+    <div class="text-start mx-auto" style="max-width: 520px">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <strong class="text-uppercase small">Bantuan</strong>
+        <a href="#" class="text-decoration-underline small fw-medium">Lihat lainnya</a>
       </div>
-      <ul class="nav flex-column p-3">
-        <li class="nav-item" v-for="item in menuItems" :key="item">
-          <a href="#" class="nav-link" :class="{ active: currentPanel === item }" @click.prevent="currentPanel = item">
-            {{ item }}
-          </a>
-        </li>
-        <li class="nav-item mt-4">
-          <button class="btn btn-outline-danger w-100">Log Out</button>
-        </li>
-      </ul>
+      <p class="mb-1">Bagaimana saya dapat membayar pembelian online saya?</p>
+      <p class="mb-4">Berapa ukuran saya?</p>
     </div>
 
-    <!-- Main Content -->
-    <div class="flex-grow-1 p-4 overflow-auto">
-      <button class="btn btn-outline-secondary d-md-none mb-3" @click="sidebarOpen = !sidebarOpen">
-        ☰ Menu
-      </button>
-      <component :is="panelComponents[currentPanel]"></component>
+    <!-- Daftar Navigasi -->
+    <div class="mx-auto text-start" style="max-width: 520px">
+      <RouterLink
+      v-for="(item, idx) in menuItems"
+      :key="idx"
+      :to="item.to"
+      class="d-flex justify-content-between align-items-center py-3 border-top text-decoration-none text-dark">
+      <strong class="text-uppercase small m-0">{{ item.label }}</strong>
+      <i class="bi bi-arrow-right"></i>
+    </RouterLink>
+
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-
-// Panel state
-const currentPanel = ref('DATA SAYA')
-const sidebarOpen = ref(false)
-
-// Menu items
-const menuItems = ['DATA SAYA', 'PEMBELIAN SAYA', 'PENGEMBALIAN']
-
-// Panel Components
-import DataSaya from '../../components/Data.vue'
-import PembelianSaya from '../../components/Pembelian.vue'
-import Pengembalian from '../../components/Pengembalian.vue'
-
-const panelComponents = {
-  'DATA SAYA': DataSaya,
-  'PEMBELIAN SAYA': PembelianSaya,
-  'PENGEMBALIAN': Pengembalian
-}
-</script>

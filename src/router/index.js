@@ -14,9 +14,12 @@ import Forgot    from '@/views/auth/Forgot.vue'
 import OTP    from '@/views/auth/OTP.vue'
 
 
-// import Data    from '@/components/Data.vue'
-// import Pembelian    from '@/components/Pembelian.vue'
-// import Pengembalian from '@/components/Pengembalian.vue'
+import MyData    from '@/components/UserSetting/MyData.vue'
+import MyPurchases    from '@/components/UserSetting/MyPurchases.vue'
+import Address from '@/components/UserSetting/Address.vue'
+import Help from '@/components/UserSetting/Help.vue'
+import AddAddress from '@/components/UserSetting/AddAddress.vue'
+import EditAddress from '@/components/UserSetting/EditAddress.vue'
 
 const routes = [
   { path: '/',          name: 'Fashion',    component: Home },
@@ -28,15 +31,17 @@ const routes = [
   { path: '/otp',name: 'OTP', component: OTP },
 
 
-  // { path: '/data', name: 'Data', component: Data },
-  // { path: '/pembelian',name: 'Pembelian', component: Pembelian },
-  // { path: '/pengembalian',name: 'Pengembalian', component: Pengembalian},
+  { path: '/mydata', name: 'My Data', component: MyData },
+  { path: '/myPurchases', name: 'My Purchases', component: MyPurchases },
+  { path: '/address', name: 'Address', component: Address },
+  { path: '/help', name: 'Help', component: Help },
+  { path: '/addAddress', name: 'Add Address', component: AddAddress },
+   { path: '/editAddress', name: 'Edit Address', component: EditAddress },
 
-
-  { path: '/UserProfile', name: 'Profile', component: UserProfile },
-  { path: '/UserSetting',    name: 'Setting',   component: UserSetting },
-  { path: '/AboutUs',   name: 'About Us',     component: AboutUs },
-  { path: '/Product',   name: 'Product',     component: Product }
+  { path: '/userProfile', name: 'Profile', component: UserProfile },
+  { path: '/userSetting',    name: 'Setting',   component: UserSetting },
+  { path: '/aboutUs',   name: 'About Us',     component: AboutUs },
+  { path: '/product',   name: 'Product',     component: Product }
 ]
 
 export default createRouter({

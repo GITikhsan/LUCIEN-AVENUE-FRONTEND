@@ -5,8 +5,7 @@ const items = [
   { to: '/login', name: 'Login' },
   { to: '/register',name: 'Register' },
   { to: '/userProfile', name: 'Profile' },
-  { to: '/userSetting',    name: 'Setting' },
-  { to: '/AboutUs',   name: 'About Us' }
+  { to: '/aboutUs',   name: 'About Us' }
 ]
 </script>
 
