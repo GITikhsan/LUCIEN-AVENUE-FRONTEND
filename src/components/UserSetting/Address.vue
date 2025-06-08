@@ -11,7 +11,7 @@ const menuItems = [
     <div class="mx-auto text-start border p-4" style="max-width: 640px;">
       <div class="d-flex justify-content-between mb-2">
         <div>
-          <p class="mb-1 fw-medium">Ikhsanuddin Kaslan</p>
+          <p class="mb-1 fw-medium">Ikhsan</p>
           <p class="mb-1">ikhsanfauzi537@gmail.com</p>
           <p class="mb-1">+62 81233466631</p>
           <p class="mb-1">

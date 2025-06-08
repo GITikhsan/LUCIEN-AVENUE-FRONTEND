@@ -25,7 +25,7 @@ function togglePassword() {
           <h2 class="h4 fw-semibold mb-2">Register</h2>
           <p class="text-muted small">
             Already have an account?
-            <a href="/register" class="text-success fw-bold text-decoration-none">Login here</a>
+            <a href="/Login" class="text-success fw-bold text-decoration-none">Login here</a>
           </p>
         </div>
 

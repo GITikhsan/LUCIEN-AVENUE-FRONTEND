@@ -12,6 +12,7 @@ import AboutUs    from '@/views/User/AboutUs.vue'
 import Product    from '@/views/product/Product.vue'
 import Forgot    from '@/views/auth/Forgot.vue'
 import OTP    from '@/views/auth/OTP.vue'
+import ViewMore    from '@/views/User/ViewMore.vue'
 
 
 import MyData    from '@/components/UserSetting/MyData.vue'
@@ -41,6 +42,7 @@ const routes = [
   { path: '/userProfile', name: 'Profile', component: UserProfile },
   { path: '/userSetting',    name: 'Setting',   component: UserSetting },
   { path: '/aboutUs',   name: 'About Us',     component: AboutUs },
+  { path: '/viewMore',   name: 'View More',     component: ViewMore },
   { path: '/product',   name: 'Product',     component: Product }
 ]
 

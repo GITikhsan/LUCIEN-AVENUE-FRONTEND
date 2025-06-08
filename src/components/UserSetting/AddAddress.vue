@@ -43,9 +43,9 @@ import { ref } from 'vue'
 const form = ref({
   name: '',
   surname: '',
-  email: 'test@gmail.com',
+  email: '',
   mobile: '',
-  country: 'Indonesia',
+  country: '',
   address: '',
   state: '',
   city: '',

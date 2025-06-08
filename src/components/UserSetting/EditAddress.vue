@@ -2,8 +2,8 @@
 import { ref } from 'vue'
 
 const form = ref({
-  name: 'Ikhsanuddin',
-  surname: 'Kaslan',
+  name: 'Ikhsan',
+  surname: ' ',
   email: 'ikhsanfauzi537@gmail.com',
   mobile: '81233466631',
   country: 'Indonesia',

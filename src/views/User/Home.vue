@@ -29,7 +29,7 @@ import { onMounted } from 'vue'
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
-              <a href="4,240" class="btn btn-outline-secondary w-100">Detail</a>
+              <a href="Product" class="btn btn-outline-secondary w-100">Detail</a>
             </div>
           </div>
         </div>
@@ -39,7 +39,7 @@ import { onMounted } from 'vue'
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
-              <a href="4,240" class="btn btn-outline-secondary w-100">Detail</a>
+              <a href="Product" class="btn btn-outline-secondary w-100">Detail</a>
             </div>
           </div>
         </div>
@@ -49,7 +49,7 @@ import { onMounted } from 'vue'
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
-              <a href="4,240" class="btn btn-outline-secondary w-100">Detail</a>
+              <a href="Product" class="btn btn-outline-secondary w-100">Detail</a>
             </div>
           </div>
         </div>
@@ -59,7 +59,7 @@ import { onMounted } from 'vue'
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
-              <a href="4,240" class="btn btn-outline-secondary w-100">Detail</a>
+              <a href="Product" class="btn btn-outline-secondary w-100">Detail</a>
             </div>
           </div>
         </div>
@@ -132,7 +132,7 @@ import { onMounted } from 'vue'
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
-              <a href="4,240" class="btn btn-outline-secondary w-100">Detail</a>
+              <a href="Product" class="btn btn-outline-secondary w-100">Detail</a>
             </div>
           </div>
         </div>
@@ -142,7 +142,7 @@ import { onMounted } from 'vue'
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
-              <a href="4,240" class="btn btn-outline-secondary w-100">Detail</a>
+              <a href="Product" class="btn btn-outline-secondary w-100">Detail</a>
             </div>
           </div>
         </div>
@@ -152,7 +152,7 @@ import { onMounted } from 'vue'
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
-              <a href="4,240" class="btn btn-outline-secondary w-100">Detail</a>
+              <a href="Product" class="btn btn-outline-secondary w-100">Detail</a>
             </div>
           </div>
         </div>
@@ -162,7 +162,7 @@ import { onMounted } from 'vue'
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
-              <a href="4,240" class="btn btn-outline-secondary w-100">Detail</a>
+              <a href="Product" class="btn btn-outline-secondary w-100">Detail</a>
             </div>
           </div>
         </div>  
@@ -214,7 +214,7 @@ import { onMounted } from 'vue'
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
-              <a href="4,240" class="btn btn-outline-secondary w-100">Detail</a>
+              <a href="Product" class="btn btn-outline-secondary w-100">Detail</a>
             </div>
           </div>
         </div>
@@ -224,7 +224,7 @@ import { onMounted } from 'vue'
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
-              <a href="4,240" class="btn btn-outline-secondary w-100">Detail</a>
+              <a href="Product" class="btn btn-outline-secondary w-100">Detail</a>
             </div>
           </div>
         </div>
@@ -234,7 +234,7 @@ import { onMounted } from 'vue'
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
-              <a href="4,240" class="btn btn-outline-secondary w-100">Detail</a>
+              <a href="Product" class="btn btn-outline-secondary w-100">Detail</a>
             </div>
           </div>
         </div>
@@ -244,7 +244,7 @@ import { onMounted } from 'vue'
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
-              <a href="4,240" class="btn btn-outline-secondary w-100">Detail</a>
+              <a href="Product" class="btn btn-outline-secondary w-100">Detail</a>
             </div>
           </div>
         </div>  

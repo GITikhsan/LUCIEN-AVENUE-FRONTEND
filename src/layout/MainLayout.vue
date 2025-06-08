@@ -1,30 +1,50 @@
+
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 const items = [
-  { to: '/',          name: 'Fashion' },
+  { to: '/',          name: 'Home' },
   { to: '/login', name: 'Login' },
   { to: '/register',name: 'Register' },
   { to: '/userProfile', name: 'Profile' },
+  { to: '/bag', name: 'Bag' },
   { to: '/aboutUs',   name: 'About Us' }
 ]
 </script>
 
 <template>
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top py-3">
     <div class="container">
-      <RouterLink class="navbar-brand" to="/">LUCIEN AVENUE</RouterLink>
+     <RouterLink class="navbar-brand mx-auto fw-bold text-uppercase font-serif" style="letter-spacing: 2px" to="/">
+        Lucien Avenue
+      </RouterLink>
       
       <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
         <span class="navbar-toggler-icon"></span>
       </button>
+
       <div id="nav" class="collapse navbar-collapse">
-        <ul class="navbar-nav ms-auto">
-          <li v-for="i in items" :key="i.to" class="nav-item">
-            <RouterLink class="nav-link" :to="i.to">{{ i.name }}</RouterLink>
-          </li>
-        </ul>
-      </div>
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li v-for="i in items" :key="i.to" class="nav-item">
+          <RouterLink class="nav-link" :to="i.to">{{ i.name }}</RouterLink>
+        </li>
+        <!-- Search Form -->
+        <li class="nav-item ms-3">
+          <form class="d-flex" @submit.prevent="handleSearch">
+            <input
+              v-model="searchQuery"
+              class="form-control"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+            />
+            <button class="btn btn-outline-dark ms-2" type="submit">
+              <i class="bi bi-search"></i>
+            </button>
+          </form>
+        </li>
+      </ul>
+    </div>
     </div>
   </nav>
 
