@@ -93,7 +93,7 @@ import { onMounted } from 'vue'
   </div> --> 
   <section>
      <div class="position-relative w-100 vh-100 bg-cover bg-center d-flex align-items-center justify-content-center text-center text-white"
-     style="background-image: url('/public/images/fashion/sepatu3.png'); background-size: cover; background-position: center;">
+     style="background-image: url('/public/images/fashion/Men.JPG'); background-size: cover; background-position: center;">
     
     <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
     
