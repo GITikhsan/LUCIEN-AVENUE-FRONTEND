@@ -47,7 +47,7 @@ const routes = [
   { path: '/viewMore',   name: 'View More',     component: ViewMore },
   { path: '/product',   name: 'Product',     component: Product },
   { path: '/payment',   name: 'Payment',     component: Payment },
-  { path: '/Admin',   name: 'Admin',     component: Admin }
+  { path: '/admin',   name: 'Admin',     component: Admin }
 ]
 
 export default createRouter({
