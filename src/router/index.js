@@ -39,7 +39,7 @@ const routes = [
   { path: '/address', name: 'Address', component: Address },
   { path: '/help', name: 'Help', component: Help },
   { path: '/addAddress', name: 'Add Address', component: AddAddress },
-   { path: '/editAddress', name: 'Edit Address', component: EditAddress },
+  { path: '/editAddress', name: 'Edit Address', component: EditAddress },
 
   { path: '/userProfile', name: 'Profile', component: UserProfile },
   { path: '/userSetting',    name: 'Setting',   component: UserSetting },
