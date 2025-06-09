@@ -21,6 +21,7 @@ import Address from '@/components/UserSetting/Address.vue'
 import Help from '@/components/UserSetting/Help.vue'
 import AddAddress from '@/components/UserSetting/AddAddress.vue'
 import EditAddress from '@/components/UserSetting/EditAddress.vue'
+import Payment from '@/views/payment/Payment.vue'
 import Admin from '@/views/admin/Admin.vue'
 
 const routes = [
@@ -45,7 +46,7 @@ const routes = [
   { path: '/aboutUs',   name: 'About Us',     component: AboutUs },
   { path: '/viewMore',   name: 'View More',     component: ViewMore },
   { path: '/product',   name: 'Product',     component: Product },
-
+  { path: '/payment',   name: 'Payment',     component: Payment },
   { path: '/Admin',   name: 'Admin',     component: Admin }
 ]
 
