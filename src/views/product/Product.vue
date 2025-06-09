@@ -54,6 +54,26 @@ const similarProducts = ref([
     name: 'Air Jordan 1 Low Chloropyll',
     price: 'IDR 1,240,000',
     image: '/images/1JT/1,240,000(1).png'
+  },
+  {
+    name: 'Air Jordan 1 Low Chloropyll',
+    price: 'IDR 1,240,000',
+    image: '/images/1JT/1,240,000(1).png'
+  },
+  {
+    name: 'Air Jordan 1 Low Chloropyll',
+    price: 'IDR 1,240,000',
+    image: '/images/1JT/1,240,000(1).png'
+  },
+  {
+    name: 'Air Jordan 1 Low Chloropyll',
+    price: 'IDR 1,240,000',
+    image: '/images/1JT/1,240,000(1).png'
+  },
+  {
+    name: 'Air Jordan 1 Low Chloropyll',
+    price: 'IDR 1,240,000',
+    image: '/images/1JT/1,240,000(1).png'
   }
 ])
 </script>
@@ -82,6 +102,57 @@ const similarProducts = ref([
 .carousel-control-next {
   width: 50px;
 }
+
+.product-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  padding: 16px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.product-image-wrapper {
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.product-image {
+  max-height: 180px; /* diperbesar */
+  width: 100%;
+  object-fit: contain;
+}
+
+.product-info {
+  padding: 0 4px;
+}
+
+.product-title {
+  font-size: 16px; /* diperbesar */
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 6px 0;
+}
+
+.product-price {
+  font-weight: bold;
+  color: #007b33;
+  font-size: 15px;
+  margin: 0;
+}
+
 </style>
 
 <template>
@@ -114,56 +185,62 @@ const similarProducts = ref([
       <div class="col-md-6">
         <h2 class="h4 fw-semibold">{{ product.name }}</h2>
 
-        <div class="mb-3">
-          <p class="small text-muted">PRICE</p>
-          <div class="d-flex align-items-start gap-2">
-            <p class="h5 fw-bold text-dark">{{ product.price }}</p>
-            <span class="badge bg-danger">-{{ product.discount }}%</span>
-          </div>
-          <p class="text-muted text-decoration-line-through">{{ product.originalPrice }}</p>
+        <div class="mt-5 mb-4">
+        <!-- Label "PRICE" -->
+        <p class="text-uppercase text-muted fw-medium small mb-2" style="letter-spacing: 0.05em;">
+          Price
+        </p>
+
+        <!-- Harga dan Diskon -->
+        <div class="d-flex align-items-baseline gap-2">
+          <p class="h4 fw-semibold text-dark mb-0">IDR {{ product.price }}</p>
+          <span class="badge rounded-pill bg-danger small py-1 px-2">-{{ product.discount }}%</span>
         </div>
+
+        <!-- Harga Coret -->
+        <p class="text-muted text-decoration-line-through mt-1 mb-0" style="font-size: 0.9rem;">
+          IDR {{ product.originalPrice }}
+        </p>
+      </div>
+
 
         <!-- Size -->
-        <div class="mb-3">
-          <label class="form-label">Select Size</label>
-          <div class="d-flex flex-wrap gap-2">
-            <button
-            v-for="size in product.sizes"
-            :key="size"
-            :class="['btn btn-outline-secondary btn-sm rounded-pill px-3', { active: selectedSize === size }]"
-            @click="selectedSize = size">
-            {{ size }}
-            </button>
+  <div class="mt-4">
+    <label class="form-label fw-medium">Select Size</label>
+    <div class="d-flex flex-wrap gap-2">
+      <button
+        v-for="size in product.sizes"
+        :key="size"
+        :class="['btn border rounded-3', selectedSize === size ? 'btn-dark text-white' : 'btn-light']"
+        @click="selectedSize = size"
+        style="width: 48px; height: 38px;"
+      >
+        {{ size }}
+      </button>
+    </div>
+  </div>
 
-          </div>
-          <small class="text-muted mt-2 d-block">Selected: {{ selectedSize || '-' }}</small>
-        </div>
+  <!-- Quantity -->
+  <div class="mt-4">
+    <label class="form-label fw-medium">Quantity</label>
+    <div class="input-group" style="max-width: 140px;">
+      <button class="btn btn-light border" @click="decreaseQty">−</button>
+      <input
+        v-model.number="quantity"
+        type="number"
+        class="form-control text-center border-start-0 border-end-0"
+        style="background-color: #fafafa"
+        min="1"
+      />
+      <button class="btn btn-light border" @click="increaseQty">+</button>
+    </div>
+  </div>
 
-        <!-- Quantity -->
-        <div class="mb-3">
-          <label class="form-label">Quantity</label>
-          <div class="input-group w-auto">
-            <button class="btn btn-outline-dark" @click="decreaseQty">-</button>
-            <input
-              type="number"
-              v-model.number="quantity"
-              class="form-control text-center"
-              style="width: 60px"
-              min="1"
-            />
-            <button class="btn btn-outline-dark" @click="increaseQty">+</button>
-          </div>
-        </div>
-
-        <!-- Buttons -->
-        <div class="row g-2">
-        <div class="col-md-6">
-            <button class="btn btn-dark w-100 py-2">Add to Cart</button>
-        </div>
-        <div class="col-md-6">
-            <button class="btn btn-warning w-100 py-2">Buy Now</button>
-        </div>
-        </div>
+  <!-- Buttons -->
+  <div class="d-flex gap-3 mt-4">
+    <button class="btn btn-dark w-100 py-2 rounded-pill">Add to Cart</button>
+    <button class="btn btn-warning w-100 py-2 rounded-pill text-dark fw-semibold">Buy Now</button>
+  </div>
 
         <!-- Accordion -->
         <div class="accordion mt-4" id="accordionInfo">
@@ -233,19 +310,27 @@ const similarProducts = ref([
     </div>
 
     <!-- Similar Products -->
-    <div class="mt-5">
-      <h3 class="text-center fw-bold mb-4">Similar Products</h3>
-      <div class="row row-cols-2 row-cols-md-4 g-4">
-        <div class="col" v-for="(item, idx) in similarProducts" :key="idx">
-          <div class="card h-100">
-            <img :src="item.image" class="card-img-top" alt="..." />
-            <div class="card-body">
-              <h6 class="card-title">{{ item.name }}</h6>
-              <p class="text-success fw-bold">{{ item.price }}</p>
-            </div>
-          </div>
+    <div class="container mt-5">
+  <h3 class="text-center fw-bold mb-4">Similar Products</h3>
+  <div class="row row-cols-2 row-cols-md-4 g-4">
+    <div class="col" v-for="(item, idx) in similarProducts.slice(0, 8)" :key="idx">
+      <div class="product-card">
+        <div class="product-image-wrapper">
+          <img :src="item.image" alt="Product Image" class="product-image" />
+        </div>
+        <div class="product-info text-start">
+          <p class="product-title">{{ item.name }}</p>
+          <p class="product-price">IDR {{ item.price }}</p>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+
+
+
+
+
   </div>
 </template>
