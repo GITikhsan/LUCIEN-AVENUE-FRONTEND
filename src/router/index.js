@@ -5,7 +5,6 @@ import Register from '@/views/auth/Register.vue'
 import Login from '@/views/auth/Login.vue'
 
 import UserProfile from '@/views/User/UserProfile.vue'
-import UserSetting from '@/views/User/UserSetting.vue'
 
 
 import AboutUs    from '@/views/User/AboutUs.vue'
@@ -42,12 +41,11 @@ const routes = [
   { path: '/editAddress', name: 'Edit Address', component: EditAddress },
 
   { path: '/userProfile', name: 'Profile', component: UserProfile },
-  { path: '/userSetting',    name: 'Setting',   component: UserSetting },
   { path: '/aboutUs',   name: 'About Us',     component: AboutUs },
   { path: '/viewMore',   name: 'View More',     component: ViewMore },
   { path: '/product',   name: 'Product',     component: Product },
   { path: '/payment',   name: 'Payment',     component: Payment },
-  { path: '/Admin',   name: 'Admin',     component: Admin }
+  { path: '/admin',   name: 'Admin',     component: Admin }
 ]
 
 export default createRouter({

@@ -57,8 +57,7 @@ const purchases = [
               <div class="text-danger fw-bold">Total: {{ item.total }}</div>
             </div>
           </div>
-          <hr />
-          <button class="btn btn-success btn-sm">Nilai</button>
+          <hr/>
         </div>
       </div>
     </div>
