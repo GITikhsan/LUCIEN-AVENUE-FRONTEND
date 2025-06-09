@@ -11,17 +11,17 @@ const sortOption = ref('')
 
 const sizes = [20, 21, 22, 23, 24, 25, 26, 27]
 const discounts = [
-  { label: 'Any', value: 'any', class: 'btn-outline-secondary' },
-  { label: '10%+', value: 10, class: 'btn-outline-success' },
-  { label: '25%+', value: 25, class: 'btn-outline-primary' },
-  { label: '50%+', value: 50, class: 'btn-outline-danger' },
+  { label: 'Any', value: 'any' },
+  { label: '10%+', value: 10 },
+  { label: '25%+', value: 25 },
+  { label: '50%+', value: 50 }
 ]
 const priceRanges = [
-  { value: '0-1000000', label: '💸 Below IDR 1.000.000' },
-  { value: '1000000-3000000', label: '💰 IDR 1.000.000 – 3.000.000' },
-  { value: '3000000-5000000', label: '💼 IDR 3.000.000 – 5.000.000' },
-  { value: '5000000-10000000', label: '💎 IDR 5.000.000 – 10.000.000' },
-  { value: '10000000+', label: '🛍️ Above IDR 10.000.000' },
+  { value: '0-1000000', label: 'Below IDR 1.000.000' },
+  { value: '1000000-3000000', label: 'IDR 1.000.000 – 3.000.000' },
+  { value: '3000000-5000000', label: 'IDR 3.000.000 – 5.000.000' },
+  { value: '5000000-10000000', label: 'IDR 5.000.000 – 10.000.000' },
+  { value: '10000000+', label: 'Above IDR 10.000.000' },
 ]
 const colors = ['green', 'blue', 'pink', 'red', 'purple', 'yellow', 'maroon']
 const brands = ['Nike', 'Adidas', 'Air Jordan', 'Yeezy', 'New Balance']
@@ -29,120 +29,438 @@ const brands = ['Nike', 'Adidas', 'Air Jordan', 'Yeezy', 'New Balance']
 const products = ref([
   {
     id: 1,
-    name: 'Yeezy Boost 350 V2 Dazling Blue (Toddler)',
+    name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
     image: '/images/youth adidas/2,920,000(1).webp',
     price: 'IDR 2,920,000',
     discount: 10,
     brand: 'Yeezy'
   },
-  // ...tambah produk lain
+  {
+    id: 2,
+    name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
+    image: '/images/youth adidas/2,920,000(1).webp',
+    price: 'IDR 2,920,000',
+    discount: 10,
+    brand: 'Yeezy'
+  },
+  {
+    id: 3,
+    name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
+    image: '/images/youth adidas/2,920,000(1).webp',
+    price: 'IDR 2,920,000',
+    discount: 10,
+    brand: 'Yeezy'
+  },
+  {
+    id: 4,
+    name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
+    image: '/images/youth adidas/2,920,000(1).webp',
+    price: 'IDR 2,920,000',
+    discount: 10,
+    brand: 'Yeezy'
+  },
+  {
+  id: 5,
+    name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
+    image: '/images/youth adidas/2,920,000(1).webp',
+    price: 'IDR 2,920,000',
+    discount: 10,
+    brand: 'Yeezy'
+  },
+  {
+  id: 6,
+    name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
+    image: '/images/youth adidas/2,920,000(1).webp',
+    price: 'IDR 2,920,000',
+    discount: 10,
+    brand: 'Yeezy'
+  },
+  {
+  id: 7,
+    name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
+    image: '/images/youth adidas/2,920,000(1).webp',
+    price: 'IDR 2,920,000',
+    discount: 10,
+    brand: 'Yeezy'
+  },
+  {
+  id: 8,
+    name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
+    image: '/images/youth adidas/2,920,000(1).webp',
+    price: 'IDR 2,920,000',
+    discount: 10,
+    brand: 'Yeezy'
+  },
+  {
+  id: 9,
+    name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
+    image: '/images/youth adidas/2,920,000(1).webp',
+    price: 'IDR 2,920,000',
+    discount: 10,
+    brand: 'Yeezy'
+  },
 ])
 
 const filteredProducts = computed(() => {
-  return products.value.filter(p => {
-    return true // filter logic bisa ditambahkan
-  })
+  return products.value // filter logic bisa ditambahkan nanti
 })
 </script>
 
-<style scoped>
-.card .position-absolute {
-  font-size: 0.75rem;
-  border-radius: 0 0.5rem 0.5rem 0;
-}
-</style>
-
-
 <template>
-  <div class="container py-4">
-    <div class="row">
-      <!-- Sidebar Filter -->
-      <div class="col-lg-3 mb-4">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Select Gender</h5>
-            <div class="btn-group w-100 mb-3" role="group">
-              <input type="radio" class="btn-check" name="gender" id="men" value="men" v-model="gender">
-              <label class="btn btn-outline-secondary" for="men">Men</label>
+  <div class="container-fluid py-5">
+    <div class="d-flex gap-4">
+      <!-- Sidebar -->
+      <aside class="sidebar-filter p-4 bg-white border rounded shadow-sm">
+        <h6 class="fw-semibold mb-3">Select Gender</h6>
+        <div class="d-flex justify-content-between mb-4 gap-2">
+          <button
+            class="btn w-100 fw-semibold border"
+            :class="gender === 'men' ? 'btn-men-active' : 'btn-men'"
+            @click="gender = 'men'"
+          >
+            Men
+          </button>
 
-              <input type="radio" class="btn-check" name="gender" id="women" value="women" v-model="gender">
-              <label class="btn btn-outline-secondary" for="women">Women</label>
+          <button
+            class="btn w-100 fw-semibold border"
+            :class="gender === 'women' ? 'btn-women-active' : 'btn-women'"
+            @click="gender = 'women'"
+          >
+            Women
+          </button>
 
-              <input type="radio" class="btn-check" name="gender" id="youth" value="youth" v-model="gender">
-              <label class="btn btn-outline-secondary" for="youth">Youth</label>
-            </div>
+          <button
+            class="btn w-100 fw-semibold border"
+            :class="gender === 'youth' ? 'btn-youth-active' : 'btn-youth'"
+            @click="gender = 'youth'"
+          >
+            Youth
+          </button>
+        </div>
 
-            <h5 class="card-title">Size</h5>
-            <div class="row g-2">
-              <div class="col-3" v-for="n in sizes" :key="n">
-                <input type="radio" class="btn-check" :id="'size'+n" name="size" :value="n" v-model="size">
-                <label class="btn btn-outline-dark w-100" :for="'size'+n">{{ n }}</label>
-              </div>
-            </div>
 
-            <h5 class="card-title mt-4">Discount</h5>
-            <div class="d-flex flex-wrap gap-2">
-              <div v-for="d in discounts" :key="d.label">
-                <input type="radio" class="btn-check" :id="'discount'+d.value" name="discount" :value="d.value" v-model="discount">
-                <label class="btn" :class="d.class" :for="'discount'+d.value">{{ d.label }}</label>
-              </div>
-            </div>
-
-            <h5 class="card-title mt-4">Price Range</h5>
-            <select class="form-select" v-model="priceRange">
-              <option disabled value="">Select a range</option>
-              <option v-for="range in priceRanges" :value="range.value" :key="range.value">
-                {{ range.label }}
-              </option>
-            </select>
-
-            <h5 class="card-title mt-4">Color</h5>
-            <div class="d-flex flex-wrap gap-2">
-              <div v-for="(color, i) in colors" :key="i" class="form-check">
-                <input class="form-check-input" type="checkbox" :id="'color'+i" :value="color" v-model="selectedColors">
-                <label class="form-check-label" :for="'color'+i">
-                  <span class="d-inline-block rounded-circle" :style="'width:20px;height:20px;background:'+color"></span>
-                </label>
-              </div>
-            </div>
-
-            <h5 class="card-title mt-4">Brands</h5>
-            <div v-for="(brand, i) in brands" :key="brand" class="form-check">
-              <input class="form-check-input" type="checkbox" :id="'brand'+i" :value="brand" v-model="selectedBrands">
-              <label class="form-check-label" :for="'brand'+i">{{ brand }}</label>
-            </div>
-
+        <h6 class="fw-semibold mb-3">Size</h6>
+        <div class="row g-2 mb-4">
+          <div class="col-3" v-for="n in sizes" :key="n">
+            <input
+              type="radio"
+              class="visually-hidden"
+              :id="'size' + n"
+              name="size"
+              :value="n"
+              v-model="size"
+            >
+            <label
+              class="btn w-100 py-2 size-tile text-center"
+              :for="'size' + n"
+              :class="{ active: size === n }"
+            >
+              {{ n }}
+            </label>
           </div>
         </div>
-      </div>
 
-      <!-- Produk -->
-      <div class="col-lg-9">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h4>Available Sneakers</h4>
-          <select class="form-select w-auto" v-model="sortOption">
-            <option disabled value="">Sort by</option>
-            <option>Featured Items</option>
-            <option>Price: Low to High</option>
-            <option>Price: High to Low</option>
-            <option>Newest</option>
+
+        <h6 class="fw-semibold mb-3">Discount</h6>
+        <div class="row row-cols-2 g-3 mb-4">
+          <div class="col-6 col-md-3" v-for="d in discounts" :key="d.label">
+            <input
+              type="radio"
+              class="btn-check"
+              :id="'discount' + d.value"
+              name="discount"
+              :value="d.value"
+              v-model="discount"
+            >
+            <label
+              class="btn w-100 py-2 text-white fw-semibold glow-anim"
+              :for="'discount' + d.value"
+              :class="[
+                discount === d.value ? 'selected' : '',
+                {
+                  'bg-success': d.value === 10,
+                  'bg-primary': d.value === 25,
+                  'bg-danger': d.value === 50,
+                  'bg-secondary': d.value === 'any'
+                }
+              ]"
+            >
+              {{ d.label }}
+            </label>
+          </div>
+        </div>
+
+
+        <!-- Price Range -->
+        <h6 class="fw-semibold mb-3">Price Range</h6>
+        <div class="mb-4">
+          <select class="form-select shadow-sm rounded-3 border-dark" v-model="priceRange">
+            <option disabled value="">Select a range</option>
+            <option
+              v-for="range in priceRanges"
+              :value="range.value"
+              :key="range.value"
+            >
+              {{ range.label }}
+            </option>
           </select>
         </div>
 
-        <div class="row row-cols-2 row-cols-md-4 g-4">
-          <div class="col" v-for="product in filteredProducts" :key="product.id">
-            <div class="card h-100">
-              <div class="position-absolute top-0 start-0 bg-danger text-white px-2 py-1 small fw-bold">{{ product.discount }}%</div>
-              <img :src="product.image" class="card-img-top" :alt="product.name">
-              <div class="card-body">
-                <h6 class="card-title">{{ product.name }}</h6>
-                <p class="card-text text-success fw-bold">{{ product.price }}</p>
+        <h6 class="fw-semibold mb-3">Color</h6>
+          <div class="row g-3 mb-4">
+            <div
+              class="col-2 d-flex justify-content-center"
+              v-for="(color, i) in colors.slice(0, 6)"
+              :key="i"
+            >
+              <div class="position-relative">
+                <input
+                  class="visually-hidden"
+                  type="checkbox"
+                  :id="'color' + i"
+                  :value="color"
+                  v-model="selectedColors"
+                >
+                <label
+                  class="rounded-circle border"
+                  :for="'color' + i"
+                  :style="{
+                    backgroundColor: color,
+                    width: '34px',
+                    height: '34px',
+                    display: 'inline-block',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    transform: selectedColors.includes(color) ? 'scale(1.15)' : 'scale(1)',
+                    boxShadow: selectedColors.includes(color)
+                      ? '0 0 8px rgba(0, 0, 0, 0.4)'
+                      : 'none'
+                  }"
+                ></label>
               </div>
             </div>
           </div>
+
+
+        <h6 class="fw-semibold mb-2">Brands</h6>
+        <div v-for="(brand, i) in brands" :key="brand" class="form-check">
+          <input class="form-check-input" type="checkbox" :id="'brand'+i" :value="brand" v-model="selectedBrands">
+          <label class="form-check-label" :for="'brand'+i">{{ brand }}</label>
+        </div>
+      </aside>
+
+      <!-- Produk -->
+      <section class="flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="fw-bold">Available Sneakers</h5>
+          <div class="dropdown d-inline-block">
+            <button
+              class="btn btn-light border rounded-pill px-3 py-1 d-flex align-items-center gap-2 shadow-sm"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              style="font-size: 0.875rem; font-weight: 500; color: #333;"
+            >
+              <i class="bi bi-sliders2-vertical"></i>
+              {{ sortOption || 'Sort by' }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow rounded-4 p-1" style="min-width: 180px;">
+              <li><a class="dropdown-item rounded-2" href="#" @click.prevent="sortOption = 'Featured Items'">🌟 Featured Items</a></li>
+              <li><a class="dropdown-item rounded-2" href="#" @click.prevent="sortOption = 'Price: Low to High'">⬆️ Price: Low to High</a></li>
+              <li><a class="dropdown-item rounded-2" href="#" @click.prevent="sortOption = 'Price: High to Low'">⬇️ Price: High to Low</a></li>
+              <li><a class="dropdown-item rounded-2" href="#" @click.prevent="sortOption = 'Newest'">🆕 Newest</a></li>
+            </ul>
+          </div>
+
         </div>
 
+        <div class="row row-cols-2 row-cols-md-4 g-4">
+        <div class="col" v-for="product in filteredProducts" :key="product.id">
+          <div class="card h-100 border-0 shadow-sm position-relative rounded-4">
+            <!-- Badge Diskon -->
+            <div
+              class="position-absolute top-0 start-0 bg-danger text-white px-2 py-1 small rounded-end"
+              style="font-size: 0.75rem;"
+            >
+              {{ product.discount }}%
+            </div>
+
+            <!-- Gambar Produk -->
+            <div
+              class="p-3 d-flex justify-content-center align-items-center"
+              style="height: 200px;"
+            >
+              <img
+                :src="product.image"
+                class="img-fluid"
+                :alt="product.name"
+                style="max-height: 160px; object-fit: contain;"
+              />
+            </div>
+
+            <!-- Detail Produk -->
+            <div class="card-body px-3 pt-0 pb-3">
+              <!-- Set height tetap agar sejajar -->
+              <h6
+                class="card-title mb-1"
+                style="font-size: 0.9rem; height: 40px; overflow: hidden;"
+              >
+                {{ product.name }}
+              </h6>
+              <p class="text-success fw-bold mb-0" style="font-size: 0.95rem;">
+                {{ product.price }}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
+      </section>
     </div>
   </div>
 </template>
+
+<style scoped>
+.glow-anim {
+  transition: transform 0.25s ease, box-shadow 0.3s ease;
+}
+
+.selected {
+  transform: scale(1.08);
+  animation: glow 0.8s ease-in-out infinite alternate;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
+  }
+  to {
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.9);
+  }
+}
+
+.container-fluid {
+  padding-left: 3rem;
+  padding-right: 3rem;
+}
+
+.sidebar-filter {
+  width: 340px;
+  min-width: 320px;
+  flex-shrink: 0;
+}
+
+.card .position-absolute {
+  font-size: 0.75rem;
+}
+
+.btn.active {
+  background-color: #343a40;
+  color: white;
+}
+
+/* Tambahan: agar grid produk ada ruang */
+.row-cols-md-4 > * {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.product-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+/* Warna */
+.size-tile {
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f1f3f5, #dee2e6);
+  color: #212529;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.size-tile:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #e9ecef, #ced4da);
+}
+
+.size-tile.active {
+  background: linear-gradient(135deg, #4dabf7, #228be6);
+  color: white;
+  border-color: #228be6;
+  box-shadow: 0 4px 10px rgba(34, 139, 230, 0.4);
+  transform: scale(1.05);
+}
+
+/* Gender */
+.btn-men,
+.btn-women,
+.btn-youth {
+  background-color: #f8f9fa;
+  color: #333;
+  border-radius: 8px;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.btn-men-active {
+  background-color: #0d6efd !important;
+  color: #fff !important;
+  box-shadow: 0 0 6px rgba(13, 110, 253, 0.4);
+  transform: scale(1.03);
+}
+
+.btn-women-active {
+  background-color: #d63384 !important;
+  color: #fff !important;
+  box-shadow: 0 0 6px rgba(214, 51, 132, 0.4);
+  transform: scale(1.03);
+}
+
+.btn-youth-active {
+  background-color: #20c997 !important;
+  color: #fff !important;
+  box-shadow: 0 0 6px rgba(32, 201, 151, 0.4);
+  transform: scale(1.03);
+}
+
+.sidebar-filter {
+  width: 340px;
+  min-width: 320px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  padding-right: 0.5rem; /* agar isi sidebar tidak tertutup scrollbar */
+}
+
+/* Scrollbar elegan untuk WebKit (Chrome, Safari, Edge) */
+.sidebar-filter::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar-filter::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-filter::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar-filter::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Untuk Firefox */
+.sidebar-filter {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+
+</style>
+

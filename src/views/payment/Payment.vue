@@ -83,7 +83,7 @@ export default {
       alert(`Pembayaran melalui ${this.selectedMethod} sejumlah Rp ${this.formatPrice(this.price * this.quantity)}`);
     },
     goBack() {
-      this.$router.push("/cart");
+      this.$router.push("/product");
     },
   },
 };

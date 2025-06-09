@@ -22,6 +22,7 @@ import AddAddress from '@/components/UserSetting/AddAddress.vue'
 import EditAddress from '@/components/UserSetting/EditAddress.vue'
 import Payment from '@/views/payment/Payment.vue'
 import Admin from '@/views/admin/Admin.vue'
+import Bag from '@/views/payment/Bag.vue'
 
 const routes = [
   { path: '/',          name: 'Fashion',    component: Home },
@@ -45,7 +46,12 @@ const routes = [
   { path: '/viewMore',   name: 'View More',     component: ViewMore },
   { path: '/product',   name: 'Product',     component: Product },
   { path: '/payment',   name: 'Payment',     component: Payment },
+<<<<<<< HEAD
   { path: '/admin',   name: 'Admin',     component: Admin }
+=======
+  { path: '/admin',   name: 'Admin',     component: Admin },
+  { path: '/bag',   name: 'Bag',     component: Bag }
+>>>>>>> b732472299016b0440d7dce903fd9c80f06f07aa
 ]
 
 export default createRouter({
