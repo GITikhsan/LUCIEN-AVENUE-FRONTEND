@@ -145,7 +145,68 @@
           <div id="orderContent" class="text-center py-5 text-muted"></div>
         </div>
       </div>
-    `
+    `,
+    "promo": `
+  <div class="card">
+    <div class="card-header bg-warning text-dark">
+      <h5 class="mb-0">Input Promo</h5>
+    </div>
+    <div class="card-body">
+      <form id="promoForm">
+        <div class="mb-3">
+          <label for="promoName" class="form-label">Nama Promo</label>
+          <input type="text" class="form-control" id="promoName" required>
+        </div>
+        <div class="mb-3">
+          <label for="promoCode" class="form-label">Kode Promo</label>
+          <input type="text" class="form-control" id="promoCode" required>
+        </div>
+        <div class="mb-3">
+          <label for="promoDiscount" class="form-label">Diskon (%)</label>
+          <input type="number" class="form-control" id="promoDiscount" required>
+        </div>
+        <div class="mb-3">
+          <label for="promoStart" class="form-label">Tanggal Mulai</label>
+          <input type="date" class="form-control" id="promoStart" required>
+        </div>
+        <div class="mb-3">
+          <label for="promoEnd" class="form-label">Tanggal Berakhir</label>
+          <input type="date" class="form-control" id="promoEnd" required>
+        </div>
+        <button type="submit" class="btn btn-success">Simpan Promo</button>
+      </form>
+    </div>
+  </div>
+`,
+"diskon": `
+  <div class="card">
+    <div class="card-header bg-success text-white">
+      <h5 class="mb-0">Input Diskon Produk</h5>
+    </div>
+    <div class="card-body">
+      <form id="diskonForm">
+        <div class="mb-3">
+          <label for="produkName" class="form-label">Nama Produk</label>
+          <input type="text" class="form-control" id="produkName" required>
+        </div>
+        <div class="mb-3">
+          <label for="diskonPersen" class="form-label">Diskon (%)</label>
+          <input type="number" class="form-control" id="diskonPersen" required>
+        </div>
+        <div class="mb-3">
+          <label for="diskonStart" class="form-label">Tanggal Mulai</label>
+          <input type="date" class="form-control" id="diskonStart" required>
+        </div>
+        <div class="mb-3">
+          <label for="diskonEnd" class="form-label">Tanggal Berakhir</label>
+          <input type="date" class="form-control" id="diskonEnd" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Simpan Diskon</button>
+      </form>
+    </div>
+  </div>
+`
+
   };
 
   function loadPanel(name) {
@@ -172,6 +233,41 @@
     const selectedTab = $(this).data("tab");
     $("#orderContent").html(`<p>You don't have any order${selectedTab !== 'all' ? ` in ${selectedTab}` : ''}</p>`);
   });
+  
+  $(document).on("submit", "#promoForm", function (e) {
+  e.preventDefault();
+  const data = {
+    nama: $("#promoName").val(),
+    kode: $("#promoCode").val(),
+    diskon: $("#promoDiscount").val(),
+    mulai: $("#promoStart").val(),
+    akhir: $("#promoEnd").val()
+  };
+
+  let promos = JSON.parse(localStorage.getItem("promos")) || [];
+  promos.push(data);
+  localStorage.setItem("promos", JSON.stringify(promos));
+
+  alert("Promo berhasil disimpan!");
+  this.reset();
+});
+
+$(document).on("submit", "#diskonForm", function (e) {
+  e.preventDefault();
+  const data = {
+    produk: $("#produkName").val(),
+    diskon: $("#diskonPersen").val(),
+    mulai: $("#diskonStart").val(),
+    akhir: $("#diskonEnd").val()
+  };
+
+  let diskons = JSON.parse(localStorage.getItem("diskons")) || [];
+  diskons.push(data);
+  localStorage.setItem("diskons", JSON.stringify(diskons));
+
+  alert("Diskon produk berhasil disimpan!");
+  this.reset();
+});
 </script>
 
 <template>
@@ -189,6 +285,8 @@
       <a href="#" data-panel="Discussion" class="nav-link text-dark">Chat</a>
       <a href="#" data-panel="Product" class="nav-link text-dark">Product Input</a>
       <a href="#" data-panel="Orders" class="nav-link text-dark">Orders</a>
+      <a href="#" data-panel="promo" class="nav-link">Promo</a>
+      <a href="#" data-panel="diskon" class="nav-link">Discount</a>
     </nav>
   </aside>
 
