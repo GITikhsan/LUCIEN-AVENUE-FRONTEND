@@ -104,54 +104,88 @@ const similarProducts = ref([
 }
 
 .product-card {
-  background: #fff;
+  background-color: white;
   border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
   padding: 16px;
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-}
-
-.product-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  align-items: flex-start; /* kiri semua */
 }
 
 .product-image-wrapper {
-  background-color: #f9f9f9;
-  border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 16px;
-  text-align: center;
+  width: 100%;
+  height: 160px; /* seragamkan tinggi gambar */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .product-image {
-  max-height: 180px; /* diperbesar */
-  width: 100%;
+  max-height: 100%;
   object-fit: contain;
 }
 
 .product-info {
-  padding: 0 4px;
+  margin-top: auto; /* dorong ke bawah */
+  width: 100%;
 }
 
 .product-title {
-  font-size: 16px; /* diperbesar */
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 6px 0;
+  font-size: 1rem;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .product-price {
+  font-size: 1rem;
   font-weight: bold;
-  color: #007b33;
-  font-size: 15px;
+  color: #28a745;
   margin: 0;
 }
+
+/* Hilangkan panah default */
+.accordion-button::after {
+  display: none;
+}
+
+/* Tambahkan ikon custom (+ / -) */
+.accordion-button .icon::before {
+  content: "+";
+  font-size: 1.25rem;
+  font-weight: bold;
+  transition: transform 0.2s ease;
+}
+
+/* Saat tombol dibuka, ubah ke minus */
+.accordion-button:not(.collapsed) .icon::before {
+  content: "−"; /* bukan double minus */
+}
+
+/* Hilangkan efek biru saat tombol accordion ditekan atau difokuskan */
+.accordion-button:focus {
+  box-shadow: none;
+  outline: none;
+}
+
+/* Hilangkan background biru saat diklik */
+.accordion-button:not(.collapsed) {
+  background-color: transparent;
+}
+
+/* Jaga agar tetap putih saat hover juga */
+.accordion-button {
+  background-color: transparent;
+}
+
+.accordion .accordion-button {
+  font-weight: 500 !important;
+}
+
 
 </style>
 
@@ -242,33 +276,41 @@ const similarProducts = ref([
     <button class="btn btn-warning w-100 py-2 rounded-pill text-dark fw-semibold">Buy Now</button>
   </div>
 
-        <!-- Accordion -->
         <div class="accordion mt-4" id="accordionInfo">
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
-                Please Make Sure The Size Fits You.
-              </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse">
-              <div class="accordion-body small text-muted">
-                If you are unsure about your size, please click the size chart button and browse through the chart. Our company policy does not accept refunds or returns for sizing-related issues.
-              </div>
-            </div>
-          </div>
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
-                Authentic. Guaranteed.
-              </button>
-            </h2>
-            <div id="collapseTwo" class="accordion-collapse collapse">
-              <div class="accordion-body small text-muted">
-                All products sold are 100% authentic and verified by our team of experts. We guarantee original items only.
-              </div>
-            </div>
-          </div>
-        </div>
+  <!-- Accordion Item 1 -->
+  <div class="accordion-item border-0 border-bottom">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed justify-content-between d-flex" type="button"
+        data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+        <span class="fw-bold">Please Make Sure The Size Fits You.</span>
+        <span class="icon ms-auto"></span>
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionInfo">
+      <div class="accordion-body small text-muted">
+        If you are unsure about your size, please click the size chart button and browse through the chart. Our company policy does not accept refunds or returns for sizing-related issues.
+      </div>
+    </div>
+  </div>
+
+  <!-- Accordion Item 2 -->
+  <div class="accordion-item border-0 border-bottom">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed justify-content-between d-flex" type="button"
+        data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+        <span class="fw-bold">Authentic. Guaranteed.</span>
+        <span class="icon ms-auto"></span>
+      </button>
+    </h2>
+    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionInfo">
+      <div class="accordion-body small text-muted">
+        All products sold are 100% authentic and verified by our team of experts. We guarantee original items only.
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
         <!-- Share -->
         <div class="mt-4">
@@ -309,37 +351,32 @@ const similarProducts = ref([
       </div>
     </div>
 
-    <!-- Similar Products -->
     <div class="container mt-5">
+  <!-- Judul -->
   <h3 class="text-center fw-bold mb-4">Similar Products</h3>
 
+  <!-- Grid Produk -->
   <div class="row row-cols-2 row-cols-md-4 g-4">
     <div class="col" v-for="(item, idx) in similarProducts.slice(0, 8)" :key="idx">
-      <div class="product-card">
+      <div class="product-card text-start">
         <div class="product-image-wrapper">
           <img :src="item.image" alt="Product Image" class="product-image" />
         </div>
-        <div class="product-info text-start">
-          <p class="product-title">{{ item.name }}</p>
-          <p class="product-price">IDR {{ item.price }}</p>
+        <div class="product-info">
+          <p class="product-title fw-medium">{{ item.name }}</p>
+          <p class="product-price fw-bold text-success">IDR {{ item.price }}</p>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Tombol View More -->
-  <div class="text-center mt-4">
-    <button class="btn btn-outline-dark px-4 py-2">
+  <div class="text-center mt-5 mb-5">
+    <router-link to="/ViewMore" class="btn btn-dark rounded-pill px-5 py-2 shadow-sm">
       View More
-    </button>
+    </router-link>
   </div>
 </div>
 
-
-
-
-
-
-
-  </div>
+</div>
 </template>
