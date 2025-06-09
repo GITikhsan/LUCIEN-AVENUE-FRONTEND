@@ -312,6 +312,7 @@ const similarProducts = ref([
     <!-- Similar Products -->
     <div class="container mt-5">
   <h3 class="text-center fw-bold mb-4">Similar Products</h3>
+
   <div class="row row-cols-2 row-cols-md-4 g-4">
     <div class="col" v-for="(item, idx) in similarProducts.slice(0, 8)" :key="idx">
       <div class="product-card">
@@ -325,7 +326,15 @@ const similarProducts = ref([
       </div>
     </div>
   </div>
+
+  <!-- Tombol View More -->
+  <div class="text-center mt-4">
+    <button class="btn btn-outline-dark px-4 py-2">
+      View More
+    </button>
+  </div>
 </div>
+
 
 
 
