@@ -271,7 +271,7 @@ $(document).on("submit", "#diskonForm", function (e) {
 </script>
 
 <template>
-   <body class="bg-light text-body small">
+   <div class="bg-light text-body small">
 
 <div class="d-flex min-vh-100">
   <!-- Sidebar -->
@@ -296,6 +296,5 @@ $(document).on("submit", "#diskonForm", function (e) {
   </main>
 </div>
 
-</body>
-
+</div>
 </template>
