@@ -201,7 +201,7 @@
           <label for="diskonEnd" class="form-label">Tanggal Berakhir</label>
           <input type="date" class="form-control" id="diskonEnd" required>
         </div>
-        <button type="submit" class="btn btn-primary">Simpan Diskon</button>
+        <button type="submit" class="btn btn-success">Simpan Diskon</button>
       </form>
     </div>
   </div>
