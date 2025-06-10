@@ -1,11 +1,10 @@
-
 <script setup>
 import { ref } from 'vue'
 
 const product = ref({
   name: 'Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown',
-  price: 'IDR 4,240,000',
-  originalPrice: 'IDR 5,808,219',
+  price: '4,240,000',
+  originalPrice: '5,808,219',
   discount: 27,
   sizes: [38, 39, 40, 41, 42],
   description:
@@ -19,10 +18,10 @@ const product = ref({
     retail: '-'
   },
   images: [
-    '/public/images/4JT/4,240,000.png',
-    '/public/images/4JT/4,240,000(2).png',
-    '/public/images/4JT/4,240,000(3).png',
-    '/public/images/4JT/4,240,000(4).png'
+    '/public/images/4JT/4240(1).webp',
+    '/public/images/4JT/4240(2).webp',
+    '/public/images/4JT/4240(3).webp',
+    '/public/images/4JT/4240(4).webp'
   ]
 })
 
@@ -36,44 +35,44 @@ const decreaseQty = () => {
 
 const similarProducts = ref([
   {
-    name: 'Air Jordan 1 Retro Low Dior',
-    price: 'IDR 100,000,000',
-    image: '/images/100JT/100,000,000(1).png'
+    name: 'Air Jordan 1 Retro Low OG SP Travis Scott Canary (Women) ',
+    price: '3,700,000',
+    image: '/images/3JT/3700.webp'
   },
   {
-    name: 'Air Jordan 1 Low SE Craft Light Olive',
-    price: 'IDR 3,210,000',
-    image: '/images/3JT/3,210,000(1).png'
+    name: 'Air Jordan 1 Retro Low OG Swarovski Stealth (Women)',
+    price: '21,510,000',
+    image: '/images/21JT/21510.webp'
   },
   {
-    name: 'Air Jordan 1 Low SE WRMK Sashiko Denim',
-    price: 'IDR 2,050,000',
-    image: '/images/2JT/2,050,000(1).png'
+    name: 'Nike Zoom Field Jaxx Travis Scott Leche Blue',
+    price: '2,000,000',
+    image: '/images/2JT/2000.webp'
   },
   {
-    name: 'Air Jordan 1 Low Chloropyll',
-    price: 'IDR 1,240,000',
-    image: '/images/1JT/1,240,000(1).png'
+    name: 'Air Jordan 1 Low Fragment x Travis Scott',
+    price: '15,000,000',
+    image: '/images/15JT/15000.webp'
   },
   {
-    name: 'Air Jordan 1 Low Chloropyll',
-    price: 'IDR 1,240,000',
-    image: '/images/1JT/1,240,000(1).png'
+    name: 'Air Jordan Jumpman Jack TR Travis Scott Bright Cactus',
+    price: '3,900,000',
+    image: '/images/3JT/3900.webp'
   },
   {
-    name: 'Air Jordan 1 Low Chloropyll',
-    price: 'IDR 1,240,000',
-    image: '/images/1JT/1,240,000(1).png'
+    name: 'Air Jordan 1 Retro Low OG Doernbecher (2023)',
+    price: '7,400,000',
+    image: '/images/7JT/7400.webp'
   },
   {
-    name: 'Air Jordan 1 Low Chloropyll',
-    price: 'IDR 1,240,000',
-    image: '/images/1JT/1,240,000(1).png'
+    name: 'Air Jordan 1 Retro Low OG Mocha',
+    price: '2,200,000',
+    image: '/images/2JT/2200.webp'
   },
   {
-    name: 'Air Jordan 1 Low Chloropyll',
-    price: 'IDR 1,240,000',
-    image: '/images/1JT/1,240,000(1).png'
+    name: 'Air Jordan 1 Low Illuminates Vivid Orange',
+    price: '3,630,000',
+    image: '/images/3JT/3630.webp'
   }
 ])
 </script>
@@ -90,7 +89,7 @@ const similarProducts = ref([
 .carousel-item img {
   object-fit: contain;
   height: 260px;
-  margin: 100px auto 20px auto; /* turun lebih jauh ke bawah */
+  margin: 120px auto 20px auto; /* turun lebih jauh ke bawah */
   display: block;
   padding: 0;
 }
@@ -189,43 +188,46 @@ const similarProducts = ref([
   margin: 0;
 }
 
-/* Hilangkan panah default */
+/* Hapus panah default Bootstrap */
 .accordion-button::after {
-  display: none;
+  display: none !important;
 }
 
-/* Tambahkan ikon custom (+ / -) */
-.accordion-button .icon::before {
+/* Tambahkan simbol + / − di akhir tombol */
+.accordion-button {
+  position: relative;
+}
+
+.accordion-button::before {
   content: "+";
-  font-size: 1.25rem;
+  position: absolute;
+  right: 1.25rem;
+  font-size: 1.2rem;
   font-weight: bold;
-  transition: transform 0.2s ease;
+  transition: transform 0.3s ease;
 }
 
-/* Saat tombol dibuka, ubah ke minus */
-.accordion-button:not(.collapsed) .icon::before {
-  content: "−"; /* bukan double minus */
+/* Saat accordion terbuka, ganti ke − */
+.accordion-button:not(.collapsed)::before {
+  content: "−";
 }
 
-/* Hilangkan efek biru saat tombol accordion ditekan atau difokuskan */
 .accordion-button:focus {
-  box-shadow: none;
-  outline: none;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
-/* Hilangkan background biru saat diklik */
 .accordion-button:not(.collapsed) {
   background-color: transparent;
+  color: inherit;
 }
 
-/* Jaga agar tetap putih saat hover juga */
-.accordion-button {
-  background-color: transparent;
+.custom-accordion-btn {
+  font-size: 0.875rem; /* ukuran kecil */
+  font-weight: 500;
 }
 
-.accordion .accordion-button {
-  font-weight: 500 !important;
-}
+
 
 .size-button {
   width: 48px;
@@ -254,6 +256,50 @@ const similarProducts = ref([
   color: #333;
 }
 
+.product-card-similar {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
+  cursor: pointer;
+}
+
+.product-card-similar:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+}
+
+.image-wrapper-similar {
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-image-similar {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.product-name {
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin: 0;
+  color: #333;
+  white-space: normal;       /* Biarkan teks bisa membungkus */
+  word-break: break-word;    /* Boleh pecah kata kalau perlu */
+  min-height: 40px;          /* Tambahan agar tingginya seragam */
+}
+
+
+.product-price-similar {
+  font-weight: bold;
+  color: #28a745;
+  font-size: 1rem;
+}
+
 
 </style>
 
@@ -268,16 +314,16 @@ const similarProducts = ref([
   <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-inner">
       <div class="carousel-item active">
-        <img src="/public/images/4JT/4,240,000.png" class="d-block product-image" alt="Product Image 1" />
+        <img src="/public/images/4JT/4240(1).webp" class="d-block product-image" alt="Product Image 1" />
       </div>
       <div class="carousel-item">
-        <img src="/public/images/4JT/4,240,000(2).png" class="d-block product-image" alt="Product Image 2" />
+        <img src="/public/images/4JT/4240(2).webp" class="d-block product-image" alt="Product Image 2" />
       </div>
       <div class="carousel-item">
-        <img src="/public/images/4JT/4,240,000(3).png" class="d-block product-image" alt="Product Image 2" />
+        <img src="/public/images/4JT/4240(3).webp" class="d-block product-image" alt="Product Image 2" />
       </div>
       <div class="carousel-item">
-        <img src="/public/images/4JT/4,240,000(4).png" class="d-block product-image" alt="Product Image 2" />
+        <img src="/public/images/4JT/4240(4).webp" class="d-block product-image" alt="Product Image 2" />
       </div>
     </div>
 
@@ -309,37 +355,22 @@ const similarProducts = ref([
 
       <!-- Size Options -->
       <div class="mb-4">
-  <label class="form-label fw-semibold mb-2">Select Size</label>
-  <div class="d-flex flex-wrap gap-2">
-    <button
-      v-for="size in product.sizes"
-      :key="size"
-      :class="[
-        'btn size-button',
-        selectedSize === size ? 'active-size' : 'inactive-size'
-      ]"
-      @click="selectedSize = size"
-    >
-      {{ size }}
-    </button>
-  </div>
-</div>
-
-
-      <!-- Quantity Selector -->
-      <div class="mb-4">
-        <label class="form-label fw-medium">Quantity</label>
-        <div class="input-group" style="max-width: 140px;">
-          <button class="btn btn-outline-secondary" @click="decreaseQty">−</button>
-          <input
-            v-model.number="quantity"
-            type="number"
-            class="form-control text-center border-start-0 border-end-0 bg-light"
-            min="1"
-          />
-          <button class="btn btn-outline-secondary" @click="increaseQty">+</button>
+        <label class="form-label fw-semibold mb-2">Select Size</label>
+        <div class="d-flex flex-wrap gap-2">
+          <button
+            v-for="size in product.sizes"
+            :key="size"
+            :class="[
+              'btn size-button',
+              selectedSize === size ? 'active-size' : 'inactive-size'
+            ]"
+            @click="selectedSize = size"
+          >
+            {{ size }}
+          </button>
         </div>
       </div>
+
 
       <!-- Action Buttons -->
       <div class="d-flex flex-column flex-sm-row gap-3 mb-4">
@@ -349,45 +380,39 @@ const similarProducts = ref([
 
       <!-- Accordion Info -->
       <div class="accordion" id="accordionInfo">
-        <div class="accordion-item border-0 border-bottom">
-          <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#collapseOne">
-              <span class="fw-bold">Please Make Sure The Size Fits You.</span>
-            </button>
-          </h2>
-          <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionInfo">
-            <div class="accordion-body small text-muted">
-              If you are unsure about your size, please click the size chart button and browse through the chart. Our company policy does not accept refunds or returns for sizing-related issues.
-            </div>
-          </div>
-        </div>
-        <div class="accordion-item border-0 border-bottom">
-          <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-              data-bs-target="#collapseTwo">
-              <span class="fw-bold">Authentic. Guaranteed.</span>
-            </button>
-          </h2>
-          <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionInfo">
-            <div class="accordion-body small text-muted">
-              All products sold are 100% authentic and verified by our team of experts. We guarantee original items only.
-            </div>
-          </div>
-        </div>
+  <div class="accordion-item border-0 border-bottom">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed custom-accordion-btn" type="button"
+        data-bs-toggle="collapse" data-bs-target="#collapseOne">
+        Please Make Sure The Size Fits You.   
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionInfo">
+      <div class="accordion-body small text-muted">
+        If you are unsure about your size, please click the size chart button and browse through the chart.
+        Our company policy does not accept refunds or returns for sizing-related issues.
       </div>
+    </div>
+  </div>
 
-      <!-- Share Icons -->
-      <div class="mt-4">
-        <p class="mb-2">Share this product:</p>
-        <div class="d-flex gap-3">
-          <img src="/images/instagram.png" alt="Instagram" width="24" />
-          <img src="/images/facebook.png" alt="Facebook" width="24" />
-          <img src="/images/whatsapp.png" alt="WhatsApp" width="24" />
-          <img src="/images/twitter.png" alt="Twitter" width="24" />
-          <img src="/images/email.png" alt="Email" width="24" />
-        </div>
+  <div class="accordion-item border-0 border-bottom">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed custom-accordion-btn" type="button"
+        data-bs-toggle="collapse" data-bs-target="#collapseOne">
+        Authentic. Guaranteed.
+      </button>
+
+    </h2>
+    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionInfo">
+      <div class="accordion-body small text-muted">
+        All products sold are 100% authentic and verified by our team of experts. We guarantee original items only.
       </div>
+    </div>
+  </div>
+</div>
+
+
+      
     </div>
   </div>
 
@@ -418,22 +443,23 @@ const similarProducts = ref([
     </div>
 
     <div class="container mt-5">
-  <!-- Judul -->
+  <!-- Grid Produk -->
+  <div class="container mt-5">
   <h3 class="text-center fw-bold mb-4">Similar Products</h3>
 
-  <!-- Grid Produk -->
   <div class="row row-cols-2 row-cols-md-4 g-4">
     <div class="col" v-for="(item, idx) in similarProducts.slice(0, 8)" :key="idx">
-      <div class="product-card text-start">
-        <div class="product-image-wrapper">
-          <img :src="item.image" alt="Product Image" class="product-image" />
+      <div class="product-card-similar text-start p-3">
+        <div class="image-wrapper-similar mb-3">
+          <img :src="item.image" alt="Product Image" class="product-image-similar" />
         </div>
-        <div class="product-info">
-          <p class="product-title fw-medium">{{ item.name }}</p>
-          <p class="product-price fw-bold text-success">IDR {{ item.price }}</p>
+        <div>
+          <p class="product-name mb-1">{{ item.name }}</p>
+          <p class="product-price-similar">IDR {{ item.price }}</p>
         </div>
       </div>
     </div>
+  </div>
   </div>
 
   <!-- Tombol View More -->

@@ -25,7 +25,27 @@ import { onMounted } from 'vue'
         <!-- Ulangi blok ini sesuai jumlah produk -->
         <div class="col-12 col-sm-6 col-md-3">
           <div class="card h-100 shadow-sm">
-            <img src="/public/images/2JT/2,030,000(1).png" class="card-img-top" alt="Product 1">
+            <img src="/public/images/15JT/15000.webp" class="card-img-top" alt="Product 1">
+            <div class="card-body">
+              <h5 class="card-title">Air Jordan 1 Low Fragment x Travis Scott</h5>
+              <p class="card-text">Rp 15,000,000</p>
+              <a href="Product" class="btn btn-outline-secondary w-100">Detail</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-3">
+          <div class="card h-100 shadow-sm">
+            <img src="/public/images/3JT/3900.webp" class="card-img-top" alt="Product 1">
+            <div class="card-body">
+              <h5 class="card-title">Air Jordan Jumpman Jack TR Travis Scott Bright Cactus</h5>
+              <p class="card-text">Rp 3,900,000</p>
+              <a href="Product" class="btn btn-outline-secondary w-100">Detail</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-3">
+          <div class="card h-100 shadow-sm">
+            <img src="/public/images/2JT/2200.webp" class="card-img-top" alt="Product 1">
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
@@ -35,30 +55,10 @@ import { onMounted } from 'vue'
         </div>
         <div class="col-12 col-sm-6 col-md-3">
           <div class="card h-100 shadow-sm">
-            <img src="/public/images/2JT/2,030,000(1).png" class="card-img-top" alt="Product 1">
+            <img src="/public/images/7JT/7400.webp" class="card-img-top" alt="Product 1">
             <div class="card-body">
-              <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
-              <p class="card-text">Rp 4.240.000</p>
-              <a href="Product" class="btn btn-outline-secondary w-100">Detail</a>
-            </div>
-          </div>
-        </div>
-        <div class="col-12 col-sm-6 col-md-3">
-          <div class="card h-100 shadow-sm">
-            <img src="/public/images/2JT/2,030,000(1).png" class="card-img-top" alt="Product 1">
-            <div class="card-body">
-              <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
-              <p class="card-text">Rp 4.240.000</p>
-              <a href="Product" class="btn btn-outline-secondary w-100">Detail</a>
-            </div>
-          </div>
-        </div>
-        <div class="col-12 col-sm-6 col-md-3">
-          <div class="card h-100 shadow-sm">
-            <img src="/public/images/2JT/2,030,000(1).png" class="card-img-top" alt="Product 1">
-            <div class="card-body">
-              <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
-              <p class="card-text">Rp 4.240.000</p>
+              <h5 class="card-title">Air Jordan 1 Retro Low OG Doernbecher (2023)</h5>
+              <p class="card-text">Rp 7,400,000</p>
               <a href="Product" class="btn btn-outline-secondary w-100">Detail</a>
             </div>
           </div>
@@ -128,7 +128,7 @@ import { onMounted } from 'vue'
         <!-- Ulangi blok ini sesuai jumlah produk -->
         <div class="col-12 col-sm-6 col-md-3">
           <div class="card h-100 shadow-sm">
-            <img src="/public/images/2JT/2,030,000(1).png" class="card-img-top" alt="Product 1">
+            <img src="/public/images/2JT/2200.webp" class="card-img-top" alt="Product 1">
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
@@ -138,7 +138,7 @@ import { onMounted } from 'vue'
         </div>
         <div class="col-12 col-sm-6 col-md-3">
           <div class="card h-100 shadow-sm">
-            <img src="/public/images/2JT/2,030,000(1).png" class="card-img-top" alt="Product 1">
+            <img src="/public/images/2JT/2200.webp" class="card-img-top" alt="Product 1">
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
@@ -148,7 +148,7 @@ import { onMounted } from 'vue'
         </div>
         <div class="col-12 col-sm-6 col-md-3">
           <div class="card h-100 shadow-sm">
-            <img src="/public/images/2JT/2,030,000(1).png" class="card-img-top" alt="Product 1">
+            <img src="/public/images/2JT/2200.webp" class="card-img-top" alt="Product 1">
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
@@ -158,7 +158,7 @@ import { onMounted } from 'vue'
         </div>
         <div class="col-12 col-sm-6 col-md-3">
           <div class="card h-100 shadow-sm">
-            <img src="/public/images/2JT/2,030,000(1).png" class="card-img-top" alt="Product 1">
+            <img src="/public/images/2JT/2200.webp" class="card-img-top" alt="Product 1">
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
@@ -210,7 +210,7 @@ import { onMounted } from 'vue'
         <!-- Ulangi blok ini sesuai jumlah produk -->
         <div class="col-12 col-sm-6 col-md-3">
           <div class="card h-100 shadow-sm">
-            <img src="/public/images/2JT/2,030,000(1).png" class="card-img-top" alt="Product 1">
+            <img src="/public/images/2JT/2200.webp" class="card-img-top" alt="Product 1">
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
@@ -220,7 +220,7 @@ import { onMounted } from 'vue'
         </div>
         <div class="col-12 col-sm-6 col-md-3">
           <div class="card h-100 shadow-sm">
-            <img src="/public/images/2JT/2,030,000(1).png" class="card-img-top" alt="Product 1">
+            <img src="/public/images/2JT/2200.webp" class="card-img-top" alt="Product 1">
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
@@ -230,7 +230,7 @@ import { onMounted } from 'vue'
         </div>
         <div class="col-12 col-sm-6 col-md-3">
           <div class="card h-100 shadow-sm">
-            <img src="/public/images/2JT/2,030,000(1).png" class="card-img-top" alt="Product 1">
+            <img src="/public/images/2JT/2200.webp" class="card-img-top" alt="Product 1">
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
@@ -240,7 +240,7 @@ import { onMounted } from 'vue'
         </div>
         <div class="col-12 col-sm-6 col-md-3">
           <div class="card h-100 shadow-sm">
-            <img src="/public/images/2JT/2,030,000(1).png" class="card-img-top" alt="Product 1">
+            <img src="/public/images/2JT/2200.webp" class="card-img-top" alt="Product 1">
             <div class="card-body">
               <h5 class="card-title">Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown</h5>
               <p class="card-text">Rp 4.240.000</p>
