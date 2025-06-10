@@ -82,7 +82,7 @@
     <div class="bg-light">
     <div class="container py-4">
       <div class="mb-3">
-        <a href="/ViewMore" class="text-decoration-none">&larr; Lanjut Mencari Barang</a>
+        <a href="ViewMore" class="text-decoration-none">&larr; Lanjut Mencari Barang</a>
       </div>
       <h4>Keranjang Produk</h4>
       <p class="text-muted">Kamu memiliki <span id="total-items">0</span> produk</p>
@@ -94,7 +94,7 @@
       <div class="d-flex justify-content-end mt-4">
         <div class="d-flex align-items-center gap-3">
           <h5 class="mb-0">Rp <span id="grand-total">0</span></h5>
-          <button class="btn btn-checkout">Checkout →</button>
+         <a href="Checkout">Checkout →</a> 
         </div>
       </div>
     </div>
