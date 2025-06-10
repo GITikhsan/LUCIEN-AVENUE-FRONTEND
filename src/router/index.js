@@ -46,12 +46,8 @@ const routes = [
   { path: '/viewMore',   name: 'View More',     component: ViewMore },
   { path: '/product',   name: 'Product',     component: Product },
   { path: '/payment',   name: 'Payment',     component: Payment },
-<<<<<<< HEAD
-  { path: '/admin',   name: 'Admin',     component: Admin }
-=======
   { path: '/admin',   name: 'Admin',     component: Admin },
   { path: '/bag',   name: 'Bag',     component: Bag }
->>>>>>> b732472299016b0440d7dce903fd9c80f06f07aa
 ]
 
 export default createRouter({
