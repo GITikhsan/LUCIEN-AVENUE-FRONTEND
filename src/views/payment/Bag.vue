@@ -4,25 +4,25 @@
         name: "Sepatu1 - Sandal Anak",
         price: 20000,
         qty: 1,
-        image: "/public/images/2JT/2,030,000(1).png"
+        image: "/public/images/4JT/4240(1).webp"
       },
       {
         name: "Sepatu2- Baju Pria",
         price: 15000,
         qty: 1,
-        image: "/public/images/2JT/2,030,000(1).png"
+        image: "/public/images/4JT/4240(1).webp"
       },
       {
         name: "Sepatu3 - Jam Tangan Pria",
         price: 104000,
         qty: 1,
-        image: "/public/images/2JT/2,030,000(1).png"
+        image: "/public/images/4JT/4240(1).webp"
       },
       {
         name: "Sepatu4 - Kaos Kaki",
         price: 8000,
         qty: 1,
-        image: "/public/images/2JT/2,030,000(1).png"
+        image: "/public/images/4JT/4240(1).webp"
       }
     ];
 

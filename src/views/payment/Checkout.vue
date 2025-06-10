@@ -19,7 +19,7 @@ const menuItems = [
             <div class="card-body">
               <!-- Produk -->
               <div class="d-flex mb-3">
-                <img src="/public/images/100JT/100,000,000(1).png" class="me-3 rounded w-50" alt="Sepatu">
+                <img src="/public/images/4JT/4240(1).webp" class="me-3 rounded w-50" alt="Sepatu">
                 <div>
                   <h6 class="mb-1">Sepatu Sneakers Pria</h6>
                   <small>Ukuran: 42</small><br>

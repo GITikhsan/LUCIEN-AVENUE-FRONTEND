@@ -23,6 +23,7 @@ import EditAddress from '@/components/UserSetting/EditAddress.vue'
 import Admin from '@/views/admin/Admin.vue'
 import Bag from '@/views/payment/Bag.vue'
 import Checkout from '@/views/payment/Checkout.vue'
+import Payment from '@/views/payment/Payment.vue'
 
 const routes = [
   { path: '/',          name: 'Fashion',    component: Home },
@@ -47,7 +48,8 @@ const routes = [
   { path: '/product',   name: 'Product',     component: Product },
   { path: '/admin',   name: 'Admin',     component: Admin },
   { path: '/checkout',   name: 'Checkout',  component: Checkout },
-    { path: '/bag',   name: 'Bag',     component: Bag }
+    { path: '/bag',   name: 'Bag',     component: Bag },
+    { path: '/payment',   name: 'Payment',     component: Payment }
  
 ]
 
