@@ -1,6 +1,42 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 
+// --- LOGIKA RESPONSIVE  ---
+const sidebarVisible = ref(false)
+const isDesktop = ref(window.innerWidth >= 992) // Pakai 992px untuk breakpoint 'lg' Bootstrap
+
+// Fungsi untuk update state berdasarkan lebar layar
+const updateLayout = () => {
+  isDesktop.value = window.innerWidth >= 992
+  // Di desktop, sidebar selalu terlihat. Di mobile, defaultnya tersembunyi.
+  if (isDesktop.value) {
+    sidebarVisible.value = true
+  } else {
+    // Saat beralih ke mobile, pastikan sidebar tertutup kecuali dibuka manual
+    sidebarVisible.value = false
+  }
+}
+
+// Tombol untuk membuka/menutup sidebar di mobile
+const toggleSidebar = () => {
+  // Fungsi ini hanya boleh berjalan di mode mobile
+  if (!isDesktop.value) {
+    sidebarVisible.value = !sidebarVisible.value
+  }
+}
+
+// Event listener untuk resize window
+onMounted(() => {
+  window.addEventListener('resize', updateLayout)
+  updateLayout() // Panggil sekali saat komponen dimuat
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateLayout)
+})
+
+
+// --- DATA FILTER & PRODUK ---
 const gender = ref('')
 const size = ref(null)
 const discount = ref('any')
@@ -21,7 +57,7 @@ const priceRanges = [
   { value: '1000000-3000000', label: 'IDR 1.000.000 – 3.000.000' },
   { value: '3000000-5000000', label: 'IDR 3.000.000 – 5.000.000' },
   { value: '5000000-10000000', label: 'IDR 5.000.000 – 10.000.000' },
-  { value: '10000000+', label: 'Above IDR 10.000.000' },
+  { value: '10000000+', label: 'Above IDR 10.000.000' }
 ]
 const colors = ['green', 'blue', 'pink', 'red', 'purple', 'yellow', 'maroon']
 const brands = ['Nike', 'Adidas', 'Air Jordan', 'Yeezy', 'New Balance']
@@ -60,7 +96,7 @@ const products = ref([
     brand: 'Yeezy'
   },
   {
-  id: 5,
+    id: 5,
     name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
     image: '/images/youth adidas/2,920,000(1).webp',
     price: 'IDR 2,920,000',
@@ -68,7 +104,7 @@ const products = ref([
     brand: 'Yeezy'
   },
   {
-  id: 6,
+    id: 6,
     name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
     image: '/images/youth adidas/2,920,000(1).webp',
     price: 'IDR 2,920,000',
@@ -76,7 +112,7 @@ const products = ref([
     brand: 'Yeezy'
   },
   {
-  id: 7,
+    id: 7,
     name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
     image: '/images/youth adidas/2,920,000(1).webp',
     price: 'IDR 2,920,000',
@@ -84,7 +120,7 @@ const products = ref([
     brand: 'Yeezy'
   },
   {
-  id: 8,
+    id: 8,
     name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
     image: '/images/youth adidas/2,920,000(1).webp',
     price: 'IDR 2,920,000',
@@ -92,13 +128,13 @@ const products = ref([
     brand: 'Yeezy'
   },
   {
-  id: 9,
+    id: 9,
     name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
     image: '/images/youth adidas/2,920,000(1).webp',
     price: 'IDR 2,920,000',
     discount: 10,
     brand: 'Yeezy'
-  },
+  }
 ])
 
 const filteredProducts = computed(() => {
@@ -108,11 +144,32 @@ const filteredProducts = computed(() => {
 
 <template>
   <div class="container-fluid py-5">
+    <button
+      v-if="!isDesktop"
+      @click="toggleSidebar"
+      class="btn btn-dark position-fixed shadow-lg"
+      style="bottom: 20px; right: 20px; z-index: 1050; border-radius: 50px; padding: 10px 15px;"
+    >
+      <i class="bi bi-funnel-fill"></i>
+      <span class="ms-2">Filter</span>
+    </button>
+
     <div class="d-flex gap-4">
-      <!-- Sidebar -->
-      <aside class="sidebar-filter p-4 bg-white border rounded shadow-sm">
+      <aside
+        v-if="sidebarVisible"
+        id="filterSidebar"
+        :class="{
+          'sidebar-filter p-4 bg-white border rounded shadow-sm': isDesktop,
+          'sidebar-mobile-overlay': !isDesktop
+        }"
+      >
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">Filters</h5>
+          <button v-if="!isDesktop" @click="toggleSidebar" class="btn-close"></button>
+        </div>
+
         <h6 class="fw-semibold mb-3">Select Gender</h6>
-        <div class="d-flex justify-content-between mb-4 gap-2">
+        <div class="d-flex justify-content-between mb-3 gap-2">
           <button
             class="btn w-100 fw-semibold border"
             :class="gender === 'men' ? 'btn-men-active' : 'btn-men'"
@@ -138,9 +195,8 @@ const filteredProducts = computed(() => {
           </button>
         </div>
 
-
         <h6 class="fw-semibold mb-3">Size</h6>
-        <div class="row g-2 mb-4">
+        <div class="row g-2 mb-3">
           <div class="col-3" v-for="n in sizes" :key="n">
             <input
               type="radio"
@@ -149,7 +205,7 @@ const filteredProducts = computed(() => {
               name="size"
               :value="n"
               v-model="size"
-            >
+            />
             <label
               class="btn w-100 py-2 size-tile text-center"
               :for="'size' + n"
@@ -160,9 +216,8 @@ const filteredProducts = computed(() => {
           </div>
         </div>
 
-
         <h6 class="fw-semibold mb-3">Discount</h6>
-        <div class="row row-cols-2 g-3 mb-4">
+        <div class="row row-cols-2 g-3 mb-3">
           <div class="col-6 col-md-3" v-for="d in discounts" :key="d.label">
             <input
               type="radio"
@@ -171,7 +226,7 @@ const filteredProducts = computed(() => {
               name="discount"
               :value="d.value"
               v-model="discount"
-            >
+            />
             <label
               class="btn w-100 py-2 text-white fw-semibold glow-anim"
               :for="'discount' + d.value"
@@ -190,10 +245,8 @@ const filteredProducts = computed(() => {
           </div>
         </div>
 
-
-        <!-- Price Range -->
         <h6 class="fw-semibold mb-3">Price Range</h6>
-        <div class="mb-4">
+        <div class="mb-3">
           <select class="form-select shadow-sm rounded-3 border-dark" v-model="priceRange">
             <option disabled value="">Select a range</option>
             <option
@@ -207,40 +260,39 @@ const filteredProducts = computed(() => {
         </div>
 
         <h6 class="fw-semibold mb-3">Color</h6>
-          <div class="row g-3 mb-4">
-            <div
-              class="col-2 d-flex justify-content-center"
-              v-for="(color, i) in colors.slice(0, 6)"
-              :key="i"
-            >
-              <div class="position-relative">
-                <input
-                  class="visually-hidden"
-                  type="checkbox"
-                  :id="'color' + i"
-                  :value="color"
-                  v-model="selectedColors"
-                >
-                <label
-                  class="rounded-circle border"
-                  :for="'color' + i"
-                  :style="{
-                    backgroundColor: color,
-                    width: '34px',
-                    height: '34px',
-                    display: 'inline-block',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    transform: selectedColors.includes(color) ? 'scale(1.15)' : 'scale(1)',
-                    boxShadow: selectedColors.includes(color)
-                      ? '0 0 8px rgba(0, 0, 0, 0.4)'
-                      : 'none'
-                  }"
-                ></label>
-              </div>
+        <div class="row g-3 mb-4">
+          <div
+            class="col-2 d-flex justify-content-center"
+            v-for="(color, i) in colors.slice(0, 6)"
+            :key="i"
+          >
+            <div class="position-relative">
+              <input
+                class="visually-hidden"
+                type="checkbox"
+                :id="'color' + i"
+                :value="color"
+                v-model="selectedColors"
+              />
+              <label
+                class="rounded-circle border"
+                :for="'color' + i"
+                :style="{
+                  backgroundColor: color,
+                  width: '34px',
+                  height: '34px',
+                  display: 'inline-block',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  transform: selectedColors.includes(color) ? 'scale(1.15)' : 'scale(1)',
+                  boxShadow: selectedColors.includes(color)
+                    ? '0 0 8px rgba(0, 0, 0, 0.4)'
+                    : 'none'
+                }"
+              ></label>
             </div>
           </div>
-
+        </div>
 
         <h6 class="fw-semibold mb-2">Brands</h6>
         <div v-for="(brand, i) in brands" :key="brand" class="form-check">
@@ -249,7 +301,6 @@ const filteredProducts = computed(() => {
         </div>
       </aside>
 
-      <!-- Produk -->
       <section class="flex-grow-1">
         <div class="d-flex justify-content-between align-items-center mb-4">
           <h5 class="fw-bold">Available Sneakers</h5>
@@ -271,55 +322,73 @@ const filteredProducts = computed(() => {
               <li><a class="dropdown-item rounded-2" href="#" @click.prevent="sortOption = 'Newest'">🆕 Newest</a></li>
             </ul>
           </div>
-
         </div>
 
         <div class="row row-cols-2 row-cols-md-4 g-4">
-        <div class="col" v-for="product in filteredProducts" :key="product.id">
-          <div class="card h-100 border-0 shadow-sm position-relative rounded-4">
-            <!-- Badge Diskon -->
-            <div
-              class="position-absolute top-0 start-0 bg-danger text-white px-2 py-1 small rounded-end"
-              style="font-size: 0.75rem;"
-            >
-              {{ product.discount }}%
-            </div>
-
-            <!-- Gambar Produk -->
-            <div
-              class="p-3 d-flex justify-content-center align-items-center"
-              style="height: 200px;"
-            >
-              <img
-                :src="product.image"
-                class="img-fluid"
-                :alt="product.name"
-                style="max-height: 160px; object-fit: contain;"
-              />
-            </div>
-
-            <!-- Detail Produk -->
-            <div class="card-body px-3 pt-0 pb-3">
-              <!-- Set height tetap agar sejajar -->
-              <h6
-                class="card-title mb-1"
-                style="font-size: 0.9rem; height: 40px; overflow: hidden;"
+          <div class="col" v-for="product in filteredProducts" :key="product.id">
+            <div class="card h-100 border-0 shadow-sm position-relative rounded-4">
+              <div
+                class="position-absolute top-0 start-0 bg-danger text-white px-2 py-1 small rounded-end"
+                style="font-size: 0.75rem;"
               >
-                {{ product.name }}
-              </h6>
-              <p class="text-success fw-bold mb-0" style="font-size: 0.95rem;">
-                {{ product.price }}
-              </p>
+                {{ product.discount }}%
+              </div>
+
+              <div
+                class="p-3 d-flex justify-content-center align-items-center"
+                style="height: 200px;"
+              >
+                <img
+                  :src="product.image"
+                  class="img-fluid"
+                  :alt="product.name"
+                  style="max-height: 160px; object-fit: contain;"
+                />
+              </div>
+
+              <div class="card-body px-3 pt-0 pb-3">
+                <h6
+                  class="card-title mb-1"
+                >
+                  {{ product.name }}
+                </h6>
+                <p class="text-success fw-bold mb-0">
+                  {{ product.price }}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
       </section>
     </div>
   </div>
 </template>
 
 <style scoped>
+/* DITAMBAHKAN: Style untuk sidebar overlay di mobile */
+.sidebar-mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  z-index: 1045;
+  overflow-y: auto;
+  padding: 1.5rem;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* KODE CSS ASLI KAMU (TIDAK DIUBAH) */
 .glow-anim {
   transition: transform 0.25s ease, box-shadow 0.3s ease;
 }
@@ -461,6 +530,26 @@ const filteredProducts = computed(() => {
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
+@media (min-width: 480px) {
+  .product-title {
+    font-size: 0.6rem; /* <-- UKURAN MOBILE */
+    height: auto; 
+    line-height: 1.4;
+  }
+  .product-price {
+    font-size: 0.6rem; /* <-- UKURAN MOBILE */
+  }
+}
+/* 2. Style untuk DESKTOP (layar lebih besar dari 992px) */
+/* Aturan ini akan menimpa style mobile jika syarat terpenuhi */
+@media (min-width: 992px) {
+  .product-title {
+    font-size: 0.95rem; /* <-- UKURAN DESKTOP */
+    min-height: 50px; /* Untuk alignment kartu agar rapi */
+  }
+  .product-price {
+    font-size: 0.95rem; /* <-- UKURAN DESKTOP */
+  }
+}
 
 </style>
-
