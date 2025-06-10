@@ -74,10 +74,6 @@ const menuItems = [
             </div>
 
             <h5 class="mt-4">Metode Pembayaran</h5>
-            <div class="form-check mt-2">
-              <input class="form-check-input" type="radio" name="pembayaran" id="cod" checked>
-              <label class="form-check-label" for="cod">Bayar di Tempat (COD)</label>
-            </div>
             <div class="form-check">
               <input class="form-check-input" type="radio" name="pembayaran" id="transfer">
               <label class="form-check-label" for="transfer">Transfer Bank</label>
