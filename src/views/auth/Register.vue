@@ -46,7 +46,7 @@ async function register() {
     
     // Alihkan ke halaman login setelah jeda
     setTimeout(() => {
-        window.location.href = '/login';
+        window.location.href = 'Login';
     }, 2000);
 
   } catch (error) {
@@ -82,7 +82,7 @@ async function register() {
             <h2 class="h4 fw-semibold mb-2">Register</h2>
             <p class="text-muted small">
               Sudah punya akun?
-              <a href="/login" class="text-success fw-bold text-decoration-none">Login di sini</a>
+              <a href="Login" class="text-success fw-bold text-decoration-none">Login di sini</a>
             </p>
           </div>
 

@@ -45,7 +45,7 @@ async function login() {
     
     // Alihkan ke halaman dashboard setelah jeda singkat
     setTimeout(() => {
-        window.location.href = '/dashboard'; // Ganti dengan rute halaman utama Anda
+        window.location.href = 'ViewMore'; // Ganti dengan rute halaman utama Anda
     }, 1500);
 
   } catch (error) {
@@ -77,7 +77,7 @@ async function login() {
             <h2 class="h4 fw-semibold mb-2">Login</h2>
             <p class="text-muted small">
               Belum punya akun?
-              <a href="/register" class="text-success fw-bold text-decoration-none">Daftar di sini</a>
+              <a href="Register" class="text-success fw-bold text-decoration-none">Daftar di sini</a>
             </p>
           </div>
 
@@ -112,7 +112,7 @@ async function login() {
           </form>
 
           <div class="text-center">
-            <a href="/forgot" class="text-success fw-bold text-decoration-none d-block mb-2">
+            <a href="Forgot" class="text-success fw-bold text-decoration-none d-block mb-2">
               Lupa password?
             </a>
             <p class="text-muted small mb-2">Atau login dengan akun lain</p>
