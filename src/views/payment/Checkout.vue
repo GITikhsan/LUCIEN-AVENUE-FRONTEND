@@ -83,7 +83,7 @@ const menuItems = [
               <label class="form-check-label" for="ewallet">E-Wallet (OVO, DANA, dll)</label>
             </div>
 
-            <button type="submit" class="btn btn-dark w-100">Bayar Sekarang</button>
+            <router-link to="/Payment" class="btn btn-dark w-100">Bayar Sekarang</router-link>
           </form>
         </div>
       </div>
