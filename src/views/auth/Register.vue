@@ -42,7 +42,7 @@ async function register() {
     });
     
     // Proses respons sukses
-    successMessage.value = response.data.message + '. Anda akan dialihkan ke halaman login.';
+    successMessage.value = response.data.message + '. You will be redirected to the login page.';
     
     // Alihkan ke halaman login setelah jeda
     setTimeout(() => {
@@ -58,7 +58,7 @@ async function register() {
      } else if (error.response && error.response.data && error.response.data.message) {
         errorMessage.value = error.response.data.message;
      } else {
-       errorMessage.value = 'Terjadi kesalahan saat registrasi.';
+       errorMessage.value = 'An error occurred during registration.';
      }
     console.error('Registration failed:', error);
   } finally {
@@ -81,8 +81,8 @@ async function register() {
           <div class="mb-4">
             <h2 class="h4 fw-semibold mb-2">Register</h2>
             <p class="text-muted small">
-              Sudah punya akun?
-              <a href="Login" class="text-success fw-bold text-decoration-none">Login di sini</a>
+              Already have an account?
+              <a href="Login" class="text-success fw-bold text-decoration-none">Login here</a>
             </p>
           </div>
 
@@ -121,13 +121,13 @@ async function register() {
 
             <div class="d-grid mb-3">
               <button type="submit" class="btn btn-success" :disabled="isLoading">
-                {{ isLoading ? 'Memproses...' : 'Konfirmasi Pendaftaran' }}
+                {{ isLoading ? 'Loading...' : 'Confirm' }}
               </button>
             </div>
           </form>
 
           <div class="text-center">
-             <p class="text-muted small mb-2">Atau daftar dengan akun google</p>
+             <p class="text-muted small mb-2">Or register with a Google account</p>
 
             <div class="d-flex justify-content-center">
               <img src="/images/googleColor.png" alt="Google" class="cursor-pointer" style="height: 32px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.25)'" onmouseout="this.style.transform='scale(1)'">

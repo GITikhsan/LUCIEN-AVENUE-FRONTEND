@@ -36,7 +36,7 @@ async function login() {
     });
 
     // Proses respons sukses
-    successMessage.value = 'Login berhasil! Anda akan dialihkan...';
+    successMessage.value = 'Login successful! You will be redirected...';
     console.log('Login successful:', response.data);
 
     // Simpan token dan data pengguna ke localStorage untuk manajemen sesi
@@ -53,7 +53,7 @@ async function login() {
     if (error.response && error.response.data && error.response.data.message) {
       errorMessage.value = error.response.data.message;
     } else {
-      errorMessage.value = 'Terjadi kesalahan. Silakan coba lagi.';
+      errorMessage.value = 'An error occurred. Please try again..';
     }
     console.error('Login failed:', error);
   } finally {
@@ -76,8 +76,8 @@ async function login() {
           <div class="mb-4">
             <h2 class="h4 fw-semibold mb-2">Login</h2>
             <p class="text-muted small">
-              Belum punya akun?
-              <a href="Register" class="text-success fw-bold text-decoration-none">Daftar di sini</a>
+              Already have an account?
+              <a href="Register" class="text-success fw-bold text-decoration-none">Register here</a>
             </p>
           </div>
 
@@ -87,7 +87,7 @@ async function login() {
             <div v-if="successMessage" class="alert alert-success">{{ successMessage }}</div>
             
             <div class="mb-3">
-              <input type="email" class="form-control" placeholder="Alamat Email" v-model="email" required>
+              <input type="email" class="form-control" placeholder="Email Address" v-model="email" required>
             </div>
 
             <div class="mb-3 position-relative">
@@ -106,16 +106,16 @@ async function login() {
 
             <div class="d-grid mb-3">
               <button type="submit" class="btn btn-success" :disabled="isLoading">
-                {{ isLoading ? 'Memproses...' : 'Login' }}
+                {{ isLoading ? 'Loading...' : 'Login' }}
               </button>
             </div>
           </form>
 
           <div class="text-center">
             <a href="Forgot" class="text-success fw-bold text-decoration-none d-block mb-2">
-              Lupa password?
+              forgot password?
             </a>
-            <p class="text-muted small mb-2">Atau login dengan akun lain</p>
+            <p class="text-muted small mb-2">Or login with another account</p>
             <div class="d-flex justify-content-center">
               <img src="/images/googleColor.png" alt="Google" class="cursor-pointer" style="height: 32px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.25)'" onmouseout="this.style.transform='scale(1)'">
             </div>
