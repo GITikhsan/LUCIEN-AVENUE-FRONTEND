@@ -48,7 +48,7 @@ const menuItems = [
         </div>
 
         <!-- Form Pengiriman di Kanan -->
-       <div class="col-lg-5 order-2 order-1">
+       <div class="col-lg-5 order-2 ">
           
           <form>
            
