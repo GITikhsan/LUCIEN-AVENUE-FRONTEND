@@ -86,13 +86,13 @@ const items = [
 
         <!-- Instagram -->
         <a href="https://www.instagram.com/lucienavenue" target="_blank" class="d-flex align-items-center justify-content-center justify-content-md-start text-secondary text-decoration-none mb-2">
-          <img src="/images/ig2.png" alt="Instagram" style="height: 24px; width: 24px;" class="me-2">
+          <img src="/images/ig.webp" alt="Instagram" style="height: 24px; width: 24px;" class="me-2">
           <span>@lucienavenue</span>
         </a>
 
         <!-- WhatsApp -->
         <a href="https://wa.me/6282281899371" target="_blank" class="d-flex align-items-center justify-content-center justify-content-md-start text-secondary text-decoration-none">
-          <img src="/images/wafooter.png" alt="WhatsApp" style="height: 24px; width: 24px;" class="me-2">
+          <img src="/images/wa.webp" alt="WhatsApp" style="height: 24px; width: 24px;" class="me-2">
           <span>+62 822-8189-9371</span>
         </a>
       </div>
@@ -101,8 +101,8 @@ const items = [
       <div class="col text-center text-md-start">
         <p class="fw-semibold text-white">Download Our App</p>
         <div class="d-flex justify-content-center justify-content-md-start gap-3">
-          <img src="/images/appstore.png" alt="App Store" style="height: 32px;" class="img-fluid">
-          <img src="/images/googleplay.png" alt="Play Store" style="height: 32px;" class="img-fluid">
+          <img src="/images/appstore.webp" alt="App Store" style="height: 32px;" class="img-fluid">
+          <img src="/images/googleplay.webp" alt="Play Store" style="height: 32px;" class="img-fluid">
         </div>
       </div>
     </div>
