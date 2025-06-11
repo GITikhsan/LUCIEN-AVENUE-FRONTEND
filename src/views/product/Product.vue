@@ -89,7 +89,7 @@ const similarProducts = ref([
 .carousel-item img {
   object-fit: contain;
   height: 260px;
-  margin: 120px auto 20px auto; /* turun lebih jauh ke bawah */
+  margin: 50px auto 20px auto; /* turun lebih jauh ke bawah */
   display: block;
   padding: 0;
 }
@@ -105,17 +105,22 @@ const similarProducts = ref([
 /* Custom Control Buttons */
 .carousel-control-prev,
 .carousel-control-next {
-  width: 42px;
-  height: 42px;
-  top: calc(50% + 20px); /* geser turun sedikit seiring gambar turun */
+  width: 36px;
+  height: 36px;
+  top: 50%;
   transform: translateY(-50%);
-  background-color: white;
-  border: 1px solid #ccc;
+  background-color: white; /* Warna tombol putih */
   border-radius: 50%;
-  opacity: 1;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ccc; /* opsional: biar kelihatan outline-nya */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: black; /* warna panah */
+  font-size: 20px;
+  z-index: 10;
+  opacity: 1; /* biar selalu terlihat */
 }
+
 
 .carousel-control-prev:hover,
 .carousel-control-next:hover {
@@ -124,9 +129,9 @@ const similarProducts = ref([
 
 .carousel-control-prev span,
 .carousel-control-next span {
-  color: black;
-  font-size: 24px;
-  line-height: 1;
+  color: black; /* warna panah */
+  font-size: 22px;
+  font-weight: bold;
 }
 
 .carousel-control-prev:hover span,
@@ -136,11 +141,11 @@ const similarProducts = ref([
 
 /* Position buttons closer to the image */
 .carousel-control-prev {
-  left: -20px;
+  left: 10px;
 }
 
 .carousel-control-next {
-  right: -20px;
+  right: 10px;
 }
 .product-card {
   background-color: white;
@@ -165,8 +170,25 @@ const similarProducts = ref([
 .product-image {
   max-height: 320px;
   object-fit: contain;
-  margin-top: 20px;
 }
+
+@media (max-width: 576px) {
+  .product-carousel-container {
+    padding: 0 10px;
+  }
+
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+  }
+
+  .product-image {
+    max-height: 280px;
+  }
+}
+
 
 .product-info {
   margin-top: auto; /* dorong ke bawah */
@@ -257,12 +279,12 @@ const similarProducts = ref([
 }
 
 .product-card-similar {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  cursor: pointer;
 }
 
 .product-card-similar:hover {
@@ -283,24 +305,32 @@ const similarProducts = ref([
   object-fit: contain;
 }
 
+.product-text-wrapper {
+  margin-top: auto; /* Dorong ke bawah */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 80px; /* Pastikan semua konten nama+harganya sama tinggi */
+}
+
 .product-name {
   font-weight: 500;
   font-size: 0.95rem;
-  margin: 0;
   color: #333;
-  white-space: normal;       /* Biarkan teks bisa membungkus */
-  word-break: break-word;    /* Boleh pecah kata kalau perlu */
-  min-height: 40px;          /* Tambahan agar tingginya seragam */
-}
+  min-height: 40px; /* Untuk pastikan semua nama tinggi sama */
+  margin-bottom: 6px;
 
+  /* Optional: batasi 2 baris */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
 .product-price-similar {
-  font-weight: bold;
   color: #28a745;
-  font-size: 1rem;
+  font-weight: bold;
 }
-
-
 </style>
 
 <template>
@@ -310,33 +340,34 @@ const similarProducts = ref([
     <div class="col-md-6">
       <div class="position-relative mt-4" style="max-width: 420px; margin: 0 auto;">
   <!-- Product Image Carousel -->
-<div class="product-carousel-container position-relative mt-4 mx-auto" style="max-width: 420px;">
-  <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-inner">
-      <div class="carousel-item active">
-        <img src="/public/images/4JT/4240(1).webp" class="d-block product-image" alt="Product Image 1" />
-      </div>
-      <div class="carousel-item">
-        <img src="/public/images/4JT/4240(2).webp" class="d-block product-image" alt="Product Image 2" />
-      </div>
-      <div class="carousel-item">
-        <img src="/public/images/4JT/4240(3).webp" class="d-block product-image" alt="Product Image 2" />
-      </div>
-      <div class="carousel-item">
-        <img src="/public/images/4JT/4240(4).webp" class="d-block product-image" alt="Product Image 2" />
+        <div class="product-carousel-container position-relative mt-4 mx-auto" style="max-width: 420px;">
+          <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+              <div class="carousel-item active">
+                <img src="/public/images/4JT/4240(1).webp" class="d-block w-100 img-fluid product-image" alt="Product Image 1" />
+              </div>
+              <div class="carousel-item">
+                <img src="/public/images/4JT/4240(2).webp" class="d-block w-100 img-fluid product-image" alt="Product Image 2" />
+              </div>
+              <div class="carousel-item">
+                <img src="/public/images/4JT/4240(3).webp" class="d-block w-100 img-fluid product-image" alt="Product Image 2" />
+              </div>
+              <div class="carousel-item">
+                <img src="/public/images/4JT/4240(4).webp" class="d-block w-100 img-fluid product-image" alt="Product Image 2" />
+              </div>
+            </div>
+
+            <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+              <span>&#10094;</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+              <span>&#10095;</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
-      <span>&#10094;</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
-      <span>&#10095;</span>
-    </button>
-  </div>
-</div>
-      </div>
-    </div>
     <!-- Product Details -->
     <div class="col-md-6">
       <h2 class="h4 fw-bold mb-3">{{ product.name }}</h2>
@@ -380,38 +411,36 @@ const similarProducts = ref([
 
       <!-- Accordion Info -->
       <div class="accordion" id="accordionInfo">
-  <div class="accordion-item border-0 border-bottom">
-    <h2 class="accordion-header">
-      <button class="accordion-button collapsed custom-accordion-btn" type="button"
-        data-bs-toggle="collapse" data-bs-target="#collapseOne">
-        Please Make Sure The Size Fits You.   
-      </button>
-    </h2>
-    <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionInfo">
-      <div class="accordion-body small text-muted">
-        If you are unsure about your size, please click the size chart button and browse through the chart.
-        Our company policy does not accept refunds or returns for sizing-related issues.
+        <div class="accordion-item border-0 border-bottom">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed custom-accordion-btn" type="button"
+              data-bs-toggle="collapse" data-bs-target="#collapseOne">
+              Please Make Sure The Size Fits You.   
+            </button>
+          </h2>
+          <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionInfo">
+            <div class="accordion-body small text-muted">
+              If you are unsure about your size, please click the size chart button and browse through the chart.
+              Our company policy does not accept refunds or returns for sizing-related issues.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item border-0 border-bottom">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed custom-accordion-btn" type="button"
+              data-bs-toggle="collapse" data-bs-target="#collapseOne">
+              Authentic. Guaranteed.
+            </button>
+
+          </h2>
+          <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionInfo">
+            <div class="accordion-body small text-muted">
+              All products sold are 100% authentic and verified by our team of experts. We guarantee original items only.
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-
-  <div class="accordion-item border-0 border-bottom">
-    <h2 class="accordion-header">
-      <button class="accordion-button collapsed custom-accordion-btn" type="button"
-        data-bs-toggle="collapse" data-bs-target="#collapseOne">
-        Authentic. Guaranteed.
-      </button>
-
-    </h2>
-    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionInfo">
-      <div class="accordion-body small text-muted">
-        All products sold are 100% authentic and verified by our team of experts. We guarantee original items only.
-      </div>
-    </div>
-  </div>
-</div>
-
-
       
     </div>
   </div>
@@ -443,32 +472,33 @@ const similarProducts = ref([
     </div>
 
     <div class="container mt-5">
-  <!-- Grid Produk -->
-  <div class="container mt-5">
-  <h3 class="text-center fw-bold mb-4">Similar Products</h3>
+      <!-- Grid Produk -->
+      <div class="container mt-5">
+      <h3 class="text-center fw-bold mb-4">Similar Products</h3>
 
-  <div class="row row-cols-2 row-cols-md-4 g-4">
-    <div class="col" v-for="(item, idx) in similarProducts.slice(0, 8)" :key="idx">
-      <div class="product-card-similar text-start p-3">
-        <div class="image-wrapper-similar mb-3">
-          <img :src="item.image" alt="Product Image" class="product-image-similar" />
-        </div>
-        <div>
-          <p class="product-name mb-1">{{ item.name }}</p>
-          <p class="product-price-similar">IDR {{ item.price }}</p>
+      <div class="row row-cols-2 row-cols-md-4 g-4">
+        <div class="col" v-for="(item, idx) in similarProducts.slice(0, 8)" :key="idx">
+          <div class="product-card-similar text-start p-3 d-flex flex-column h-100">
+            <div class="image-wrapper-similar mb-3">
+              <img :src="item.image" alt="Product Image" class="product-image-similar" />
+            </div>
+            <!-- Konten teks dalam flex column -->
+      <div class="product-text-wrapper mt-auto">
+        <p class="product-name">{{ item.name }}</p>
+        <p class="product-price-similar">IDR {{ item.price }}</p>
+      </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-  </div>
+      </div>
 
-  <!-- Tombol View More -->
-  <div class="text-center mt-5 mb-5">
-    <router-link to="/ViewMore" class="btn btn-dark rounded-pill px-5 py-2 shadow-sm">
-      View More
-    </router-link>
-  </div>
-</div>
+      <!-- Tombol View More -->
+      <div class="text-center mt-5 mb-5">
+        <router-link to="/ViewMore" class="btn btn-dark rounded-pill px-5 py-2 shadow-sm">
+          View More
+        </router-link>
+      </div>
+    </div>
 
 </div>
 </template>
