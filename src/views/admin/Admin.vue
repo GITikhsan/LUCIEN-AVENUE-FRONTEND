@@ -25,28 +25,6 @@
       </div>
     `,
 
-    "Discussion": `
-      <div class="card">
-        <div class="card-body">
-          <h5 class="fw-semibold mb-3">Product Discussion</h5>
-          <div class="mb-3 border rounded p-3">
-            <p class="fw-semibold mb-1">User123:</p>
-            <p>Is this product compatible with Android 12?</p>
-            <p class="text-muted small mt-2">2 hours ago</p>
-          </div>
-          <div class="mb-3 border bg-light rounded p-3">
-            <p class="fw-semibold mb-1">Admin:</p>
-            <p>Yes, this product is compatible with Android 12 and above.</p>
-            <p class="text-muted small mt-2">1 hour ago</p>
-          </div>
-          <div class="mt-4">
-            <textarea class="form-control mb-2" placeholder="Write a reply..." rows="3"></textarea>
-            <button class="btn btn-success">Reply</button>
-          </div>
-        </div>
-      </div>
-    `,
-
     "Product": `
       <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -282,7 +260,6 @@ $(document).on("submit", "#diskonForm", function (e) {
     </div>
     <nav class="nav flex-column gap-2" id="sidebarMenu">
       <a href="#" data-panel="Home" class="nav-link text-dark">Home</a>
-      <a href="#" data-panel="Discussion" class="nav-link text-dark">Chat</a>
       <a href="#" data-panel="Product" class="nav-link text-dark">Product Input</a>
       <a href="#" data-panel="Orders" class="nav-link text-dark">Orders</a>
       <a href="#" data-panel="promo" class="nav-link">Promo</a>
