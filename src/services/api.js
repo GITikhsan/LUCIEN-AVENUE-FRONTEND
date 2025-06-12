@@ -1,16 +1,12 @@
-// File: src/api/axios.js
+// File: src/services/api.js
 
-import axios from 'axios';
+// 1. Impor 'api' (default export) dari konektor
+import api from '@/api/axios.js';
 
-// Konfigurasi utama koneksi ke backend Anda
-const api = axios.create({
-  baseURL: 'http://localhost:8000/api',
-  timeout: 5000, // Waktu tunggu request dalam milidetik
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
-});
+// 2. Buat fungsi 'ping' dan ekspor dengan 'export const' (named export)
+export const ping = () => {
+  return api.get('/ping');
+}
 
-// Export instance ini agar bisa digunakan oleh file lain
-export default api;
+// Tambahkan fungsi lain dengan 'export const' juga
+// export const getAllProducts = () => { ... }

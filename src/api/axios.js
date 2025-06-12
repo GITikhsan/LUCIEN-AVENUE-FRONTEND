@@ -1,17 +1,14 @@
 // File: src/api/axios.js
-
-console.log('%c[TES] File konektor axios.js berhasil dibaca!', 'color: blue; font-weight: bold;');
-
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000/api'; 
-
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: 'http://localhost:8000/api',
+  timeout: 5000,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   }
 });
 
+// Menggunakan 'export default' karena ini adalah ekspor utama dari file ini
 export default api;
