@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
 // Inisialisasi state
-const userName = ref('Memuat...')
+const userName = ref('Loading...')
 const menuItems = [
   { to: '/mydata', label: 'My data' },
   { to: '/myPurchases',  label: 'My Purchases' },
@@ -12,23 +12,24 @@ const menuItems = [
 ]
 
 // Ambil data user dari API saat komponen dimount
+
 onMounted(async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/api/users')
-    
-    // Karena pakai pagination, data user-nya ada di: data.data
-    const users = response.data.data.data
+    const token = localStorage.getItem('token') // ambil dari localStorage
+    const response = await axios.get('http://127.0.0.1:8000/api/user', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
 
-    if (users.length > 0) {
-      userName.value = users[0].name // ambil nama user pertama
-    } else {
-      userName.value = 'No user'
-    }
+    userName.value = response.data.name // asumsi response = { name: "..." }
+
   } catch (error) {
     console.error('Failed to load user data:', error)
     userName.value = 'Failed to load user'
   }
 })
+
 
 </script>
 
