@@ -1,10 +1,16 @@
-import axios from 'axios'
+// File: src/api/axios.js
 
+import axios from 'axios';
+
+// Konfigurasi utama koneksi ke backend Anda
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api',
-  timeout: 5000
-})
+  baseURL: 'http://localhost:8000/api',
+  timeout: 5000, // Waktu tunggu request dalam milidetik
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
+});
 
-export const ping = () => api.get('/ping')
-
-export default api
+// Export instance ini agar bisa digunakan oleh file lain
+export default api;
