@@ -65,75 +65,75 @@ const brands = ['Nike', 'Adidas', 'Air Jordan', 'Yeezy', 'New Balance']
 const products = ref([
   {
     id: 1,
-    name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
-    image: '/images/youth adidas/2,920,000(1).webp',
-    price: 'IDR 2,920,000',
+    name: 'Air Jordan 1 Retro Low OG SP Travis Scott Canary (Women) ',
+    image: '/images/3JT/3700.webp',
+    price: 'IDR 3,700,000',
     discount: 10,
-    brand: 'Yeezy'
+    brand: 'Air Jordan'
   },
   {
     id: 2,
-    name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
-    image: '/images/youth adidas/2,920,000(1).webp',
-    price: 'IDR 2,920,000',
+    name: 'Air Jordan 1 Retro Low OG Swarovski Stealth (Women)',
+    image: '/images/21JT/21510.webp',
+    price: 'IDR 21,510,000',
     discount: 10,
-    brand: 'Yeezy'
+    brand: 'Air Jordan'
   },
   {
     id: 3,
-    name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
-    image: '/images/youth adidas/2,920,000(1).webp',
-    price: 'IDR 2,920,000',
+    name: 'Nike Zoom Field Jaxx Travis Scott Leche Blue',
+    image: '/images/2JT/2000.webp',
+    price: 'IDR 2,000,000',
     discount: 10,
-    brand: 'Yeezy'
+    brand: 'Air Jordan'
   },
   {
     id: 4,
-    name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
-    image: '/images/youth adidas/2,920,000(1).webp',
-    price: 'IDR 2,920,000',
+    name: 'Air Jordan 1 Low Fragment x Travis Scott',
+    image: '/images/15JT/15000.webp',
+    price: 'IDR 15,000,000',
     discount: 10,
-    brand: 'Yeezy'
+    brand: 'Air Jordan'
   },
   {
     id: 5,
-    name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
-    image: '/images/youth adidas/2,920,000(1).webp',
-    price: 'IDR 2,920,000',
+    name: 'Air Jordan Jumpman Jack TR Travis Scott Bright Cactus',
+    image: '/images/3JT/3900.webp',
+    price: 'IDR 3,900,000',
     discount: 10,
-    brand: 'Yeezy'
+    brand: 'Air Jordan'
   },
   {
     id: 6,
-    name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
-    image: '/images/youth adidas/2,920,000(1).webp',
-    price: 'IDR 2,920,000',
+    name: 'Air Jordan 1 Retro Low OG Doernbecher (2023)',
+    image: '/images/7JT/7400.webp',
+    price: 'IDR 7,400,000',
     discount: 10,
-    brand: 'Yeezy'
+    brand: 'Air Jordan'
   },
   {
     id: 7,
-    name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
-    image: '/images/youth adidas/2,920,000(1).webp',
-    price: 'IDR 2,920,000',
+    name: 'Air Jordan 1 Retro Low OG Mocha',
+    image: '/images/2JT/2200.webp',
+    price: 'IDR 2,200,000',
     discount: 10,
-    brand: 'Yeezy'
+    brand: 'Air Jordan'
   },
   {
     id: 8,
-    name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
-    image: '/images/youth adidas/2,920,000(1).webp',
-    price: 'IDR 2,920,000',
+    name: 'Air Jordan 1 Low Illuminates Vivid Orange',
+    image: '/images/3JT/3630.webp',
+    price: 'IDR 3,630,000',
     discount: 10,
-    brand: 'Yeezy'
+    brand: 'Air Jordan'
   },
   {
     id: 9,
-    name: 'Yeezy Boost 350 V2 Dazzling Blue (Toddler)',
-    image: '/images/youth adidas/2,920,000(1).webp',
-    price: 'IDR 2,920,000',
+    name: 'Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown',
+    image: '/public/images/4JT/4240(1).webp',
+    price: 'IDR 4,240,000',
     discount: 10,
-    brand: 'Yeezy'
+    brand: 'Air Jordan'
   }
 ])
 
