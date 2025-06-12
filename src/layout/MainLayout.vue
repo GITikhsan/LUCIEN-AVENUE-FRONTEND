@@ -29,20 +29,37 @@ const items = [
           <RouterLink class="nav-link" :to="i.to">{{ i.name }}</RouterLink>
         </li>
         <!-- Search Form -->
-        <li class="nav-item ms-3">
-          <form class="d-flex" @submit.prevent="handleSearch">
-            <input
-              v-model="searchQuery"
-              class="form-control"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-            />
-            <button class="btn btn-outline-dark ms-2" type="submit">
-              <i class="bi bi-search"></i>
-            </button>
-          </form>
-        </li>
+       <li class="nav-item ms-3">
+  <form class="d-flex" @submit.prevent="handleSearch" style="gap: 0.5rem;">
+    <div class="input-group" style="width: 260px;">
+      <input
+        v-model="searchQuery"
+        type="search"
+        class="form-control rounded-pill ps-4"
+        placeholder="Search"
+        aria-label="Search"
+        style="
+          background-color: #f1f1f1;
+          border: none;
+          height: 42px;
+          font-size: 0.95rem;
+        "
+      />
+    </div>
+    <button
+      class="btn btn-dark d-flex align-items-center justify-content-center"
+      type="submit"
+      style="
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+      "
+    >
+      <i class="bi bi-search"></i>
+    </button>
+  </form>
+</li>
+
       </ul>
     </div>
     </div>
