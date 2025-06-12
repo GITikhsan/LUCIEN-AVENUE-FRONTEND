@@ -45,7 +45,7 @@ const routes = [
   { path: '/userProfile', name: 'Profile', component: UserProfile },
   { path: '/aboutUs',   name: 'About Us',     component: AboutUs },
   { path: '/viewMore',   name: 'View More',     component: ViewMore },
-  { path: '/product',   name: 'Product',     component: Product },
+  { path: '/product/:id',   name: 'Product',     component: Product },
   { path: '/admin',   name: 'Admin',     component: Admin },
   { path: '/checkout',   name: 'Checkout',  component: Checkout },
     { path: '/bag',   name: 'Bag',     component: Bag },
