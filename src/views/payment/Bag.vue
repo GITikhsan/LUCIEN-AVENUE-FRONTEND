@@ -1,102 +1,52 @@
-<script>
-    const products = [
-      {
-        name: "Sepatu1 - Sandal Anak",
-        price: 20000,
-        qty: 1,
-        image: "/public/images/4JT/4240(1).webp"
-      },
-      {
-        name: "Sepatu2- Baju Pria",
-        price: 15000,
-        qty: 1,
-        image: "/public/images/4JT/4240(1).webp"
-      },
-      {
-        name: "Sepatu3 - Jam Tangan Pria",
-        price: 104000,
-        qty: 1,
-        image: "/public/images/4JT/4240(1).webp"
-      },
-      {
-        name: "Sepatu4 - Kaos Kaki",
-        price: 8000,
-        qty: 1,
-        image: "/public/images/4JT/4240(1).webp"
-      }
-    ];
+<script setup>
+import { ref, computed } from 'vue';
 
-    function renderCart() {
-      const cartList = document.getElementById('cart-list');
-      cartList.innerHTML = '';
-      products.forEach((product, index) => {
-        const itemHTML = `
-          <div class="cart-item d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center gap-3">
-              <img src="${product.image}" class="item-img" alt="${product.name}" />
-              <div>
-                <div><strong>${product.name.split(' - ')[0]}</strong> - ${product.name.split(' - ')[1]}</div>
-                <div class="text-muted">Rp ${product.price.toLocaleString('id-ID')}</div>
-              </div>
-            </div>
-            <div class="d-flex align-items-center gap-3">
-              <input type="number" class="form-control qty-box" data-index="${index}" value="${product.qty}" min="1" onchange="updateQty(this)" />
-              <button class="btn btn-outline-danger btn-sm" onclick="removeItem(${index})">🗑</button>
-            </div>
-          </div>`;
-        cartList.innerHTML += itemHTML;
-      });
-      updateTotal();
-      updateItemCount();
-    }
+// Untuk contoh, kita buat data palsu. Nanti ini bisa dari API.
+const cartItems = ref([
+  { id: 1, name: 'Air Jordan 1', price: 2200000, quantity: 1, image: 'https://via.placeholder.com/100' },
+  { id: 2, name: 'Nike Zoom', price: 2000000, quantity: 2, image: 'https://via.placeholder.com/100' },
+]);
 
-    function updateQty(input) {
-      const index = input.getAttribute('data-index');
-      const newQty = parseInt(input.value) || 1;
-      products[index].qty = newQty;
-      updateTotal();
-    }
+const increaseQty = (item) => item.quantity++;
+const decreaseQty = (item) => { if (item.quantity > 1) item.quantity--; };
+const removeItem = (itemId) => { cartItems.value = cartItems.value.filter(item => item.id !== itemId); };
 
-    function updateTotal() {
-      const total = products.reduce((sum, item) => sum + item.price * item.qty, 0);
-      document.getElementById('grand-total').innerText = total.toLocaleString('id-ID');
-    }
+// Total harga dihitung secara otomatis dan reaktif
+const cartTotal = computed(() => {
+  return cartItems.value.reduce((total, item) => total + (item.price * item.quantity), 0);
+});
 
-    function removeItem(index) {
-      products.splice(index, 1);
-      renderCart();
-    }
+const formatCurrency = (value) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
+</script>
 
-    function updateItemCount() {
-      document.getElementById('total-items').innerText = products.length;
-    }
-    window.onload = renderCart;
-  </script>
-
-<style>
-    .item-img { width: auto; height: 100px; object-fit: fill; }
-    .btn-checkout { background-color: green; color: white; padding: 8px 16px; border: none; }
-  </style>
-  
 <template>
-    <div class="bg-light">
-    <div class="container py-4">
-      <div class="mb-3">
-        <a href="ViewMore" class="text-decoration-none">&larr; Lanjut Mencari Barang</a>
-      </div>
-      <h4>Keranjang Produk</h4>
-      <p class="text-muted">Kamu memiliki <span id="total-items">0</span> produk</p>
-
-      <!-- List Produk -->
-      <div id="cart-list"></div>
-
-      <!-- Checkout -->
-      <div class="d-flex justify-content-end mt-4">
-        <div class="d-flex align-items-center gap-3">
-          <h5 class="mb-0">Rp <span id="grand-total">0</span></h5>
-         <a href="Checkout">Checkout →</a> 
+  <div class="container py-5">
+    <h2 class="mb-4 fw-bold">My Bag</h2>
+    <div v-if="cartItems.length > 0" class="row">
+      <div class="col-md-8">
+        <div v-for="item in cartItems" :key="item.id" class="card mb-3">
+          <div class="card-body">
+            <h5>{{ item.name }}</h5>
+            <p>{{ formatCurrency(item.price) }}</p>
+            </div>
         </div>
       </div>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Summary</h5>
+            <hr>
+            <div class="d-flex justify-content-between fw-bold">
+              <p class="mb-2">Total</p>
+              <p class="mb-2">{{ formatCurrency(cartTotal) }}</p>
+            </div>
+            <button class="btn btn-dark w-100 mt-3">Go to checkout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-else class="text-center p-5 border rounded">
+      <h4>Your bag is empty.</h4>
     </div>
   </div>
 </template>

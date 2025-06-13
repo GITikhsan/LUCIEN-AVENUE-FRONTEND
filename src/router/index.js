@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import MainLayout from '@/layout/MainLayout.vue'
 import Home from '@/views/User/Home.vue'
 import Product from '@/views/product/Product.vue'
+import ViewMore from '@/views/User/ViewMore.vue'
 import Login from '@/views/auth/Login.vue'
 import Register from '@/views/auth/Register.vue'
 import UserProfile from '@/views/User/UserProfile.vue'
@@ -27,6 +28,11 @@ const routes = [
         path: 'product/:id', // URL menjadi: /product/123
         name: 'Product',
         component: Product
+      },
+      {
+        path: 'viewMore',
+        name: 'ViewMore',
+        component: ViewMore
       },
       {
         path: 'userProfile', // URL menjadi: /userProfile
