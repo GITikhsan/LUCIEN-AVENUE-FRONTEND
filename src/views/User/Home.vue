@@ -1,34 +1,18 @@
 <script setup>
-import { onMounted } from 'vue'
 
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
 
+const products = ref([])
 
-const products = [
-  {
-    name: "Air Jordan 1 Low Fragment x Travis Scott",
-    price: "Rp 15.000.000",
-    image: "/images/15JT/15000.webp",
-    link: "/product" // pastikan ini sesuai route
-  },
-  {
-    name: "Nike Dunk Low Retro Panda",
-    price: "Rp 2.000.000",
-    image: "/images/2JT/dunklowpanda.webp",
-    link: "/product"
-  },
-  {
-    name: "New Balance 550 White Grey",
-    price: "Rp 3.100.000",
-    image: "/images/3JT/nb550.webp",
-    link: "/product"
-  },
-  {
-    name: "Adidas Samba OG White Black",
-    price: "Rp 1.750.000",
-    image: "/images/1JT/samba.webp",
-    link: "/product"
+onMounted(async () => {
+  try {
+    const response = await axios.get('/api/products')
+    products.value = response.data
+  } catch (error) {
+    console.error('Gagal mengambil produk:', error)
   }
-]
+})
 </script>
 
 <template>
