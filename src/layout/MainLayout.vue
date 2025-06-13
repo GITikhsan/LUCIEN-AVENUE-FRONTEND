@@ -1,5 +1,6 @@
 
 <script setup>
+import { ref } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 const items = [
   { to: '/',          name: 'Home' },
@@ -9,6 +10,12 @@ const items = [
   { to: '/bag', name: 'Bag' },
   { to: '/aboutUs',   name: 'About Us' }
 ]
+
+const searchQuery = ref('')
+const handleSearch = () => {
+  alert(`Mencari: ${searchQuery.value}`)
+}
+
 </script>
 
 <template>
