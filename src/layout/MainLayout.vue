@@ -1,4 +1,3 @@
-
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 const items = [

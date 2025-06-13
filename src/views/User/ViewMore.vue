@@ -45,7 +45,7 @@ const selectedColors = ref([])
 const selectedBrands = ref([])
 const sortOption = ref('')
 
-const sizes = [20, 21, 22, 23, 24, 25, 26, 27]
+const sizes = [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45]
 const discounts = [
   { label: 'Any', value: 'any' },
   { label: '10%+', value: 10 },
@@ -195,9 +195,9 @@ const filteredProducts = computed(() => {
           </button>
         </div>
 
-        <h6 class="fw-semibold mb-3">Size</h6>
-        <div class="row g-2 mb-3">
-          <div class="col-3" v-for="n in sizes" :key="n">
+      <h6 class="fw-semibold mb-3">Size</h6>
+        <div class="row row-cols-4 g-3 mb-3">
+          <div class="col" v-for="n in sizes" :key="n">
             <input
               type="radio"
               class="visually-hidden"
@@ -207,9 +207,9 @@ const filteredProducts = computed(() => {
               v-model="size"
             />
             <label
-              class="btn w-100 py-2 size-tile text-center"
+              class="size-clean w-100 text-center"
               :for="'size' + n"
-              :class="{ active: size === n }"
+              :class="{ selected: size === n }"
             >
               {{ n }}
             </label>
@@ -217,46 +217,60 @@ const filteredProducts = computed(() => {
         </div>
 
         <h6 class="fw-semibold mb-3">Discount</h6>
-        <div class="row row-cols-2 g-3 mb-3">
-          <div class="col-6 col-md-3" v-for="d in discounts" :key="d.label">
-            <input
-              type="radio"
-              class="btn-check"
-              :id="'discount' + d.value"
-              name="discount"
-              :value="d.value"
-              v-model="discount"
-            />
-            <label
-              class="btn w-100 py-2 text-white fw-semibold glow-anim"
-              :for="'discount' + d.value"
-              :class="[
-                discount === d.value ? 'selected' : '',
-                {
-                  'bg-success': d.value === 10,
-                  'bg-primary': d.value === 25,
-                  'bg-danger': d.value === 50,
-                  'bg-secondary': d.value === 'any'
-                }
-              ]"
-            >
-              {{ d.label }}
-            </label>
+          <div class="row row-cols-2 row-cols-md-4 g-3 mb-3">
+            <div class="col" v-for="d in discounts.filter(dis => dis.value !== 'any')" :key="d.label">
+              <input
+                type="radio"
+                class="btn-check"
+                :id="'discount' + d.value"
+                name="discount"
+                :value="d.value"
+                v-model="discount"
+              />
+              <label
+                class="btn w-100 py-2 fw-semibold rounded-3 discount-tile"
+                :for="'discount' + d.value"
+                :class="[
+                  discount === d.value ? 'active-tile' : '',
+                  {
+                    'bg-success text-white': d.value === 10,
+                    'bg-primary text-white': d.value === 25,
+                    'bg-danger text-white': d.value === 50
+                  }
+                ]"
+              >
+                {{ d.label }}
+              </label>
+            </div>
           </div>
-        </div>
 
-        <h6 class="fw-semibold mb-3">Price Range</h6>
-        <div class="mb-3">
-          <select class="form-select shadow-sm rounded-3 border-dark" v-model="priceRange">
-            <option disabled value="">Select a range</option>
-            <option
+
+      <h6 class="fw-semibold mb-3">Price Range</h6>
+        <div class="dropdown w-100 mb-4">
+          <button
+            class="btn border w-100 text-start d-flex justify-content-between align-items-center shadow-sm px-3 py-2 rounded-3"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            {{ selectedLabel || 'Select Price Range' }}
+            <i class="bi bi-chevron-down"></i>
+          </button>
+
+          <ul class="dropdown-menu w-100 mt-1 rounded-3 shadow-sm p-1">
+            <li
               v-for="range in priceRanges"
-              :value="range.value"
               :key="range.value"
             >
-              {{ range.label }}
-            </option>
-          </select>
+              <a
+                href="#"
+                class="dropdown-item rounded-2 py-2 px-3"
+                @click.prevent="selectPriceRange(range)"
+              >
+                {{ range.label }}
+              </a>
+            </li>
+          </ul>
         </div>
 
         <h6 class="fw-semibold mb-3">Color</h6>
@@ -442,29 +456,33 @@ const filteredProducts = computed(() => {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
 }
 
-/* Warna */
-.size-tile {
+/* Size */
+.size-clean {
+  display: block;
+  padding: 12px 0;
   border-radius: 10px;
-  background: linear-gradient(135deg, #f1f3f5, #dee2e6);
-  color: #212529;
-  font-weight: 600;
+  background-color: #f5f5f5;
+  color: #333;
+  font-weight: 500;
+  font-size: 1rem;
+  border: 1px solid #ddd;
   transition: all 0.3s ease;
-  border: 2px solid transparent;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
 }
 
-.size-tile:hover {
-  transform: translateY(-2px);
-  background: linear-gradient(135deg, #e9ecef, #ced4da);
+.size-clean:hover {
+  background-color: #eaeaea;
+  border-color: #bbb;
 }
 
-.size-tile.active {
-  background: linear-gradient(135deg, #4dabf7, #228be6);
-  color: white;
-  border-color: #228be6;
-  box-shadow: 0 4px 10px rgba(34, 139, 230, 0.4);
-  transform: scale(1.05);
+.size-clean.selected {
+  background-color: #000;
+  color: #fff;
+  border-color: #000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
+
 
 /* Gender */
 .btn-men,
@@ -551,5 +569,34 @@ const filteredProducts = computed(() => {
     font-size: 0.95rem; /* <-- UKURAN DESKTOP */
   }
 }
+
+/* discount */
+.discount-tile {
+  transition: all 0.3s ease;
+  box-shadow: none;
+  border: 1px solid transparent;
+}
+
+.discount-tile:hover {
+  opacity: 0.9;
+  transform: scale(1.03);
+}
+
+.active-tile {
+  box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.1);
+  transform: scale(1.05);
+}
+
+/* price */
+.active-price {
+  background-color: #f1f3f5;
+  font-weight: 600;
+  color: #000;
+}
+.dropdown-menu .dropdown-item:hover {
+  background-color: #f8f9fa;
+  transition: background 0.2s ease;
+}
+
 
 </style>
