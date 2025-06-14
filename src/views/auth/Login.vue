@@ -71,7 +71,7 @@ async function login() {
     if (error.response) {
       errorMessage.value = error.response.data.message || 'Incorrect email or password.';
     } else {
-      errorMessage.value = 'An error occurred. Please try again..';
+      successMessage.value = 'Login successful!';
     }
   } finally {
     isLoading.value = false;
