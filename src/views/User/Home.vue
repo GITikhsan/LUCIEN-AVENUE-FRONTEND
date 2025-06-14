@@ -7,7 +7,7 @@ const products = ref([])
 
 onMounted(async () => {
   try {
-    const response = await axios.get('/api/products')
+    const response = await axios.get('http://127.0.0.1:8000/api/products')
     products.value = response.data
   } catch (error) {
     console.error('Gagal mengambil produk:', error)
@@ -73,27 +73,7 @@ onMounted(async () => {
       </div>
     </div>
   </section>
-  <!-- Gallery Carousel -->
-  <!-- <div id="galleryCarousel" class="carousel slide container py-5" data-bs-ride="carousel">
-    <div class="carousel-inner">
-      <div class="carousel-item active">
-        <img src="/public/images/4JT/4,240,000.png" class="d-block w-100 rounded shadow" alt="Fashion 1">
-      </div>
-      <div class="carousel-item">
-        <img src="/public/images/3JT/3,210,000(1).png" class="d-block w-100 rounded shadow" alt="Fashion 2">
-      </div>
-      <div class="carousel-item">
-        <img src="/public/images/2JT/2,030,000(1).png" class="d-block w-100 rounded shadow" alt="Fashion 3">
-      </div>
-      Tambah item lainnya jika dibutuhkan -->
-    <!-- </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon bg-dark rounded-circle p-2"></span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel" data-bs-slide="next">
-      <span class="carousel-control-next-icon bg-dark rounded-circle p-2"></span>
-    </button>
-  </div> --> 
+ 
   <section>
      <div class="position-relative w-100 vh-100 bg-cover bg-center d-flex align-items-center justify-content-center text-center text-white"
      style="background-image: url('/public/images/fashion/Men.JPG'); background-size: cover; background-position: center;">
@@ -111,20 +91,6 @@ onMounted(async () => {
     </div>
     </div>
   </section>
-
-  <!-- Hero Section -->
-  <!-- <section class="bg-light py-5 px-3">
-    <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between gap-4">
-      <div class="text-start">
-        <h1 class="h3 fw-bold mb-3">🔥 New Arrival: Streetwear Sneakers</h1>
-        <p class="text-muted mb-3">Comfort and style come together in one step</p>
-        <a href="viewmore" class="btn btn-secondary fw-bold">Explore Now</a>
-      </div>
-      <div>
-        <img src="/public/images/2JT/2,030,000(1).png" alt="Sneaker Promo" class="img-fluid rounded">
-      </div>
-    </div>
-  </section> -->
 
   <!-- Featured Products Section -->
   <section class="py-5 text-center">
@@ -184,21 +150,6 @@ onMounted(async () => {
     </div>
     </div>
   </section>
-
-  <!-- Hero Section -->
-  <!-- <section class="bg-light py-5 px-3">
-    <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between gap-4">
-      <div class="text-start">
-        <h1 class="h3 fw-bold mb-3">🔥 New Arrival: Streetwear Sneakers</h1>
-        <p class="text-muted mb-3">Comfort and style come together in one step</p>
-        <a href="viewmore" class="btn btn-secondary fw-bold">Explore Now</a>
-      </div>
-      <div>
-        <img src="/public/images/2JT/2,030,000(1).png" alt="Sneaker Promo" class="img-fluid rounded">
-      </div>
-    </div>
-  </section> -->
-
   <!-- Featured Products Section -->
   <section class="py-5 text-center">
     <div class="container">
