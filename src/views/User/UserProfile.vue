@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import axios from 'axios';
 
 // Inisialisasi state
 const userName = ref('Loading...')
@@ -16,7 +16,7 @@ const menuItems = [
 onMounted(async () => {
   try {
     const token = localStorage.getItem('token') // ambil dari localStorage
-    const response = await axios.get('http://127.0.0.1:8000/api/user', {
+    const response = await axios.get('http://127.0.0.1:8000/api/profile', {
       headers: {
         Authorization: `Bearer ${token}`
       }
