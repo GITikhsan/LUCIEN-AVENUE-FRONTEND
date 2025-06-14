@@ -1,102 +1,114 @@
-<script>
-    const products = [
-      {
-        name: "Sepatu1 - Sandal Anak",
-        price: 20000,
-        qty: 1,
-        image: "/public/images/4JT/4240(1).webp"
-      },
-      {
-        name: "Sepatu2- Baju Pria",
-        price: 15000,
-        qty: 1,
-        image: "/public/images/4JT/4240(1).webp"
-      },
-      {
-        name: "Sepatu3 - Jam Tangan Pria",
-        price: 104000,
-        qty: 1,
-        image: "/public/images/4JT/4240(1).webp"
-      },
-      {
-        name: "Sepatu4 - Kaos Kaki",
-        price: 8000,
-        qty: 1,
-        image: "/public/images/4JT/4240(1).webp"
-      }
-    ];
-
-    function renderCart() {
-      const cartList = document.getElementById('cart-list');
-      cartList.innerHTML = '';
-      products.forEach((product, index) => {
-        const itemHTML = `
-          <div class="cart-item d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center gap-3">
-              <img src="${product.image}" class="item-img" alt="${product.name}" />
-              <div>
-                <div><strong>${product.name.split(' - ')[0]}</strong> - ${product.name.split(' - ')[1]}</div>
-                <div class="text-muted">Rp ${product.price.toLocaleString('id-ID')}</div>
-              </div>
-            </div>
-            <div class="d-flex align-items-center gap-3">
-              <input type="number" class="form-control qty-box" data-index="${index}" value="${product.qty}" min="1" onchange="updateQty(this)" />
-              <button class="btn btn-outline-danger btn-sm" onclick="removeItem(${index})">🗑</button>
-            </div>
-          </div>`;
-        cartList.innerHTML += itemHTML;
-      });
-      updateTotal();
-      updateItemCount();
-    }
-
-    function updateQty(input) {
-      const index = input.getAttribute('data-index');
-      const newQty = parseInt(input.value) || 1;
-      products[index].qty = newQty;
-      updateTotal();
-    }
-
-    function updateTotal() {
-      const total = products.reduce((sum, item) => sum + item.price * item.qty, 0);
-      document.getElementById('grand-total').innerText = total.toLocaleString('id-ID');
-    }
-
-    function removeItem(index) {
-      products.splice(index, 1);
-      renderCart();
-    }
-
-    function updateItemCount() {
-      document.getElementById('total-items').innerText = products.length;
-    }
-    window.onload = renderCart;
-  </script>
-
-<style>
-    .item-img { width: auto; height: 100px; object-fit: fill; }
-    .btn-checkout { background-color: green; color: white; padding: 8px 16px; border: none; }
-  </style>
-  
 <template>
-    <div class="bg-light">
-    <div class="container py-4">
-      <div class="mb-3">
-        <a href="ViewMore" class="text-decoration-none">&larr; Lanjut Mencari Barang</a>
+  <div class="bg-body-tertiary min-vh-100 py-5">
+    <div class="container">
+      <!-- Link Kembali -->
+      <div class="mb-4">
+        <a href="ViewMore" class="text-decoration-none text-secondary-emphasis fw-medium">
+          ← Lanjutkan Belanja
+        </a>
       </div>
-      <h4>Keranjang Produk</h4>
-      <p class="text-muted">Kamu memiliki <span id="total-items">0</span> produk</p>
 
-      <!-- List Produk -->
-      <div id="cart-list"></div>
+      <!-- Header -->
+      <div class="mb-4">
+        <h2 class="fw-bold">Keranjang Kamu</h2>
+        <p class="text-muted">Total: {{ products.length }} produk</p>
+      </div>
 
-      <!-- Checkout -->
-      <div class="d-flex justify-content-end mt-4">
-        <div class="d-flex align-items-center gap-3">
-          <h5 class="mb-0">Rp <span id="grand-total">0</span></h5>
-         <a href="Checkout">Checkout →</a> 
+      <!-- Cart Items -->
+      <div v-if="products.length > 0" class="vstack gap-4">
+        <div
+          v-for="(product, index) in products"
+          :key="index"
+          class="bg-white p-4 rounded-4 shadow-sm d-flex flex-column flex-md-row gap-4 align-items-center"
+        >
+          <!-- Gambar -->
+          <img :src="product.image" :alt="product.model" class="cart-img shadow rounded-4" />
+
+          <!-- Info -->
+          <div class="flex-grow-1 text-center text-md-start">
+            <h5 class="fw-semibold mb-1">{{ product.model }}</h5>
+            <p class="text-muted small mb-1">Ukuran: {{ product.size }}</p>
+            <p class="fw-bold text-primary fs-5 mb-0">Rp {{ product.price.toLocaleString('id-ID') }}</p>
+          </div>
+
+          <!-- Hapus -->
+          <div>
+            <button class="btn btn-outline-danger" @click="removeItem(index)">
+              <i class="bi bi-trash3"></i>
+            </button>
+          </div>
         </div>
+      </div>
+
+      <!-- Kosong -->
+      <div v-else class="text-center bg-white p-5 rounded-4 shadow-sm mt-4">
+        <h5 class="text-muted mb-3">Keranjang kamu kosong 😢</h5>
+        <a href="ViewMore" class="btn btn-dark">Cari Produk</a>
+      </div>
+
+      <!-- Total & Checkout -->
+      <div
+        v-if="products.length > 0"
+        class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mt-5 p-4 bg-white rounded-4 shadow-sm"
+      >
+        <h4 class="mb-3 mb-md-0">
+          Total: <span class="text-success fw-bold">Rp {{ grandTotal.toLocaleString('id-ID') }}</span>
+        </h4>
+        <a href="Checkout" class="btn btn-success btn-lg px-5 py-2 rounded-4 shadow-sm">
+          Checkout →
+        </a>
       </div>
     </div>
   </div>
 </template>
+
+<script>
+export default {
+  data() {
+    return {
+      products: [
+        {
+          model: "Air Jordan 1 Low Illuminates Vivid Orange",
+          size: 43,
+          price: 3630000,
+          image: "/images/3JT/3630.webp",
+        },
+        {
+          model: "Air Jordan 1 Retro Low OG Mocha",
+          size: 42,
+          price: 2200000,
+          image: "/images/2JT/2200.webp",
+        },
+      ],
+    };
+  },
+  computed: {
+    grandTotal() {
+      return this.products.reduce((total, p) => total + p.price, 0);
+    },
+  },
+  methods: {
+    removeItem(index) {
+      if (confirm("Yakin ingin menghapus produk ini?")) {
+        this.products.splice(index, 1);
+      }
+    },
+  },
+};
+</script>
+
+<style scoped>
+.cart-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  background-color: #f8f9fa;
+  padding: 6px;
+}
+@media (max-width: 576px) {
+  .cart-img {
+    width: 65px;
+    height: 65px;
+  }
+}
+</style>
