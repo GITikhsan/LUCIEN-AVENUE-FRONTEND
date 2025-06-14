@@ -54,8 +54,10 @@ async function register() {
     // 2. Arahkan ke dashboard yang sesuai menggunakan router
     const userRole = response.data.user.role;
     if (userRole === 'admin') {
+      successMessage.value = 'Login successful! You will be redirected...';
       router.push('/Admin'); 
     } else {
+      successMessage.value = 'Register successful!';
       router.push('/Login'); 
     }
 

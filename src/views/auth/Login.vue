@@ -28,7 +28,7 @@ function togglePassword() {
 // Ganti seluruh fungsi login() kamu dengan ini. Copy-paste saja.
 async function login() {
   // Reset pesan dan set status loading
-  errorMessage.value = '';
+  errorMessage.value = 'An error occurred. Please try again..';
   isLoading.value = true;
 
   try {
@@ -59,19 +59,19 @@ async function login() {
     // 4. Kita cek kondisi IF-nya
     console.log("LANGKAH 4: Mengecek apakah (role === 'admin')...");
     if (role === 'admin') {
-      console.log(">> HASIL: BENAR. Role adalah 'admin'. Akan redirect ke /admin/dashboard");
+      successMessage.value = 'Login successful! You will be redirected...';
       router.push('Admin');
     } else {
-      console.log(">> HASIL: SALAH. Role bukan 'admin'. Akan redirect ke /viewmore");
+      successMessage.value = 'Login successful!';
       router.push('/viewmore');
     }
 
   } catch (error) {
     console.error("!! TERJADI ERROR DI BLOK CATCH !!", error);
     if (error.response) {
-      errorMessage.value = error.response.data.message || 'Email atau Password salah.';
+      errorMessage.value = error.response.data.message || 'Incorrect email or password.';
     } else {
-      errorMessage.value = 'Tidak bisa terhubung ke server.';
+      errorMessage.value = 'An error occurred. Please try again..';
     }
   } finally {
     isLoading.value = false;
