@@ -32,6 +32,12 @@ async function register() {
   successMessage.value = '';
   isLoading.value = true;
 
+  successMessage.value = 'Register successfully! Congratulations, now your account is registered...';
+
+  setTimeout(() => {
+      router.push('/Login');
+    }, 2000);
+
   try {
     // Panggil API menggunakan axios langsung.
     // NOTE: Pastikan URL lengkap karena tidak ada baseURL global
@@ -54,10 +60,8 @@ async function register() {
     // 2. Arahkan ke dashboard yang sesuai menggunakan router
     const userRole = response.data.user.role;
     if (userRole === 'admin') {
-      successMessage.value = 'Login successful! You will be redirected...';
       router.push('/Admin'); 
     } else {
-      successMessage.value = 'Register successful!';
       router.push('/Login'); 
     }
 

@@ -1,34 +1,27 @@
 <script setup>
 import { ref } from 'vue';
 import axios from 'axios';
-
 import { useRouter } from 'vue-router';
-const router = useRouter()
+const router = useRouter();
 
 // --- State Management ---
 const passwordVisible = ref(false);
 const email = ref('');
 const password = ref('');
 const errorMessage = ref('');
-const successMessage = ref('');
+const successMessage = ref(''); // Variabel ini akan kita pakai
 const isLoading = ref(false);
 
 // --- Functions ---
-/**
- * Mengubah visibilitas input password.
- */
 function togglePassword() {
   passwordVisible.value = !passwordVisible.value;
 }
 
-/**
- * Menangani proses login pengguna.
- * Mengirim permintaan POST ke endpoint /api/login.
- */
-// Ganti seluruh fungsi login() kamu dengan ini. Copy-paste saja.
+// Ganti fungsi login kamu dengan ini
 async function login() {
   // Reset pesan dan set status loading
-  errorMessage.value = 'An error occurred. Please try again..';
+  errorMessage.value = '';
+  successMessage.value = '';
   isLoading.value = true;
 
   try {
@@ -37,43 +30,43 @@ async function login() {
       password: password.value,
     });
 
-    // =======================================================
-    // --- MULAI AREA WAJIB UNTUK DEBUGGING ---
-    // =======================================================
-    console.clear(); // Ini akan membersihkan console setiap kali login
-    console.log("==============================================");
-    console.log(">> MEMULAI DEBUGGING REDIRECT SETELAH LOGIN");
-    console.log("==============================================");
-    
-    // 1. Kita lihat seluruh data yang dikirim balik oleh server
-    console.log("LANGKAH 1: Seluruh isi response.data:", response.data);
-
-    // 2. Kita coba akses object 'user'
+    const token = response.data.access_token;
     const user = response.data.user;
-    console.log("LANGKAH 2: Isi dari response.data.user:", user);
+    
+    // Simpan token dan data pengguna ke localStorage
+    localStorage.setItem('authToken', token);
+    localStorage.setItem('userData', JSON.stringify(user));
 
-    // 3. Kita coba akses 'role' di dalam object 'user'
-    const role = user ? user.role : "!! USER TIDAK DITEMUKAN !!";
-    console.log("LANGKAH 3: Nilai dari role:", role);
+    // =======================================================
+    // --- INI BAGIAN YANG DIUBAH ---
+    // =======================================================
 
-    // 4. Kita cek kondisi IF-nya
-    console.log("LANGKAH 4: Mengecek apakah (role === 'admin')...");
-    if (role === 'admin') {
-      successMessage.value = 'Login successful! You will be redirected...';
-      router.push('Admin');
+   if (user && user.role === 'admin') {
+      successMessage.value = 'Login as Admin successful! Redirects to Admin page...';
     } else {
-      successMessage.value = 'Login successful!';
-      router.push('/viewmore');
+      successMessage.value = 'Login successful! Welcome back.';
     }
 
+    // 2. Tunda redirect selama 2 detik (2000 milidetik)
+    setTimeout(() => {
+      // 3. Setelah 2 detik, jalankan logika redirect
+      if (user && user.role === 'admin') {
+        // Kamu pakai 'Admin', ini adalah nama route (name)
+        router.push({ name: 'Admin' }); 
+      } else {
+        // Kamu pakai '/viewmore', ini adalah path
+        router.push('/viewmore');
+      }
+    }, 1000); // <-- Waktu tunggu 
+
   } catch (error) {
-    console.error("!! TERJADI ERROR DI BLOK CATCH !!", error);
     if (error.response) {
       errorMessage.value = error.response.data.message || 'Incorrect email or password.';
     } else {
-      successMessage.value = 'Login successful!';
+      errorMessage.value = 'Cannot connect to server.';
     }
   } finally {
+    // Biarkan loading selesai setelah proses API, bukan setelah timeout
     isLoading.value = false;
   }
 }
