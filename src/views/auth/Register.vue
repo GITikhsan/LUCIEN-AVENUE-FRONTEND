@@ -33,7 +33,7 @@ async function register() {
 
   try {
     // Kirim permintaan registrasi hanya dengan data esensial
-    const response = await axios.post('/api/users', {
+    const response = await axios.post('/register', {
       first_name: firstName.value,
       last_name: lastName.value,
       email: email.value,
