@@ -5,6 +5,7 @@ function copyAccountNumber() {
   input.setSelectionRange(0, 99999);
   document.execCommand("copy");
 }
+console.log(products.value)
 </script>
 
 <template>
@@ -44,7 +45,7 @@ function copyAccountNumber() {
               After completing the payment, please click the button below to confirm.
             </div>
 
-            <button class="btn btn-success w-100 fw-bold">I Have Paid</button>
+            <router-link to="/myPurchases" class="btn btn-success w-100 fw-bold">i have paid</router-link>
           </div>
         </div>
       </div>
