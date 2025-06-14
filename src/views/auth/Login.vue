@@ -2,6 +2,9 @@
 import { ref } from 'vue';
 import axios from 'axios';
 
+import { useRouter } from 'vue-router';
+const router = useRouter()
+
 // --- State Management ---
 const passwordVisible = ref(false);
 const email = ref('');
@@ -22,40 +25,54 @@ function togglePassword() {
  * Menangani proses login pengguna.
  * Mengirim permintaan POST ke endpoint /api/login.
  */
+// Ganti seluruh fungsi login() kamu dengan ini. Copy-paste saja.
 async function login() {
   // Reset pesan dan set status loading
   errorMessage.value = '';
-  successMessage.value = '';
   isLoading.value = true;
 
   try {
-    // Kirim permintaan login
-    const response = await axios.post('/login', {
+    const response = await axios.post('http://localhost:8000/api/login', {
       email: email.value,
       password: password.value,
     });
 
-    // Proses respons sukses
-    successMessage.value = 'Login successful! You will be redirected...';
-    console.log('Login successful:', response.data);
-
-    // Simpan token dan data pengguna ke localStorage untuk manajemen sesi
-    localStorage.setItem('token', response.data.token);
-    localStorage.setItem('user', JSON.stringify(response.data.data));
+    // =======================================================
+    // --- MULAI AREA WAJIB UNTUK DEBUGGING ---
+    // =======================================================
+    console.clear(); // Ini akan membersihkan console setiap kali login
+    console.log("==============================================");
+    console.log(">> MEMULAI DEBUGGING REDIRECT SETELAH LOGIN");
+    console.log("==============================================");
     
-    // Alihkan ke halaman dashboard setelah jeda singkat
-    setTimeout(() => {
-        window.location.href = 'ViewMore'; // Ganti dengan rute halaman utama Anda
-    }, 1500);
+    // 1. Kita lihat seluruh data yang dikirim balik oleh server
+    console.log("LANGKAH 1: Seluruh isi response.data:", response.data);
+
+    // 2. Kita coba akses object 'user'
+    const user = response.data.user;
+    console.log("LANGKAH 2: Isi dari response.data.user:", user);
+
+    // 3. Kita coba akses 'role' di dalam object 'user'
+    const role = user ? user.role : "!! USER TIDAK DITEMUKAN !!";
+    console.log("LANGKAH 3: Nilai dari role:", role);
+
+    // 4. Kita cek kondisi IF-nya
+    console.log("LANGKAH 4: Mengecek apakah (role === 'admin')...");
+    if (role === 'admin') {
+      console.log(">> HASIL: BENAR. Role adalah 'admin'. Akan redirect ke /admin/dashboard");
+      router.push('Admin');
+    } else {
+      console.log(">> HASIL: SALAH. Role bukan 'admin'. Akan redirect ke /viewmore");
+      router.push('/viewmore');
+    }
 
   } catch (error) {
-    // Tangani error dari API
-    if (error.response && error.response.data && error.response.data.message) {
-      errorMessage.value = error.response.data.message;
+    console.error("!! TERJADI ERROR DI BLOK CATCH !!", error);
+    if (error.response) {
+      errorMessage.value = error.response.data.message || 'Email atau Password salah.';
     } else {
-      errorMessage.value = 'An error occurred. Please try again..';
+      errorMessage.value = 'Tidak bisa terhubung ke server.';
     }
-    console.error('Login failed:', error);
   } finally {
     isLoading.value = false;
   }

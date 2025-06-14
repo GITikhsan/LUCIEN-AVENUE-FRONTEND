@@ -1,67 +1,78 @@
 <script setup>
 import { ref } from 'vue';
+// --- TIDAK DIUBAH ---
+// Tetap menggunakan axios langsung sesuai kodemu
 import axios from 'axios';
+// --- TAMBAHKAN (INI BERHUBUNGAN) ---
+// Impor useRouter untuk navigasi. Ini wajib untuk pindah halaman tanpa reload.
+import { useRouter } from 'vue-router';
 
-// --- State Management ---
+// --- State Management (TIDAK DIUBAH) ---
 const passwordVisible = ref(false);
 const firstName = ref('');
 const lastName = ref('');
 const email = ref('');
 const password = ref('');
-// State untuk noTelepon dan alamat dihapus
 const successMessage = ref('');
 const errorMessage = ref('');
 const isLoading = ref(false);
 
+// --- TAMBAHKAN (INI BERHUBUNGAN) ---
+// Dapatkan instance router untuk bisa menggunakan router.push()
+const router = useRouter(); 
+
 // --- Functions ---
-/**
- * Mengubah visibilitas input password.
- */
 function togglePassword() {
   passwordVisible.value = !passwordVisible.value;
 }
 
-/**
- * Menangani proses registrasi pengguna.
- * Mengirim permintaan POST ke endpoint /api/users.
- */
 async function register() {
-  // Reset pesan dan set status loading
+  // Reset pesan dan set status loading (TIDAK DIUBAH)
   errorMessage.value = '';
   successMessage.value = '';
   isLoading.value = true;
 
   try {
-    // Kirim permintaan registrasi hanya dengan data esensial
-    const response = await axios.post('/register', {
+    // Panggil API menggunakan axios langsung.
+    // NOTE: Pastikan URL lengkap karena tidak ada baseURL global
+    const response = await axios.post('http://localhost:8000/api/register', {
       first_name: firstName.value,
       last_name: lastName.value,
       email: email.value,
       password: password.value,
-      // no_telepon dan alamat dihapus dari payload
     });
     
-    // Proses respons sukses
-    successMessage.value = response.data.message + '. You will be redirected to the login page.';
+    // ==============================================================
+    // --- INI SATU-SATUNYA BAGIAN LOGIKA YANG DIUBAH ---
+    // Ganti logika redirect ke login dengan logika auto-login
+    // ==============================================================
     
-    // Alihkan ke halaman login setelah jeda
-    setTimeout(() => {
-        window.location.href = 'Login';
-    }, 2000);
+    // 1. Simpan token & data user ke Local Storage agar login diingat
+    localStorage.setItem('authToken', response.data.access_token);
+    localStorage.setItem('userData', JSON.stringify(response.data.user));
+
+    // 2. Arahkan ke dashboard yang sesuai menggunakan router
+    const userRole = response.data.user.role;
+    if (userRole === 'admin') {
+      router.push('/Admin'); 
+    } else {
+      router.push('/viewmore'); 
+    }
 
   } catch (error) {
-    // Tangani error validasi atau error lainnya dari API
-     if (error.response && error.response.data && error.response.data.errors) {
-       const errors = error.response.data.errors;
-       const errorMessages = Object.values(errors).flat();
-       errorMessage.value = errorMessages.join(' ');
-     } else if (error.response && error.response.data && error.response.data.message) {
-        errorMessage.value = error.response.data.message;
-     } else {
-       errorMessage.value = 'An error occurred during registration.';
-     }
+    // Bagian penanganan error ini tidak diubah, sudah bagus
+    if (error.response && error.response.data && error.response.data.errors) {
+      const errors = error.response.data.errors;
+      const errorMessages = Object.values(errors).flat();
+      errorMessage.value = errorMessages.join(' ');
+    } else if (error.response && error.response.data && error.response.data.message) {
+      errorMessage.value = error.response.data.message;
+    } else {
+      errorMessage.value = 'An error occurred during registration.';
+    }
     console.error('Registration failed:', error);
   } finally {
+    // Bagian finally ini tidak diubah
     isLoading.value = false;
   }
 }
