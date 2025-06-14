@@ -8,7 +8,6 @@ import ViewMore from '@/views/User/ViewMore.vue'
 import Login from '@/views/auth/Login.vue'
 import Register from '@/views/auth/Register.vue'
 
-import Bag from '@/views/payment/Bag.vue'
 import AboutUs from '@/views/User/AboutUs.vue'
 import Admin from '@/views/admin/Admin.vue'
 // ... import halaman lainnya jika ada
@@ -23,13 +22,16 @@ import Help from '@/components/UserSetting/Help.vue'
 import AddAddress from '@/components/UserSetting/AddAddress.vue'
 import EditAddress from '@/components/UserSetting/EditAddress.vue'
 
+import Bag from '@/views/payment/Bag.vue'
+import Checkout from '@/views/payment/Checkout.vue'
+import Payment from '@/views/payment/Payment.vue'
 
 
 
 const routes = [
 
-
-
+  { path: '/payment',   name: 'Payment',     component: Payment },
+  { path: '/checkout',   name: 'Checkout',  component: Checkout },
   { path: '/mydata', name: 'My Data', component: MyData },
   { path: '/myPurchases', name: 'My Purchases', component: MyPurchases },
   { path: '/address', name: 'Address', component: Address },

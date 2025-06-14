@@ -40,7 +40,7 @@ const formatCurrency = (value) => new Intl.NumberFormat('id-ID', { style: 'curre
               <p class="mb-2">Total</p>
               <p class="mb-2">{{ formatCurrency(cartTotal) }}</p>
             </div>
-            <button class="btn btn-dark w-100 mt-3">Go to checkout</button>
+            <RouterLink to="/checkout" class="btn btn-dark w-100 mt-3">Go to checkout</RouterLink>
           </div>
         </div>
       </div>
