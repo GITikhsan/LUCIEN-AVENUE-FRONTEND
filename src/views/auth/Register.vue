@@ -56,7 +56,7 @@ async function register() {
     if (userRole === 'admin') {
       router.push('/Admin'); 
     } else {
-      router.push('/viewmore'); 
+      router.push('/Login'); 
     }
 
   } catch (error) {
