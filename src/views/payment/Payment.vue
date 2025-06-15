@@ -1,11 +1,50 @@
 <script setup>
-function copyAccountNumber() {
-  const input = document.getElementById("accountNumber");
-  input.select();
-  input.setSelectionRange(0, 99999);
-  document.execCommand("copy");
+import axios from 'axios'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const paymentData = ref({
+  metode_pembayaran: 'bca',
+  jumlah: 0,
+  password: '',
+  status_pembayaran: 'pending',
+  pesanan_id: null
+})
+
+const customerName = ref('')
+
+onMounted(async () => {
+  try {
+    const res = await axios.get('http://127.0.0.1:8000/api/pesanan/1')
+    const pesanan = res.data.data
+
+    paymentData.value.jumlah = pesanan.total_harga
+    paymentData.value.pesanan_id = pesanan.id
+    customerName.value = pesanan.user.name
+  } catch (error) {
+    console.error('Gagal memuat data pesanan:', error)
+  }
+})
+
+async function submitPayment() {
+  try {
+    await axios.post('http://127.0.0.1:8000/api/pembayaran', paymentData.value)
+    alert('Pembayaran berhasil dikirim!')
+    router.push('/myPurchases')
+  } catch (error) {
+    console.error('Gagal mengirim pembayaran:', error)
+    alert('Gagal mengirim pembayaran!')
+  }
 }
-console.log(products.value)
+
+function copyAccountNumber() {
+  const input = document.getElementById("accountNumber")
+  input.select()
+  input.setSelectionRange(0, 99999)
+  document.execCommand("copy")
+}
 </script>
 
 <template>
@@ -32,12 +71,12 @@ console.log(products.value)
                 />
                 <button class="btn btn-outline-dark" @click="copyAccountNumber">Copy</button>
               </div>
-              <p class="mt-2 mb-0">Account Holder: <strong>ikhsan</strong></p>
+              <p>Account Holder: <strong>{{ customerName }}</strong></p>
             </div>
 
             <div class="mb-3">
               <p><strong>Total Amount:</strong></p>
-              <h3 class="text-success fw-bold">Rp 480,000</h3>
+              <h3 class="text-success fw-bold">Rp {{ paymentData.jumlah.toLocaleString('id-ID') }}</h3>
               <p class="text-muted">*Please transfer the exact amount including the last 3 digits for automatic verification.</p>
             </div>
 
@@ -45,12 +84,10 @@ console.log(products.value)
               After completing the payment, please click the button below to confirm.
             </div>
 
-            <router-link to="/myPurchases" class="btn btn-success w-100 fw-bold">i have paid</router-link>
+            <button @click="submitPayment" class="btn btn-success w-100 fw-bold">I have paid</button>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-
