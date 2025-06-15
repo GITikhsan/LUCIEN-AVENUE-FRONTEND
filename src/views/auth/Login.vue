@@ -25,7 +25,7 @@ async function login() {
   isLoading.value = true;
 
   try {
-    const response = await axios.post('http://localhost:8000/api/login', {
+    const response = await axios.post('/login', {
       email: email.value,
       password: password.value,
     });
@@ -34,8 +34,8 @@ async function login() {
     const user = response.data.user;
     
     // Simpan token dan data pengguna ke localStorage
-    localStorage.setItem('authToken', token);
-    localStorage.setItem('userData', JSON.stringify(user));
+    localStorage.setItem('AUTH_TOKEN', token);
+    localStorage.setItem('user', JSON.stringify(user));
 
     // =======================================================
     // --- INI BAGIAN YANG DIUBAH ---
@@ -46,6 +46,8 @@ async function login() {
     } else {
       successMessage.value = 'Login successful! Welcome back.';
     }
+
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
     // 2. Tunda redirect selama 2 detik (2000 milidetik)
     setTimeout(() => {
