@@ -30,14 +30,14 @@ import Payment from '@/views/payment/Payment.vue'
 
 const routes = [
 
-  { path: '/payment',   name: 'Payment',     component: Payment },
-  { path: '/checkout',   name: 'Checkout',  component: Checkout },
-  { path: '/mydata', name: 'My Data', component: MyData },
-  { path: '/myPurchases', name: 'My Purchases', component: MyPurchases },
-  { path: '/address', name: 'Address', component: Address },
-  { path: '/help', name: 'Help', component: Help },
-  { path: '/addAddress', name: 'Add Address', component: AddAddress },
-  { path: '/editAddress', name: 'Edit Address', component: EditAddress },
+  // { path: '/payment',   name: 'Payment',     component: Payment },
+  // { path: '/checkout',   name: 'Checkout',  component: Checkout },
+  // { path: '/mydata', name: 'My Data', component: MyData },
+  // { path: '/myPurchases', name: 'My Purchases', component: MyPurchases },
+  // { path: '/address', name: 'Address', component: Address },
+  // { path: '/help', name: 'Help', component: Help },
+  // { path: '/addAddress', name: 'Add Address', component: AddAddress },
+  // { path: '/editAddress', name: 'Edit Address', component: EditAddress },
   // --- GRUP RUTE YANG MENGGUNAKAN MAINLAYOUT ---
   {
     path: '/',
