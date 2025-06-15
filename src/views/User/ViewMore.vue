@@ -1,145 +1,156 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from "vue";
+
+const formatPrice = (value) => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0
+  }).format(value)
+}
+
 
 // --- LOGIKA RESPONSIVE  ---
-const sidebarVisible = ref(false)
-const isDesktop = ref(window.innerWidth >= 992) // Pakai 992px untuk breakpoint 'lg' Bootstrap
+const sidebarVisible = ref(false);
+const isDesktop = ref(window.innerWidth >= 992); // Pakai 992px untuk breakpoint 'lg' Bootstrap
 
 // Fungsi untuk update state berdasarkan lebar layar
 const updateLayout = () => {
-  isDesktop.value = window.innerWidth >= 992
+  isDesktop.value = window.innerWidth >= 992;
   // Di desktop, sidebar selalu terlihat. Di mobile, defaultnya tersembunyi.
   if (isDesktop.value) {
-    sidebarVisible.value = true
+    sidebarVisible.value = true;
   } else {
     // Saat beralih ke mobile, pastikan sidebar tertutup kecuali dibuka manual
-    sidebarVisible.value = false
+    sidebarVisible.value = false;
   }
-}
+};
 
 // Tombol untuk membuka/menutup sidebar di mobile
 const toggleSidebar = () => {
   // Fungsi ini hanya boleh berjalan di mode mobile
   if (!isDesktop.value) {
-    sidebarVisible.value = !sidebarVisible.value
+    sidebarVisible.value = !sidebarVisible.value;
   }
-}
+};
 
 // Event listener untuk resize window
 onMounted(() => {
-  window.addEventListener('resize', updateLayout)
-  updateLayout() // Panggil sekali saat komponen dimuat
-})
+  window.addEventListener("resize", updateLayout);
+  updateLayout(); // Panggil sekali saat komponen dimuat
+});
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateLayout)
-})
-
+  window.removeEventListener("resize", updateLayout);
+});
 
 // --- DATA FILTER & PRODUK ---
-const gender = ref('')
-const size = ref(null)
-const discount = ref('any')
-const priceRange = ref('')
-const selectedColors = ref([])
-const selectedBrands = ref([])
-const sortOption = ref('')
+const gender = ref("");
+const size = ref(null);
+const discount = ref("any");
+const priceRange = ref("");
+const selectedColors = ref([]);
+const selectedBrands = ref([]);
+const sortOption = ref("");
 
-const sizes = [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45]
+const sizes = [
+  22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+  41, 42, 43, 44, 45,
+];
 const discounts = [
-  { label: 'Any', value: 'any' },
-  { label: '10%+', value: 10 },
-  { label: '25%+', value: 25 },
-  { label: '50%+', value: 50 }
-]
+  { label: "Any", value: "any" },
+  { label: "10%+", value: 10 },
+  { label: "25%+", value: 25 },
+  { label: "50%+", value: 50 },
+];
 const priceRanges = [
-  { value: '0-1000000', label: 'Below IDR 1.000.000' },
-  { value: '1000000-3000000', label: 'IDR 1.000.000 – 3.000.000' },
-  { value: '3000000-5000000', label: 'IDR 3.000.000 – 5.000.000' },
-  { value: '5000000-10000000', label: 'IDR 5.000.000 – 10.000.000' },
-  { value: '10000000+', label: 'Above IDR 10.000.000' }
-]
-const colors = ['green', 'blue', 'pink', 'red', 'purple', 'yellow', 'maroon']
-const brands = ['Nike', 'Adidas', 'Air Jordan', 'Yeezy', 'New Balance']
+  { value: "0-1000000", label: "Below IDR 1.000.000" },
+  { value: "1000000-3000000", label: "IDR 1.000.000 – 3.000.000" },
+  { value: "3000000-5000000", label: "IDR 3.000.000 – 5.000.000" },
+  { value: "5000000-10000000", label: "IDR 5.000.000 – 10.000.000" },
+  { value: "10000000+", label: "Above IDR 10.000.000" },
+];
+const colors = ["green", "blue", "pink", "red", "purple", "yellow", "maroon"];
+const brands = ["Nike", "Adidas", "Air Jordan", "Yeezy", "New Balance"];
 
 const products = ref([
   {
     id: 1,
-    name: 'Air Jordan 1 Retro Low OG SP Travis Scott Canary (Women) ',
-    image: '/images/3JT/3700.webp',
-    price: 'IDR 3,700,000',
+    name: "Air Jordan 1 Retro Low OG SP Travis Scott Canary (Women) ",
+    image: "/images/3JT/3700.webp",
+    price: "3700000",
     discount: 10,
-    brand: 'Air Jordan'
+    brand: "Air Jordan",
   },
   {
     id: 2,
-    name: 'Air Jordan 1 Retro Low OG Swarovski Stealth (Women)',
-    image: '/images/21JT/21510.webp',
-    price: 'IDR 21,510,000',
+    name: "Air Jordan 1 Retro Low OG Swarovski Stealth (Women)",
+    image: "/images/21JT/21510.webp",
+    price: "21510000",
     discount: 10,
-    brand: 'Air Jordan'
+    brand: "Air Jordan",
   },
   {
     id: 3,
-    name: 'Nike Zoom Field Jaxx Travis Scott Leche Blue',
-    image: '/images/2JT/2000.webp',
-    price: 'IDR 2,000,000',
+    name: "Nike Zoom Field Jaxx Travis Scott Leche Blue",
+    image: "/images/2JT/2000.webp",
+    price: "2000000",
     discount: 10,
-    brand: 'Air Jordan'
+    brand: "Air Jordan",
   },
   {
     id: 4,
-    name: 'Air Jordan 1 Low Fragment x Travis Scott',
-    image: '/images/15JT/15000.webp',
-    price: 'IDR 15,000,000',
+    name: "Air Jordan 1 Low Fragment x Travis Scott",
+    image: "/images/15JT/15000.webp",
+    price: "15000000",
     discount: 10,
-    brand: 'Air Jordan'
+    brand: "Air Jordan",
   },
   {
     id: 5,
-    name: 'Air Jordan Jumpman Jack TR Travis Scott Bright Cactus',
-    image: '/images/3JT/3900.webp',
-    price: 'IDR 3,900,000',
+    name: "Air Jordan Jumpman Jack TR Travis Scott Bright Cactus",
+    image: "/images/3JT/3900.webp",
+    price: "3900000",
     discount: 10,
-    brand: 'Air Jordan'
+    brand: "Air Jordan",
   },
   {
     id: 6,
-    name: 'Air Jordan 1 Retro Low OG Doernbecher (2023)',
-    image: '/images/7JT/7400.webp',
-    price: 'IDR 7,400,000',
+    name: "Air Jordan 1 Retro Low OG Doernbecher (2023)",
+    image: "/images/7JT/7400.webp",
+    price: "7400000",
     discount: 10,
-    brand: 'Air Jordan'
+    brand: "Air Jordan",
   },
   {
     id: 7,
-    name: 'Air Jordan 1 Retro Low OG Mocha',
-    image: '/images/2JT/2200.webp',
-    price: 'IDR 2,200,000',
+    name: "Air Jordan 1 Retro Low OG Mocha",
+    image: "/images/2JT/2200.webp",
+    price: "2200000",
     discount: 10,
-    brand: 'Air Jordan'
+    brand: "Air Jordan",
   },
   {
     id: 8,
-    name: 'Air Jordan 1 Low Illuminates Vivid Orange',
-    image: '/images/3JT/3630.webp',
-    price: 'IDR 3,630,000',
+    name: "Air Jordan 1 Low Illuminates Vivid Orange",
+    image: "/images/3JT/3630.webp",
+    price: "3630000",
     discount: 10,
-    brand: 'Air Jordan'
+    brand: "Air Jordan",
   },
   {
     id: 9,
-    name: 'Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown',
-    image: '/public/images/4JT/4240(1).webp',
-    price: 'IDR 4,240,000',
+    name: "Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown",
+    image: "/public/images/4JT/4240(1).webp",
+    price: "4240000",
     discount: 10,
-    brand: 'Air Jordan'
-  }
-])
+    brand: "Air Jordan",
+  },
+]);
 
 const filteredProducts = computed(() => {
-  return products.value // filter logic bisa ditambahkan nanti
-})
+  return products.value; // filter logic bisa ditambahkan nanti
+});
 </script>
 
 <template>
@@ -148,7 +159,13 @@ const filteredProducts = computed(() => {
       v-if="!isDesktop"
       @click="toggleSidebar"
       class="btn btn-dark position-fixed shadow-lg"
-      style="bottom: 20px; right: 20px; z-index: 1050; border-radius: 50px; padding: 10px 15px;"
+      style="
+        bottom: 20px;
+        right: 20px;
+        z-index: 1050;
+        border-radius: 50px;
+        padding: 10px 15px;
+      "
     >
       <i class="bi bi-funnel-fill"></i>
       <span class="ms-2">Filter</span>
@@ -160,12 +177,16 @@ const filteredProducts = computed(() => {
         id="filterSidebar"
         :class="{
           'sidebar-filter p-4 bg-white border rounded shadow-sm': isDesktop,
-          'sidebar-mobile-overlay': !isDesktop
+          'sidebar-mobile-overlay': !isDesktop,
         }"
       >
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h5 class="fw-bold mb-0">Filters</h5>
-          <button v-if="!isDesktop" @click="toggleSidebar" class="btn-close"></button>
+          <button
+            v-if="!isDesktop"
+            @click="toggleSidebar"
+            class="btn-close"
+          ></button>
         </div>
 
         <h6 class="fw-semibold mb-3">Select Gender</h6>
@@ -195,7 +216,7 @@ const filteredProducts = computed(() => {
           </button>
         </div>
 
-      <h6 class="fw-semibold mb-3">Size</h6>
+        <h6 class="fw-semibold mb-3">Size</h6>
         <div class="row row-cols-4 g-3 mb-3">
           <div class="col" v-for="n in sizes" :key="n">
             <input
@@ -217,35 +238,38 @@ const filteredProducts = computed(() => {
         </div>
 
         <h6 class="fw-semibold mb-3">Discount</h6>
-          <div class="row row-cols-2 row-cols-md-4 g-3 mb-3">
-            <div class="col" v-for="d in discounts.filter(dis => dis.value !== 'any')" :key="d.label">
-              <input
-                type="radio"
-                class="btn-check"
-                :id="'discount' + d.value"
-                name="discount"
-                :value="d.value"
-                v-model="discount"
-              />
-              <label
-                class="btn w-100 py-2 fw-semibold rounded-3 discount-tile"
-                :for="'discount' + d.value"
-                :class="[
-                  discount === d.value ? 'active-tile' : '',
-                  {
-                    'bg-success text-white': d.value === 10,
-                    'bg-primary text-white': d.value === 25,
-                    'bg-danger text-white': d.value === 50
-                  }
-                ]"
-              >
-                {{ d.label }}
-              </label>
-            </div>
+        <div class="row row-cols-2 row-cols-md-4 g-3 mb-3">
+          <div
+            class="col"
+            v-for="d in discounts.filter((dis) => dis.value !== 'any')"
+            :key="d.label"
+          >
+            <input
+              type="radio"
+              class="btn-check"
+              :id="'discount' + d.value"
+              name="discount"
+              :value="d.value"
+              v-model="discount"
+            />
+            <label
+              class="btn w-100 py-2 fw-semibold rounded-3 discount-tile"
+              :for="'discount' + d.value"
+              :class="[
+                discount === d.value ? 'active-tile' : '',
+                {
+                  'bg-success text-white': d.value === 10,
+                  'bg-primary text-white': d.value === 25,
+                  'bg-danger text-white': d.value === 50,
+                },
+              ]"
+            >
+              {{ d.label }}
+            </label>
           </div>
+        </div>
 
-
-      <h6 class="fw-semibold mb-3">Price Range</h6>
+        <h6 class="fw-semibold mb-3">Price Range</h6>
         <div class="dropdown w-100 mb-4">
           <button
             class="btn border w-100 text-start d-flex justify-content-between align-items-center shadow-sm px-3 py-2 rounded-3"
@@ -253,15 +277,12 @@ const filteredProducts = computed(() => {
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            {{ selectedLabel || 'Select Price Range' }}
+            {{ selectedLabel || "Select Price Range" }}
             <i class="bi bi-chevron-down"></i>
           </button>
 
           <ul class="dropdown-menu w-100 mt-1 rounded-3 shadow-sm p-1">
-            <li
-              v-for="range in priceRanges"
-              :key="range.value"
-            >
+            <li v-for="range in priceRanges" :key="range.value">
               <a
                 href="#"
                 class="dropdown-item rounded-2 py-2 px-3"
@@ -298,10 +319,12 @@ const filteredProducts = computed(() => {
                   display: 'inline-block',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
-                  transform: selectedColors.includes(color) ? 'scale(1.15)' : 'scale(1)',
+                  transform: selectedColors.includes(color)
+                    ? 'scale(1.15)'
+                    : 'scale(1)',
                   boxShadow: selectedColors.includes(color)
                     ? '0 0 8px rgba(0, 0, 0, 0.4)'
-                    : 'none'
+                    : 'none',
                 }"
               ></label>
             </div>
@@ -310,8 +333,14 @@ const filteredProducts = computed(() => {
 
         <h6 class="fw-semibold mb-2">Brands</h6>
         <div v-for="(brand, i) in brands" :key="brand" class="form-check">
-          <input class="form-check-input" type="checkbox" :id="'brand'+i" :value="brand" v-model="selectedBrands">
-          <label class="form-check-label" :for="'brand'+i">{{ brand }}</label>
+          <input
+            class="form-check-input"
+            type="checkbox"
+            :id="'brand' + i"
+            :value="brand"
+            v-model="selectedBrands"
+          />
+          <label class="form-check-label" :for="'brand' + i">{{ brand }}</label>
         </div>
       </aside>
 
@@ -324,50 +353,85 @@ const filteredProducts = computed(() => {
               type="button"
               data-bs-toggle="dropdown"
               aria-expanded="false"
-              style="font-size: 0.875rem; font-weight: 500; color: #333;"
+              style="font-size: 0.875rem; font-weight: 500; color: #333"
             >
               <i class="bi bi-sliders2-vertical"></i>
-              {{ sortOption || 'Sort by' }}
+              {{ sortOption || "Sort by" }}
             </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow rounded-4 p-1" style="min-width: 180px;">
-              <li><a class="dropdown-item rounded-2" href="#" @click.prevent="sortOption = 'Featured Items'">🌟 Featured Items</a></li>
-              <li><a class="dropdown-item rounded-2" href="#" @click.prevent="sortOption = 'Price: Low to High'">⬆️ Price: Low to High</a></li>
-              <li><a class="dropdown-item rounded-2" href="#" @click.prevent="sortOption = 'Price: High to Low'">⬇️ Price: High to Low</a></li>
-              <li><a class="dropdown-item rounded-2" href="#" @click.prevent="sortOption = 'Newest'">🆕 Newest</a></li>
+            <ul
+              class="dropdown-menu dropdown-menu-end shadow rounded-4 p-1"
+              style="min-width: 180px"
+            >
+              <li>
+                <a
+                  class="dropdown-item rounded-2"
+                  href="#"
+                  @click.prevent="sortOption = 'Featured Items'"
+                  >🌟 Featured Items</a
+                >
+              </li>
+              <li>
+                <a
+                  class="dropdown-item rounded-2"
+                  href="#"
+                  @click.prevent="sortOption = 'Price: Low to High'"
+                  >⬆️ Price: Low to High</a
+                >
+              </li>
+              <li>
+                <a
+                  class="dropdown-item rounded-2"
+                  href="#"
+                  @click.prevent="sortOption = 'Price: High to Low'"
+                  >⬇️ Price: High to Low</a
+                >
+              </li>
+              <li>
+                <a
+                  class="dropdown-item rounded-2"
+                  href="#"
+                  @click.prevent="sortOption = 'Newest'"
+                  >🆕 Newest</a
+                >
+              </li>
             </ul>
           </div>
         </div>
 
         <div class="row row-cols-2 row-cols-md-4 g-4">
-          <div class="col" v-for="product in filteredProducts" :key="product.id">
-            <div class="card h-100 border-0 shadow-sm position-relative rounded-4">
+          <div
+            class="col"
+            v-for="product in filteredProducts"
+            :key="product.id"
+          >
+            <div
+              class="card h-100 border-0 shadow-sm position-relative rounded-4"
+            >
               <div
                 class="position-absolute top-0 start-0 bg-danger text-white px-2 py-1 small rounded-end"
-                style="font-size: 0.75rem;"
+                style="font-size: 0.75rem"
               >
                 {{ product.discount }}%
               </div>
 
               <div
                 class="p-3 d-flex justify-content-center align-items-center"
-                style="height: 200px;"
+                style="height: 200px"
               >
                 <img
                   :src="product.image"
                   class="img-fluid"
                   :alt="product.name"
-                  style="max-height: 160px; object-fit: contain;"
+                  style="max-height: 160px; object-fit: contain"
                 />
               </div>
 
               <div class="card-body px-3 pt-0 pb-3">
-                <h6
-                  class="card-title mb-1"
-                >
+                <h6 class="card-title mb-1">
                   {{ product.name }}
                 </h6>
                 <p class="text-success fw-bold mb-0">
-                  {{ product.price }}
+                  {{ formatPrice(product.price) }}
                 </p>
               </div>
             </div>
@@ -483,7 +547,6 @@ const filteredProducts = computed(() => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-
 /* Gender */
 .btn-men,
 .btn-women,
@@ -491,7 +554,8 @@ const filteredProducts = computed(() => {
   background-color: #f8f9fa;
   color: #333;
   border-radius: 8px;
-  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease,
+    transform 0.15s ease;
 }
 
 .btn-men-active {
@@ -551,7 +615,7 @@ const filteredProducts = computed(() => {
 @media (min-width: 480px) {
   .product-title {
     font-size: 0.6rem; /* <-- UKURAN MOBILE */
-    height: auto; 
+    height: auto;
     line-height: 1.4;
   }
   .product-price {
@@ -597,6 +661,4 @@ const filteredProducts = computed(() => {
   background-color: #f8f9fa;
   transition: background 0.2s ease;
 }
-
-
 </style>
