@@ -19,7 +19,7 @@ async function fetchUserProfile() {
     user.value = response.data;
 
   } catch (error) {
-    errorMessage.value = 'Failed to load user data. Please try logging in again.';
+    errorMessage.value = 'please login first';
     console.error('Failed to fetch user profile:', error);
   } finally {
     isLoading.value = false;
@@ -46,7 +46,7 @@ const menuItems = [
     </div>
 
     <div v-else-if="errorMessage">
-      <h1 class="display-4 fw-normal font-serif mb-5 text-danger">{{ errorMessage }}</h1>
+      <h1 class="display-4 fw-normal font-serif mb-5 text-dark">{{ errorMessage }}</h1>
     </div>
 
     <div v-else-if="user">
@@ -85,4 +85,5 @@ const menuItems = [
 .text-danger {
   color: #dc3545; /* Bootstrap's danger color */
 }
+
 </style>
