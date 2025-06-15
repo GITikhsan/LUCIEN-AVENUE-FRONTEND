@@ -111,10 +111,9 @@ const handleSearch = () => {
 
       <!-- DOWNLOAD APP -->
       <div class="col text-center text-md-start">
-        <p class="fw-semibold text-white">Download Our App</p>
+        <p class="fw-semibold text-white">Our Partner</p>
         <div class="d-flex justify-content-center justify-content-md-start gap-3">
-          <img src="/images/appstore.webp" alt="App Store" style="height: 32px;" class="img-fluid">
-          <img src="/images/googleplay.webp" alt="Play Store" style="height: 32px;" class="img-fluid">
+          <img src="/images/1W.png" alt="Amikom YK" style="height: 32px;" class="img-fluid">
         </div>
       </div>
     </div>
