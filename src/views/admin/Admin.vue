@@ -23,13 +23,14 @@ const newProduct = reactive({ // Untuk menampung data dari form input produk
   tanggal_rilis: '',
   deskripsi: ''
 });
-const imageFile = ref(null); // State khusus untuk menampung file gambar
+// DIUBAH: State untuk menampung BANYAK file gambar
+const imageFiles = ref([]); 
+// BARU: State untuk menampung URL preview gambar
+const imagePreviews = ref([]);
 
-// State untuk data promo (bisa Anda kembangkan nanti)
+// State untuk data promo & diskon (bisa dikembangkan nanti)
 const promos = ref([]);
 const newPromo = reactive({ /* ... field promo ... */ });
-
-// State untuk data diskon (bisa Anda kembangkan nanti)
 const diskons = ref([]);
 const newDiskon = reactive({ /* ... field diskon ... */ });
 
@@ -41,7 +42,6 @@ const fetchProducts = async () => {
   isLoadingProducts.value = true;
   try {
     const response = await api.get('/products');
-    // Jika API Anda menggunakan paginasi, data ada di response.data.data
     products.value = response.data.data ? response.data.data : response.data;
   } catch (error) {
     console.error("Gagal mengambil data produk:", error);
@@ -50,19 +50,48 @@ const fetchProducts = async () => {
   }
 };
 
+// DIUBAH: Fungsi ini sekarang menangani banyak file
 const handleFileChange = (event) => {
-  imageFile.value = event.target.files[0];
+  const files = event.target.files;
+  if (!files) return;
+
+  // Reset array file dan preview setiap kali memilih file baru
+  imageFiles.value = [];
+  imagePreviews.value = [];
+
+  // Looping sebanyak file yang dipilih
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    imageFiles.value.push(file); // Simpan object File-nya
+    
+    // Buat URL lokal untuk preview
+    const previewUrl = URL.createObjectURL(file);
+    imagePreviews.value.push(previewUrl); // Simpan URL preview-nya
+  }
 };
 
+// BARU: Fungsi untuk menghapus salah satu gambar dari preview
+const removeImage = (index) => {
+    imageFiles.value.splice(index, 1);
+    imagePreviews.value.splice(index, 1);
+}
+
+// DIUBAH: Fungsi ini sekarang mengirim banyak gambar
 const saveProduct = async () => {
   const formData = new FormData();
+  
   // Masukkan semua data teks dari form ke FormData
   for (const key in newProduct) {
     formData.append(key, newProduct[key]);
   }
-  // Lampirkan file gambar jika ada
-  if (imageFile.value) {
-    formData.append('image', imageFile.value);
+
+  // Lampirkan semua file gambar jika ada
+  if (imageFiles.value.length > 0) {
+    // Looping untuk setiap file
+    for (const file of imageFiles.value) {
+        // Gunakan nama 'images[]' agar Laravel membacanya sebagai array
+        formData.append('images[]', file);
+    }
   }
 
   try {
@@ -70,9 +99,13 @@ const saveProduct = async () => {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     products.value.unshift(response.data.data); // Tambah produk baru ke daftar
-    document.getElementById('productForm').reset(); // Reset form HTML
-    for(const key in newProduct) { newProduct[key] = '' } // Reset state reactive
-    imageFile.value = null;
+    
+    // Reset form dan semua state terkait gambar
+    document.getElementById('productForm').reset();
+    for(const key in newProduct) { newProduct[key] = '' }
+    imageFiles.value = [];
+    imagePreviews.value = [];
+    
     alert('Produk berhasil disimpan ke database!');
   } catch (error) {
     console.error("Gagal menyimpan produk:", error);
@@ -80,21 +113,11 @@ const saveProduct = async () => {
   }
 };
 
-// --- Logika untuk Promo & Diskon (Bisa Anda buat nanti polanya sama) ---
-const savePromo = async () => {
-  alert('Logika simpan promo ke API belum dibuat.');
-  // const response = await api.post('/promos', newPromo);
-  // ...
-}
-
-const saveDiskon = async () => {
-  alert('Logika simpan diskon ke API belum dibuat.');
-  // const response = await api.post('/discounts', newDiskon);
-  // ...
-}
+// --- Logika lain (tidak diubah) ---
+const savePromo = async () => { alert('Logika simpan promo ke API belum dibuat.'); }
+const saveDiskon = async () => { alert('Logika simpan diskon ke API belum dibuat.'); }
 
 // === 3. LIFECYCLE HOOK ===
-// Saat komponen pertama kali dimuat, langsung ambil data produk
 onMounted(() => {
   fetchProducts();
 });
@@ -119,6 +142,7 @@ onMounted(() => {
       </aside>
 
       <main class="flex-grow-1 p-4 overflow-auto">
+        <!-- DIKEMBALIKAN: Konten Home sekarang sudah lengkap lagi -->
         <div v-if="activePanel === 'Home'">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="h5 fw-semibold">Activity</h2>
@@ -148,70 +172,80 @@ onMounted(() => {
               <h5 class="mb-4 fw-semibold">Product Input</h5>
               <form id="productForm" @submit.prevent="saveProduct">
                 
+                <!-- DIUBAH: Input file sekarang bisa multiple -->
                 <div class="mb-3">
-                  <label for="productImage" class="form-label">Product Image</label>
-                  <input type="file" @change="handleFileChange" class="form-control" id="productImage" accept="image/*" />
+                  <label for="productImages" class="form-label">Product Images (Pilih 1 atau lebih)</label>
+                  <input type="file" @change="handleFileChange" class="form-control" id="productImages" accept="image/*" multiple />
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6 form-floating mb-2">
-                      <input v-model="newProduct.nama_sepatu" type="text" id="nama_sepatu" class="form-control" placeholder="Shoe Name" required>
-                      <label for="nama_sepatu" class="ms-2">Shoe Name</label>
-                    </div>
-                    <div class="col-md-6 form-floating mb-2">
-                      <input v-model="newProduct.brand" type="text" id="brand" class="form-control" placeholder="Brand" required>
-                      <label for="brand" class="ms-2">Brand</label>
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-6 form-floating mb-2">
-                      <input v-model="newProduct.harga_retail" type="number" id="harga" class="form-control" placeholder="Price (Rp)" required>
-                      <label for="harga" class="ms-2">Price (Rp)</label>
-                    </div>
-                    <div class="col-md-6 form-floating mb-2">
-                      <input v-model="newProduct.sku" type="text" id="SKU" class="form-control" placeholder="SKU" required>
-                      <label for="SKU" class="ms-2">SKU</label>
+                <!-- BARU: Area untuk menampilkan preview gambar -->
+                <div v-if="imagePreviews.length > 0" class="mb-3">
+                    <label class="form-label">Image Previews:</label>
+                    <div class="d-flex flex-wrap gap-2 border rounded p-2">
+                        <div v-for="(preview, index) in imagePreviews" :key="index" class="position-relative">
+                            <img :src="preview" alt="Preview" class="rounded" style="width: 100px; height: 100px; object-fit: cover;">
+                            <button @click.prevent="removeImage(index)" class="btn btn-sm btn-danger rounded-circle position-absolute top-0 end-0" style="width: 25px; height: 25px; line-height: 1; padding: 0;">
+                                &times;
+                            </button>
+                        </div>
                     </div>
                 </div>
 
+                <!-- Form input lain tidak diubah -->
                 <div class="row">
                     <div class="col-md-6 form-floating mb-2">
-                      <input v-model="newProduct.ukuran" type="text" id="ukuran" class="form-control" placeholder="Sizes (e.g. 40,41,42)">
-                      <label for="ukuran" class="ms-2">Sizes (pisahkan koma)</label>
+                        <input v-model="newProduct.nama_sepatu" type="text" id="nama_sepatu" class="form-control" placeholder="Shoe Name" required>
+                        <label for="nama_sepatu" class="ms-2">Shoe Name</label>
                     </div>
                     <div class="col-md-6 form-floating mb-2">
-                      <input v-model="newProduct.warna" type="text" id="warna" class="form-control" placeholder="Color">
-                      <label for="warna" class="ms-2">Color</label>
+                        <input v-model="newProduct.brand" type="text" id="brand" class="form-control" placeholder="Brand" required>
+                        <label for="brand" class="ms-2">Brand</label>
                     </div>
                 </div>
-
+                <div class="row">
+                     <div class="col-md-6 form-floating mb-2">
+                        <input v-model="newProduct.harga_retail" type="number" id="harga" class="form-control" placeholder="Price (Rp)" required>
+                        <label for="harga" class="ms-2">Price (Rp)</label>
+                    </div>
+                    <div class="col-md-6 form-floating mb-2">
+                        <input v-model="newProduct.sku" type="text" id="SKU" class="form-control" placeholder="SKU" required>
+                        <label for="SKU" class="ms-2">SKU</label>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-md-6 form-floating mb-2">
-                      <select v-model="newProduct.gender" id="gender" class="form-select">
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Unisex">Unisex</option>
-                      </select>
-                      <label for="gender" class="ms-2">Gender</label>
+                        <input v-model="newProduct.ukuran" type="text" id="ukuran" class="form-control" placeholder="Sizes (e.g. 40,41,42)">
+                        <label for="ukuran" class="ms-2">Sizes (pisahkan koma)</label>
                     </div>
                     <div class="col-md-6 form-floating mb-2">
-                      <input v-model="newProduct.material" type="text" id="material" class="form-control" placeholder="Material">
-                      <label for="material" class="ms-2">Material</label>
+                        <input v-model="newProduct.warna" type="text" id="warna" class="form-control" placeholder="Color">
+                        <label for="warna" class="ms-2">Color</label>
                     </div>
                 </div>
-
                 <div class="row">
                     <div class="col-md-6 form-floating mb-2">
-                      <input v-model="newProduct.dimensi" type="text" id="dimensi" class="form-control" placeholder="Dimension">
-                      <label for="dimensi" class="ms-2">Dimension</label>
+                        <select v-model="newProduct.gender" id="gender" class="form-select">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Unisex">Unisex</option>
+                        </select>
+                        <label for="gender" class="ms-2">Gender</label>
                     </div>
                     <div class="col-md-6 form-floating mb-2">
-                      <input v-model="newProduct.tanggal_rilis" type="date" id="tanggal_rilis" class="form-control" placeholder="Release Date">
-                      <label for="tanggal_rilis" class="ms-2">Release Date</label>
+                        <input v-model="newProduct.material" type="text" id="material" class="form-control" placeholder="Material">
+                        <label for="material" class="ms-2">Material</label>
                     </div>
                 </div>
-
+                <div class="row">
+                    <div class="col-md-6 form-floating mb-2">
+                        <input v-model="newProduct.dimensi" type="text" id="dimensi" class="form-control" placeholder="Dimension">
+                        <label for="dimensi" class="ms-2">Dimension</label>
+                    </div>
+                    <div class="col-md-6 form-floating mb-2">
+                        <input v-model="newProduct.tanggal_rilis" type="date" id="tanggal_rilis" class="form-control" placeholder="Release Date">
+                        <label for="tanggal_rilis" class="ms-2">Release Date</label>
+                    </div>
+                </div>
                 <div class="form-floating mb-2">
                     <textarea v-model="newProduct.deskripsi" class="form-control" placeholder="Description" id="Description" style="height: 100px"></textarea>
                     <label for="Description">Description</label>
@@ -221,17 +255,21 @@ onMounted(() => {
               </form>
             </div>
           </div>
-
+          
           <div class="card">
             <div class="card-body">
-                </div>
+              <h5 class="fw-semibold">Existing Products</h5>
+              <div v-if="isLoadingProducts">Loading...</div>
+              <div v-else>
+                  <!-- Di sini Anda bisa menampilkan daftar 'products' dalam bentuk tabel -->
+              </div>
+            </div>
           </div>
         </div>
                 
         <div v-if="activePanel === 'Orders'">... Konten Orders di sini ...</div>
         <div v-if="activePanel === 'promo'">... Konten form Promo di sini ...</div>
         <div v-if="activePanel === 'diskon'">... Konten form Diskon di sini ...</div>
-
       </main>
     </div>
   </div>
