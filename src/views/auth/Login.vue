@@ -80,7 +80,7 @@ async function login() {
       <div class="row align-items-center bg-white p-4 p-md-5 rounded shadow-lg mx-auto" style="max-width: 960px;">
         <!-- Bagian Gambar Kiri -->
         <div class="col-md-6 text-center mb-4 mb-md-0">
-          <img src="/images/LoginIcon.png" alt="Ilustrasi Login" class="img-fluid" style="max-width: 320px;">
+          <img src="/images/LR.webp" alt="Ilustrasi Login" class="img-fluid" style="max-width: 320px;">
         </div>
 
         <!-- Bagian Login Kanan -->
