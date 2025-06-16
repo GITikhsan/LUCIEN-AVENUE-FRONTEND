@@ -1,468 +1,340 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import api from '@/api/axios' // Pastikan path ini benar
+import { ref, reactive, onMounted } from 'vue';
+import api from '@/api/axios'; // Pastikan path ini benar ke file setup axios kamu
 
-// --- STATE MANAGEMENT ---
+// === 1. STATE MANAGEMENT ===
 
-// Siapkan "kerangka" data produk yang kosong. Strukturnya SAMA PERSIS
-// dengan data hardcode Anda sebelumnya agar template tidak error.
-const product = ref({
-  name: '',
-  price: '0',
-  originalPrice: '0',
-  discount: 0,
-  sizes: [],
-  description: '',
-  details: {
-    sku: '',
-    material: '',
-    release: '',
-    color: '',
-    dimension: '',
-    retail: ''
-  },
-  images: [] // Akan diisi dengan URL gambar dari API
+// State untuk daftar produk yang sudah ada (opsional, untuk ditampilkan di bawah form)
+const products = ref([]);
+const isLoadingProducts = ref(true);
+
+// State untuk menampung data dari form input produk baru
+const newProduct = reactive({
+  nama_sepatu: '',
+  brand: '',
+  harga_retail: '',
+  sku: '',
+  ukuran: '',
+  warna: '',
+  gender: 'Male', // Nilai default
+  material: '',
+  dimensi: '',
+  tanggal_rilis: '',
+  deskripsi: ''
 });
 
-// State untuk menampilkan pesan loading dan error
-const isLoading = ref(true);
-const error = ref(null);
-
-// Data similarProducts bisa dibiarkan statis atau diambil dari API lain nanti
-const similarProducts = ref([
-    { name: 'Air Jordan 1 Retro Low OG SP Travis Scott Canary (Women)', price: '3,700,000', image: '/images/3JT/3700.webp' },
-    { name: 'Air Jordan 1 Retro Low OG Swarovski Stealth (Women)', price: '21,510,000', image: '/images/21JT/21510.webp' },
-    { name: 'Nike Zoom Field Jaxx Travis Scott Leche Blue', price: '2,000,000', image: '/images/2JT/2000.webp' },
-    { name: 'Air Jordan 1 Low Fragment x Travis Scott', price: '15,000,000', image: '/images/15JT/15000.webp' },
-]);
+// State untuk menampung file gambar yang akan di-upload
+const imageFiles = ref([]);
+// State untuk menampung URL preview gambar
+const imagePreviews = ref([]);
 
 
-// --- ROUTER & API CALL ---
+// === 2. METHODS (LOGIKA) ===
 
-const route = useRoute(); // Untuk akses ke parameter URL (misal: /product/45)
-
-// Fungsi untuk format angka menjadi Rupiah
-const formatCurrency = (value) => {
-  if (!value) return '0';
-  const numberValue = Math.floor(parseFloat(value));
-  return new Intl.NumberFormat('id-ID').format(numberValue);
-};
-
-// Fungsi untuk mengambil dan memetakan data produk dari API
-const fetchProduct = async (productId) => {
-  isLoading.value = true;
-  error.value = null;
+// Mengambil daftar produk yang sudah ada
+const fetchProducts = async () => {
+  isLoadingProducts.value = true;
   try {
-    const response = await api.get(`/products/${productId}`);
-    const apiData = response.data.data; // Data mentah dari Laravel
-
-    // === MAPPING DATA API KE STRUKTUR FRONTEND ===
-    product.value = {
-      name: apiData.nama_sepatu,
-      price: formatCurrency(apiData.harga_retail),
-      originalPrice: apiData.harga_coret ? formatCurrency(apiData.harga_coret) : null,
-      discount: apiData.diskon_persen || 0,
-      sizes: apiData.ukuran ? apiData.ukuran.split(',').map(s => s.trim()) : [],
-      description: apiData.deskripsi,
-      details: {
-        sku: apiData.sku,
-        material: apiData.material,
-        release: apiData.tanggal_rilis,
-        color: apiData.warna,
-        dimension: apiData.dimensi,
-        retail: formatCurrency(apiData.harga_retail)
-      },
-      // Menggunakan gambar utama dari field 'image' dan galeri dari relasi 'images' jika ada
-      images: apiData.images && apiData.images.length > 0 
-        ? apiData.images.map(img => img.url) 
-        : (apiData.image ? [apiData.image] : []) // Jika tidak ada, gunakan gambar utama atau array kosong
-    };
-
-  } catch (err) {
-    console.error("Gagal mengambil detail produk:", err);
-    error.value = "Produk tidak ditemukan atau terjadi kesalahan pada server.";
+    const response = await api.get('/products');
+    products.value = response.data.data;
+  } catch (error) {
+    console.error("Gagal mengambil data produk:", error);
   } finally {
-    isLoading.value = false;
+    isLoadingProducts.value = false;
   }
 };
 
-// Jalankan fetchProduct() saat komponen dimuat
-onMounted(() => {
-  const productId = route.params.id;
-  if (productId) {
-    fetchProduct(productId);
-  } else {
-    error.value = "Halaman tidak valid. ID Produk tidak ditemukan.";
-    isLoading.value = false;
+// Fungsi untuk menangani saat user memilih file gambar
+const handleFileChange = (event) => {
+  const files = event.target.files;
+  if (!files) return;
+
+  // Reset array setiap kali memilih file baru
+  imageFiles.value = [];
+  imagePreviews.value = [];
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    imageFiles.value.push(file); // Simpan object File
+    
+    // Buat URL lokal untuk preview
+    const previewUrl = URL.createObjectURL(file);
+    imagePreviews.value.push(previewUrl);
   }
+};
+
+// Fungsi untuk menghapus gambar dari daftar preview
+const removeImage = (index) => {
+    imageFiles.value.splice(index, 1);
+    imagePreviews.value.splice(index, 1);
+}
+
+// Fungsi UTAMA untuk menyimpan produk baru ke backend
+const saveProduct = async () => {
+  // Gunakan FormData karena kita akan mengirim file
+  const formData = new FormData();
+  
+  // 1. Masukkan semua data teks dari form ke FormData
+  for (const key in newProduct) {
+    formData.append(key, newProduct[key]);
+  }
+
+  // 2. Lampirkan semua file gambar jika ada
+  if (imageFiles.value.length > 0) {
+    for (const file of imageFiles.value) {
+        // Gunakan nama 'images[]' agar Laravel membacanya sebagai array
+        formData.append('images[]', file);
+    }
+  } else {
+    alert('Mohon pilih minimal satu gambar produk.');
+    return;
+  }
+
+  try {
+    // 3. Kirim data ke backend dengan header yang sesuai
+    const response = await api.post('/products', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    
+    alert('Produk berhasil disimpan!');
+    
+    // 4. Reset form setelah berhasil
+    document.getElementById('productForm').reset();
+    Object.keys(newProduct).forEach(key => newProduct[key] = '');
+    imageFiles.value = [];
+    imagePreviews.value = [];
+    
+    // Tambahkan produk baru ke daftar tanpa perlu refresh
+    fetchProducts();
+
+  } catch (error) {
+    console.error("Gagal menyimpan produk:", error);
+    // Tampilkan pesan error dari backend jika ada
+    const errorMessages = error.response?.data?.errors;
+    if (errorMessages) {
+        alert("Gagal menyimpan: \n" + Object.values(errorMessages).flat().join("\n"));
+    } else {
+        alert("Terjadi kesalahan pada server. Silakan coba lagi.");
+    }
+  }
+};
+
+// === 3. LIFECYCLE HOOK ===
+onMounted(() => {
+  fetchProducts(); // Ambil data produk saat komponen pertama kali dimuat
 });
 
-// Logika UI lainnya (tidak berubah)
-const selectedSize = ref(null);
-const quantity = ref(1);
 </script>
 
 <template>
-  <div v-if="isLoading" class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-    <div class="spinner-border text-dark" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-  </div>
+  <div class="admin-container">
+    <aside class="sidebar">
+      <h1 class="brand">Lucien Avenue</h1>
+      <nav>
+        <a href="#" class="nav-link">Home</a>
+        <a href="#" class="nav-link active">Product</a>
+        <a href="#" class="nav-link">Orders</a>
+        <a href="#" class="nav-link">Promo</a>
+        <a href="#" class="nav-link">Discount</a>
+      </nav>
+    </aside>
 
-  <div v-else-if="error" class="container py-5">
-    <div class="alert alert-danger text-center">{{ error }}</div>
-  </div>
+    <main class="content">
+      <div class="card product-input-card">
+        <div class="card-body">
+          <h5 class="card-title">Product Input</h5>
+          
+          <form id="productForm" @submit.prevent="saveProduct">
+            
+            <div class="mb-3">
+              <label for="productImages" class="form-label">Product Images (Pilih 1 atau lebih)</label>
+              <input type="file" @change="handleFileChange" class="form-control" id="productImages" accept="image/*" multiple required />
+            </div>
 
-  <div v-else-if="product" class="container py-5">
-    <div class="row g-5">
-      <div class="col-md-6">
-        <div class="position-relative mt-4" style="max-width: 420px; margin: 0 auto;">
-          <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-inner">
-              <div
-                v-for="(image, index) in product.images"
-                :key="index"
-                class="carousel-item"
-                :class="{ active: index === 0 }"
-              >
-                <img :src="image" class="d-block w-100 img-fluid product-image" :alt="product.name + ' image ' + (index + 1)" />
+            <div v-if="imagePreviews.length > 0" class="mb-3 image-previews">
+              <div v-for="(preview, index) in imagePreviews" :key="index" class="preview-item">
+                <img :src="preview" alt="Preview">
+                <button @click.prevent="removeImage(index)" class="btn-remove-img">&times;</button>
               </div>
             </div>
 
-            <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
-              <span>&#10094;</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
-              <span>&#10095;</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6">
-        <h2 class="h4 fw-bold mb-3">{{ product.name }}</h2>
-
-        <div class="mb-4">
-          <p class="text-uppercase text-muted small mb-1" style="letter-spacing: 0.05em;">Price</p>
-          <div class="d-flex align-items-center gap-2">
-            <p class="h4 fw-semibold text-dark mb-0">IDR {{ product.price }}</p>
-            <span v-if="product.discount" class="badge rounded-pill bg-danger small py-1 px-2">-{{ product.discount }}%</span>
-          </div>
-          <p v-if="product.originalPrice" class="text-muted text-decoration-line-through mt-1 mb-0" style="font-size: 0.9rem;">
-            IDR {{ product.originalPrice }}
-          </p>
-        </div>
-
-        <div class="mb-4">
-          <label class="form-label fw-semibold mb-2">Select Size</label>
-          <div class="d-flex flex-wrap gap-2">
-            <button
-              v-for="size in product.sizes"
-              :key="size"
-              :class="[
-                'btn size-button',
-                selectedSize === size ? 'active-size' : 'inactive-size'
-              ]"
-              @click="selectedSize = size"
-            >
-              {{ size }}
-            </button>
-          </div>
-        </div>
-
-        <div class="d-flex flex-column flex-sm-row gap-3 mb-4">
-          <button class="btn btn-dark w-100 py-2 rounded-pill">Add to Cart</button>
-          <button class="btn btn-warning w-100 py-2 rounded-pill text-dark fw-semibold">Buy Now</button>
-        </div>
-
-        <div class="accordion" id="accordionInfo">
-            <div class="accordion-item border-0 border-bottom">
-              <h2 class="accordion-header">
-                <button class="accordion-button collapsed custom-accordion-btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
-                  Please Make Sure The Size Fits You.
-                </button>
-              </h2>
-              <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionInfo">
-                <div class="accordion-body small text-muted">
-                  If you are unsure about your size, please click the size chart button and browse through the chart. Our company policy does not accept refunds or returns for sizing-related issues.
-                </div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="nama_sepatu" class="form-label">Shoe Name</label>
+                <input v-model="newProduct.nama_sepatu" type="text" id="nama_sepatu" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label for="brand" class="form-label">Brand</label>
+                <input v-model="newProduct.brand" type="text" id="brand" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label for="harga_retail" class="form-label">Price (Rp)</label>
+                <input v-model="newProduct.harga_retail" type="number" id="harga_retail" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label for="sku" class="form-label">SKU</label>
+                <input v-model="newProduct.sku" type="text" id="sku" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label for="ukuran" class="form-label">Sizes (pisahkan koma)</label>
+                <input v-model="newProduct.ukuran" type="text" id="ukuran" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label for="warna" class="form-label">Color</label>
+                <input v-model="newProduct.warna" type="text" id="warna" class="form-control">
+              </div>
+              <div class="col-md-6">
+                 <label for="gender" class="form-label">Gender</label>
+                 <select v-model="newProduct.gender" id="gender" class="form-select">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Unisex">Unisex</option>
+                 </select>
+              </div>
+              <div class="col-md-6">
+                <label for="material" class="form-label">Material</label>
+                <input v-model="newProduct.material" type="text" id="material" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label for="dimensi" class="form-label">Dimension</label>
+                <input v-model="newProduct.dimensi" type="text" id="dimensi" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label for="tanggal_rilis" class="form-label">Release Date</label>
+                <input v-model="newProduct.tanggal_rilis" type="date" id="tanggal_rilis" class="form-control">
+              </div>
+              <div class="col-12">
+                <label for="deskripsi" class="form-label">Description</label>
+                <textarea v-model="newProduct.deskripsi" class="form-control" id="deskripsi" rows="3"></textarea>
               </div>
             </div>
-            <div class="accordion-item border-0 border-bottom">
-              <h2 class="accordion-header">
-                <button class="accordion-button collapsed custom-accordion-btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
-                  Authentic. Guaranteed.
-                </button>
-              </h2>
-              <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionInfo">
-                <div class="accordion-body small text-muted">
-                  All products sold are 100% authentic and verified by our team of experts. We guarantee original items only.
-                </div>
-              </div>
-            </div>
+
+            <button type="submit" class="btn btn-success w-100 mt-4">Save Product</button>
+          </form>
         </div>
       </div>
-    </div>
 
-    <div class="mt-5 border-top pt-4">
-      <h3 class="h5 fw-bold">Description</h3>
-      <p class="text-muted">{{ product.description }}</p>
-      <div class="row bg-light rounded p-4 mt-4">
-        <div class="col-md-6">
-          <p class="small text-muted mb-1">SKU</p>
-          <p class="fw-bold">{{ product.details.sku }}</p>
-          <p class="small text-muted mt-3 mb-1">Material</p>
-          <p class="text-muted">{{ product.details.material }}</p>
-          <p class="small text-muted mt-3 mb-1">Release Date</p>
-          <p class="text-muted">{{ product.details.release }}</p>
-        </div>
-        <div class="col-md-6">
-          <p class="small text-muted mb-1">Color</p>
-          <p class="fw-bold">{{ product.details.color }}</p>
-          <p class="small text-muted mt-3 mb-1">Dimension</p>
-          <p class="text-muted">{{ product.details.dimension }}</p>
-          <p class="small text-muted mt-3 mb-1">Retail (approx.)</p>
-          <p class="text-muted">{{ product.details.retail }}</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="container mt-5">
-      <h3 class="text-center fw-bold mb-4">Similar Products</h3>
-      <div class="row row-cols-2 row-cols-md-4 g-4">
-        <div class="col" v-for="(item, idx) in similarProducts.slice(0, 8)" :key="idx">
-          <div class="product-card-similar text-start p-3 d-flex flex-column h-100">
-            <div class="image-wrapper-similar mb-3">
-              <img :src="item.image" alt="Product Image" class="product-image-similar" />
-            </div>
-            <div class="product-text-wrapper mt-auto">
-              <p class="product-name">{{ item.name }}</p>
-              <p class="product-price-similar">IDR {{ item.price }}</p>
-            </div>
+      <div class="card mt-4">
+        <div class="card-body">
+          <h5 class="card-title">Existing Products</h5>
+          <div v-if="isLoadingProducts">Loading...</div>
+          <div v-else class="table-responsive">
+             <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Brand</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="product in products" :key="product.produk_id">
+                        <td>{{ product.nama_sepatu }}</td>
+                        <td>{{ product.brand }}</td>
+                        <td>{{ product.harga_retail }}</td>
+                    </tr>
+                </tbody>
+             </table>
           </div>
         </div>
       </div>
-      <div class="text-center mt-5 mb-5">
-        <router-link to="/ViewMore" class="btn btn-dark rounded-pill px-5 py-2 shadow-sm">
-          View More
-        </router-link>
-      </div>
-    </div>
+    </main>
   </div>
 </template>
 
 <style scoped>
-/*
-  SALIN DAN TEMPEL SELURUH CSS ANDA DARI FILE LAMA KE SINI.
-  INI AKAN MEMASTIKAN TAMPILAN DAN RESPONSIFNYA SAMA PERSIS.
-*/
-.active {
-  background-color: #000;
-  color: #fff;
+/* Basic styling to match the screenshot */
+:root {
+  --sidebar-bg: #f8f9fa;
+  --content-bg: #e9ecef;
+  --card-bg: #ffffff;
+  --text-color: #212529;
+  --active-link-bg: #e9f5e9;
+  --active-link-border: #28a745;
 }
-.carousel-item {
-  background-color: #fff;
+
+.admin-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--content-bg);
 }
-.carousel-item img {
-  object-fit: contain;
-  height: 260px;
-  margin: 50px auto 20px auto;
+
+.sidebar {
+  width: 260px;
+  background-color: var(--card-bg);
+  padding: 1.5rem;
+  flex-shrink: 0;
+}
+
+.brand {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+.nav-link {
   display: block;
-  padding: 0;
+  padding: 0.75rem 1rem;
+  color: var(--text-color);
+  text-decoration: none;
+  border-radius: 0.375rem;
+  margin-bottom: 0.5rem;
 }
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-  background-color: rgba(0, 0, 0, 0.5);
-  background-size: 100% 100%;
-  border-radius: 50%;
-  padding: 10px;
+
+.nav-link.active {
+  background-color: var(--active-link-bg);
+  border-left: 4px solid var(--active-link-border);
+  font-weight: 600;
+  color: var(--active-link-border);
 }
-.carousel-control-prev,
-.carousel-control-next {
-  width: 36px;
-  height: 36px;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: white;
-  border-radius: 50%;
-  border: 1px solid #ccc;
+
+.content {
+  flex-grow: 1;
+  padding: 2rem;
+}
+
+.product-input-card {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.card {
+  border: none;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.image-previews {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: black;
-  font-size: 20px;
-  z-index: 10;
-  opacity: 1;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
 }
-.carousel-control-prev:hover,
-.carousel-control-next:hover {
-  background-color: black;
-}
-.carousel-control-prev span,
-.carousel-control-next span {
-  color: black;
-  font-size: 22px;
-  font-weight: bold;
-}
-.carousel-control-prev:hover span,
-.carousel-control-next:hover span {
-  color: white;
-}
-.carousel-control-prev {
-  left: 10px;
-}
-.carousel-control-next {
-  right: 10px;
-}
-.product-card {
-  background-color: white;
-  border-radius: 16px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-  padding: 16px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-.product-image-wrapper {
-  width: 100%;
-  height: 160px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
-}
-.product-image {
-  max-height: 320px;
-  object-fit: contain;
-}
-@media (max-width: 576px) {
-  .product-carousel-container {
-    padding: 0 10px;
-  }
-  .carousel-control-prev,
-  .carousel-control-next {
-    width: 32px;
-    height: 32px;
-    font-size: 18px;
-  }
-  .product-image {
-    max-height: 280px;
-  }
-}
-.product-info {
-  margin-top: auto;
-  width: 100%;
-}
-.product-title {
-  font-size: 1rem;
-  margin: 0 0 4px 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.product-price {
-  font-size: 1rem;
-  font-weight: bold;
-  color: #28a745;
-  margin: 0;
-}
-.accordion-button::after {
-  display: none !important;
-}
-.accordion-button {
+
+.preview-item {
   position: relative;
 }
-.accordion-button::before {
-  content: "+";
+
+.preview-item img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 0.375rem;
+}
+
+.btn-remove-img {
   position: absolute;
-  right: 1.25rem;
-  font-size: 1.2rem;
+  top: -10px;
+  right: -10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #dc3545;
+  color: white;
+  border: none;
   font-weight: bold;
-  transition: transform 0.3s ease;
-}
-.accordion-button:not(.collapsed)::before {
-  content: "−";
-}
-.accordion-button:focus {
-  box-shadow: none !important;
-  outline: none !important;
-}
-.accordion-button:not(.collapsed) {
-  background-color: transparent;
-  color: inherit;
-}
-.custom-accordion-btn {
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-.size-button {
-  width: 48px;
-  height: 38px;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  border: 1px solid #ccc;
-  background-color: white;
-  color: #333;
-}
-.size-button:hover {
-  border-color: #000;
-  color: #000;
-}
-.active-size {
-  background-color: #000 !important;
-  color: #fff !important;
-  border-color: #000 !important;
-}
-.inactive-size {
-  background-color: #fff;
-  color: #333;
-}
-.product-card-similar {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-.product-card-similar:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
-}
-.image-wrapper-similar {
-  height: 160px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.product-image-similar {
-  max-height: 100%;
-  max-width: 100%;
-  object-fit: contain;
-}
-.product-text-wrapper {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  min-height: 80px;
-}
-.product-name {
-  font-weight: 500;
-  font-size: 0.95rem;
-  color: #333;
-  min-height: 40px;
-  margin-bottom: 6px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.product-price-similar {
-  color: #28a745;
-  font-weight: bold;
+  line-height: 1;
+  cursor: pointer;
 }
 </style>

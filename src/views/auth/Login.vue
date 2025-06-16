@@ -34,8 +34,8 @@ async function login() {
     const user = response.data.user;
     
     // Simpan token dan data pengguna ke localStorage
-    localStorage.setItem('AUTH_TOKEN', token);
-    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('auth_token', response.data.access_token);
+    localStorage.setItem('user_data', JSON.stringify(response.data.user));
 
     // =======================================================
     // --- INI BAGIAN YANG DIUBAH ---

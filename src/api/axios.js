@@ -10,5 +10,27 @@ const api = axios.create({
   }
 });
 
+// === BAGIAN PENTING YANG HILANG ADA DI SINI ===
+// Menambahkan Interceptor untuk setiap request
+api.interceptors.request.use(config => {
+  // Ambil token dari local storage
+  const token = localStorage.getItem('auth_token');
+
+  // Jika token ada, tambahkan ke header 'Authorization'
+  // sebagai Bearer Token
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  // Kembalikan konfigurasi yang sudah diubah agar request bisa dilanjutkan
+  return config;
+
+}, error => {
+  // Lakukan sesuatu jika ada error pada request
+  return Promise.reject(error);
+});
+// === AKHIR BAGIAN PENTING ===
+
+
 // Menggunakan 'export default' karena ini adalah ekspor utama dari file ini
 export default api;
