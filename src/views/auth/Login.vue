@@ -57,7 +57,7 @@ async function login() {
         router.push({ name: 'Admin' }); 
       } else {
         // Kamu pakai '/viewmore', ini adalah path
-        router.push('/viewmore');
+        router.push('/view-more');
       }
     }, 1000); // <-- Waktu tunggu 
 
