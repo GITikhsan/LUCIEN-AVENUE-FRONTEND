@@ -42,9 +42,20 @@ const fetchProducts = async () => {
   isLoadingProducts.value = true;
   try {
     const response = await api.get('/products');
-    products.value = response.data.data ? response.data.data : response.data;
+    
+    // PERBAIKANNYA DI SINI:
+    // Kita masuk satu level .data lebih dalam untuk mengambil array dari objek paginasi
+    if (response.data && response.data.data && Array.isArray(response.data.data.data)) {
+      products.value = response.data.data.data;
+    } else {
+      // Jika struktur data tidak sesuai, set ke array kosong untuk mencegah error
+      console.error("Struktur data produk dari API tidak sesuai ekspektasi.", response.data);
+      products.value = []; 
+    }
+
   } catch (error) {
     console.error("Gagal mengambil data produk:", error);
+    products.value = []; // Jika gagal fetch, pastikan products tetap array
   } finally {
     isLoadingProducts.value = false;
   }

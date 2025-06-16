@@ -1,92 +1,114 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-// 1. Impor komponen Layout dan semua halaman
+// 1. Impor komponen Layout dan semua halaman (Tidak ada perubahan di sini)
 import MainLayout from '@/layout/MainLayout.vue'
 import Home from '@/views/User/Home.vue'
 import Product from '@/views/product/Product.vue'
 import ViewMore from '@/views/User/ViewMore.vue'
 import Login from '@/views/auth/Login.vue'
 import Register from '@/views/auth/Register.vue'
-
 import AboutUs from '@/views/User/AboutUs.vue'
 import Admin from '@/views/admin/Admin.vue'
-// ... import halaman lainnya jika ada
 
-
-
+// Halaman User Profile dan anak-anaknya
 import UserProfile from '@/views/User/UserProfile.vue'
-import MyData    from '@/components/UserSetting/MyData.vue'
-import MyPurchases    from '@/components/UserSetting/MyPurchases.vue'
+import MyData from '@/components/UserSetting/MyData.vue'
+import MyPurchases from '@/components/UserSetting/MyPurchases.vue'
 import Address from '@/components/UserSetting/Address.vue'
 import Help from '@/components/UserSetting/Help.vue'
 import AddAddress from '@/components/UserSetting/AddAddress.vue'
 import EditAddress from '@/components/UserSetting/EditAddress.vue'
 
+// Halaman Payment Flow
 import Bag from '@/views/payment/Bag.vue'
 import Checkout from '@/views/payment/Checkout.vue'
 import Payment from '@/views/payment/Payment.vue'
 
-
-
 const routes = [
-
-  // { path: '/payment',   name: 'Payment',     component: Payment },
-  // { path: '/checkout',   name: 'Checkout',  component: Checkout },
-  // { path: '/mydata', name: 'My Data', component: MyData },
-  // { path: '/myPurchases', name: 'My Purchases', component: MyPurchases },
-  // { path: '/address', name: 'Address', component: Address },
-  // { path: '/help', name: 'Help', component: Help },
-  // { path: '/addAddress', name: 'Add Address', component: AddAddress },
-  // { path: '/editAddress', name: 'Edit Address', component: EditAddress },
-  // --- GRUP RUTE YANG MENGGUNAKAN MAINLAYOUT ---
+  // --- GRUP RUTE UTAMA (YANG PAKAI NAVBAR & FOOTER) ---
   {
     path: '/',
-    component: MainLayout, // Tentukan "Rumah" atau "Bingkai"-nya di sini
-    children: [            // Definisikan "Kamar-kamar" di dalamnya
+    component: MainLayout,
+    children: [
       {
-        path: '', // Path kosong berarti ini adalah halaman utama untuk grup ini (URL: /)
+        path: '', // Tetap, untuk homepage -> /
         name: 'Home',
         component: Home
       },
       {
-        path: 'product/:id', // URL menjadi: /product/123
+        path: 'product/:id', // Tetap, untuk detail produk -> /product/123
         name: 'Product',
         component: Product
       },
       {
-        path: 'viewMore',
+        path: 'view-more', // REVISI: Menggunakan kebab-case, lebih umum untuk URL
         name: 'ViewMore',
         component: ViewMore
       },
       {
-        path: 'userProfile', // URL menjadi: /userProfile
-        name: 'Profile',
-        component: UserProfile
+        path: 'about-us', // REVISI: Menggunakan kebab-case
+        name: 'AboutUs', // Nama bisa tetap spasi
+        component: AboutUs
       },
       {
-        path: 'bag', // URL menjadi: /bag
+        path: 'bag', // Tetap -> /bag
         name: 'Bag',
         component: Bag
       },
       {
-        path: 'aboutUs', // URL menjadi: /aboutUs
-        name: 'About Us',
-        component: AboutUs
+        path: 'checkout', // REVISI: Dihapus '/' di depan, karena ini anak dari MainLayout
+        name: 'Checkout',
+        component: Checkout
       },
-      { path: '/payment',   name: 'Payment',     component: Payment },
-      { path: '/checkout',   name: 'Checkout',  component: Checkout },
-      { path: '/mydata', name: 'My Data', component: MyData },
-      { path: '/myPurchases', name: 'My Purchases', component: MyPurchases },
-      { path: '/address', name: 'Address', component: Address },
-      { path: '/help', name: 'Help', component: Help },
-      { path: '/addAddress', name: 'Add Address', component: AddAddress },
-      { path: '/editAddress', name: 'Edit Address', component: EditAddress }
-      // Tambahkan halaman lain yang butuh Navbar & Footer di sini
+      {
+        path: 'payment', // REVISI: Dihapus '/' di depan
+        name: 'Payment',
+        component: Payment
+      },
+      // === REVISI UTAMA: Mengelompokkan semua halaman setting di bawah UserProfile ===
+      {
+        path: 'user-profile', // URL Induk -> /user-profile
+        component: UserProfile,
+        // Di dalam komponen UserProfile.vue, kamu perlu menambahkan <router-view />
+        // agar anak-anak rute ini bisa ditampilkan.
+        children: [
+          {
+            path: '', // Path kosong, jadi halaman default saat buka /user-profile
+            name: 'MyData',
+            component: MyData
+          },
+          {
+            path: 'my-purchases', // URL menjadi -> /user-profile/my-purchases
+            name: 'MyPurchases',
+            component: MyPurchases
+          },
+          {
+            path: 'address', // URL menjadi -> /user-profile/address
+            name: 'Address',
+            component: Address
+          },
+          {
+            path: 'address/add', // URL menjadi -> /user-profile/address/add
+            name: 'AddAddress',
+            component: AddAddress
+          },
+          {
+            path: 'address/edit/:addressId', // URL menjadi -> /user-profile/address/edit/1
+            name: 'EditAddress',
+            component: EditAddress
+          },
+          {
+            path: 'help', // URL menjadi -> /user-profile/help
+            name: 'Help',
+            component: Help
+          },
+        ]
+      }
     ]
   },
 
-  // --- GRUP RUTE YANG TIDAK MENGGUNAKAN MAINLAYOUT ---
-  // Contoh: Halaman Login, Register, dan Admin tidak perlu Navbar & Footer yang sama
+  // --- GRUP RUTE STANDALONE (TIDAK PAKAI NAVBAR & FOOTER DARI MAINLAYOUT) ---
+  // Tidak ada perubahan di sini, ini sudah benar.
   {
     path: '/login',
     name: 'Login',
@@ -104,8 +126,13 @@ const routes = [
   },
 ]
 
-export default createRouter({
-  history: createWebHistory(),
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-  scrollBehavior: () => ({ top: 0 })
+  // Fungsi ini akan membuat halaman selalu scroll ke atas saat pindah rute
+  scrollBehavior(to, from, savedPosition) {
+    return { top: 0 }
+  }
 })
+
+export default router
