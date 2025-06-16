@@ -13,26 +13,39 @@ const subdistricts = ref([]);
 
 // --- State untuk form input ---
 const form = ref({
-  name: '', surname: '', phone_code: '+62', mobile: '',
-  country: 'Indonesia', province_id: '', city_id: '',
-  district_id: '', subdistrict_id: '', postcode: '',
-  address: '', isDefault: false
+  name: '', 
+  surname: '', 
+  phone_code: '+62', 
+  mobile: '',
+  country: 'Indonesia', 
+  province_id: '', 
+  city_id: '',
+  district_id: '', 
+  subdistrict_id: '', 
+  postcode: '',
+  address: '', // Ini untuk detail jalan, nomor rumah
+  isDefault: false
 });
 
-// --- State untuk loading ---
+// --- State untuk loading dan error ---
 const isLoading = ref({
   countries: true, provinces: false, cities: false,
-  districts: false, subdistricts: false,
+  districts: false, subdistricts: false, submit: false
 });
+const errorMessage = ref('');
 
 // --- FUNGSI-FUNGSI LOGIKA ---
 
 async function fetchProvinces() {
   isLoading.value.provinces = true;
   try {
-    const response = await axios.get('/wilayah/provinsi');
+    // PERBAIKAN: Hapus /api dari sini
+    const response = await axios.get('/wilayah/provinsi'); 
     provinces.value = response.data;
-  } catch (error) { console.error("Failed to fetch provinces:", error); } 
+  } catch (error) { 
+    console.error("Failed to fetch provinces:", error); 
+    errorMessage.value = "Gagal memuat daftar provinsi. Pastikan server backend berjalan dan URL benar.";
+  } 
   finally { isLoading.value.provinces = false; }
 }
 
@@ -42,9 +55,12 @@ onMounted(async () => {
     const response = await axios.get('https://restcountries.com/v3.1/all?fields=name,cca2,idd');
     countries.value = response.data.sort((a, b) => a.name.common.localeCompare(b.name.common));
     if (form.value.country === 'Indonesia') {
-      fetchProvinces();
+      await fetchProvinces(); // Tunggu fetchProvinces selesai
     }
-  } catch (error) { console.error("Failed to fetch countries:", error); } 
+  } catch (error) { 
+    console.error("Failed to fetch countries:", error); 
+    errorMessage.value = "Gagal memuat daftar negara.";
+  } 
   finally { isLoading.value.countries = false; }
 });
 
@@ -60,6 +76,7 @@ watch(() => form.value.province_id, async (newProvinceId) => {
   if (newProvinceId) {
     isLoading.value.cities = true;
     try {
+      // PERBAIKAN: Hapus /api dari sini
       const response = await axios.get(`/wilayah/kota/${newProvinceId}`);
       cities.value = response.data;
     } catch (error) { console.error("Gagal memuat kota:", error); } 
@@ -67,66 +84,49 @@ watch(() => form.value.province_id, async (newProvinceId) => {
   }
 });
 
-watch(() => form.value.city_id, async (newCityId) => {
-    districts.value = []; subdistricts.value = [];
-    form.value.district_id = ''; form.value.subdistrict_id = '';
-    if(newCityId){
-        isLoading.value.districts = true;
-        try {
-            const response = await axios.get(`/wilayah/kecamatan/${newCityId}`);
-            districts.value = response.data;
-        } catch (error) { console.error("Gagal memuat kecamatan:", error); } 
-        finally { isLoading.value.districts = false; }
-    }
-});
-
-watch(() => form.value.district_id, async (newDistrictId) => {
-    subdistricts.value = [];
-    form.value.subdistrict_id = '';
-    if(newDistrictId){
-        isLoading.value.subdistricts = true;
-        try {
-            const response = await axios.get(`/wilayah/desa/${newDistrictId}`);
-            subdistricts.value = response.data;
-        } catch (error) { console.error("Gagal memuat kelurahan:", error); } 
-        finally { isLoading.value.subdistricts = false; }
-    }
-});
+// Watcher untuk kecamatan dan desa bisa diaktifkan kembali jika diperlukan
+// watch(() => form.value.city_id, ... );
+// watch(() => form.value.district_id, ... );
 
 async function submitAddress() {
-  isLoading.value.submit = true; // Tambahkan state loading untuk tombol
+  isLoading.value.submit = true;
+  errorMessage.value = '';
 
-  // Mengambil NAMA dari wilayah yang dipilih berdasarkan ID
-  const selectedProvince = provinces.value.find(p => p.id === form.value.province_id)?.name || '';
-  const selectedCity = cities.value.find(c => c.id === form.value.city_id)?.name || '';
-  const selectedDistrict = districts.value.find(d => d.id === form.value.district_id)?.name || '';
-  const selectedSubdistrict = subdistricts.value.find(s => s.id === form.value.subdistrict_id)?.name || '';
-
-  // Gabungkan semua field menjadi satu string alamat yang lengkap
-  const fullAddress = [
-    form.value.address_detail,
-    selectedSubdistrict,
-    selectedDistrict,
-    selectedCity,
-    selectedProvince,
-    form.value.country,
-    form.value.postcode
-  ].filter(Boolean).join(', '); // Hapus bagian yang kosong dan gabungkan dengan koma
-
-  console.log('Header yang akan dikirim:', axios.defaults.headers.common);
+  const selectedCityName = cities.value.find(c => c.id === form.value.city_id)?.name || '';
+  
+  const payload = {
+    name: `${form.value.name} ${form.value.surname}`.trim(),
+    phone: `${form.value.phone_code}${form.value.mobile}`,
+    address: form.value.address,
+    city: selectedCityName,
+    label: "Rumah",
+    note: `Kode Pos: ${form.value.postcode}`
+  };
 
   try {
-    // Kirim HANYA alamat lengkap ke endpoint /address
-    const response = await axios.post('/address', {
-      alamat: fullAddress
-    });
+    // PERBAIKAN: Hapus /api dari sini
+    const response = await axios.post('/address', payload);
 
-    alert(response.data.message); // Tampilkan pesan sukses dari server
-    router.push('/address'); // Arahkan kembali ke halaman daftar alamat
+    alert(response.data.message);
+    router.push('/userProfile'); // Contoh redirect ke halaman profil
 
   } catch (error) {
-    alert('Gagal menyimpan alamat. Silakan coba lagi.');
-    console.error('Failed to save address:', error);
+    if (error.response && error.response.status === 422) {
+      const errors = error.response.data.errors;
+      let errorText = "Harap perbaiki kesalahan berikut:\n";
+      for (const key in errors) {
+        errorText += `- ${errors[key][0]}\n`;
+      }
+      errorMessage.value = errorText;
+      alert(errorText);
+    } else if (error.response && error.response.status === 401) {
+        errorMessage.value = 'Sesi Anda telah habis. Silakan login kembali.';
+        alert(errorMessage.value);
+    } else {
+      errorMessage.value = 'Gagal menyimpan alamat. Silakan coba lagi.';
+      alert(errorMessage.value);
+      console.error('Failed to save address:', error);
+    }
   } finally {
     isLoading.value.submit = false;
   }
@@ -141,8 +141,8 @@ async function submitAddress() {
       <p>Loading initial data...</p>
     </div>
     
-    <div v-else-if="errorMessage" class="alert alert-danger mx-auto" style="max-width: 500px;">
-        {{ errorMessage }}
+    <div v-if="errorMessage" class="alert alert-danger mx-auto" style="max-width: 500px;">
+        <pre>{{ errorMessage }}</pre>
     </div>
 
     <form v-else class="mx-auto text-start" style="max-width: 500px" @submit.prevent="submitAddress">
@@ -183,24 +183,6 @@ async function submitAddress() {
             {{ city.name }}
           </option>
         </select>
-
-        <!-- <select v-model="form.district_id" class="form-select mb-3" :disabled="!form.city_id || isLoading.districts" required>
-          <option disabled value="">
-            {{ isLoading.districts ? 'Memuat...' : 'Pilih Kecamatan' }}
-          </option>
-          <option v-for="district in districts" :key="district.id" :value="district.id">
-            {{ district.name }}
-          </option>
-        </select>
-
-         <select v-model="form.subdistrict_id" class="form-select mb-3" :disabled="!form.district_id || isLoading.subdistricts" required>
-          <option disabled value="">
-            {{ isLoading.subdistricts ? 'Memuat...' : 'Pilih Kelurahan/Desa' }}
-          </option>
-          <option v-for="subdistrict in subdistricts" :key="subdistrict.id" :value="subdistrict.id">
-            {{ subdistrict.name }}
-          </option>
-        </select> -->
       </div> 
       
       <input v-model="form.postcode" type="text" placeholder="Postal code" class="form-control mb-3" required />
@@ -211,7 +193,9 @@ async function submitAddress() {
         <label class="form-check-label" for="defaultCheck">Make your shipping address primary</label>
       </div>
 
-      <button type="submit" class="btn btn-dark w-100">Save Address</button>
+      <button type="submit" class="btn btn-dark w-100" :disabled="isLoading.submit">
+        {{ isLoading.submit ? 'Saving...' : 'Save Address' }}
+      </button>
     </form>
   </div>
 </template>
