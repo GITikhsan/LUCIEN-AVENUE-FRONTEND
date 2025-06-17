@@ -35,9 +35,10 @@ const routes = [
         name: 'Home',
         component: Home
       },
+      // GANTI DENGAN BLOK INI
       {
-        path: 'Product/:produk_id', // Tetap, untuk detail produk -> /product/123
-        name: 'Product',
+        path: 'product/:id', // <-- DIUBAH: jadi huruf kecil dan :id
+        name: 'ProductDetail',
         component: Product
       },
       {
