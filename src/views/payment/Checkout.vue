@@ -12,7 +12,7 @@ const API_BASE_URL = 'http://127.0.0.1:8000/api';
 axios.defaults.baseURL = API_BASE_URL;
 
 // 2. Ambil token dari localStorage (diasumsikan sudah disimpan saat login)
-const token = localStorage.getItem('AUTH_TOKEN');
+const token = localStorage.getItem('auth_token');
 
 // 3. Jika token ada, pasang sebagai header default untuk SEMUA request axios
 if (token) {

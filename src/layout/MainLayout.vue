@@ -14,7 +14,7 @@ const searchQuery = ref('')
 const items = [
   { to: '/', name: 'Home' },
   { to: '/bag', name: 'Bag' },
-  { to: '/aboutUs', name: 'About Us' }
+  { to: '/about-us', name: 'About Us' }
 ]
 
 const handleSearch = () => {
@@ -32,7 +32,7 @@ const toggleDarkMode = () => {
 
 const logout = () => {
   localStorage.removeItem('user')
-  localStorage.removeItem('AUTH_TOKEN')
+  localStorage.removeItem('auth_token')
   isLoggedIn.value = false
   user.value = null
   router.push('/')
