@@ -67,7 +67,7 @@ const routes = [
       },
       // === REVISI UTAMA: Mengelompokkan semua halaman setting di bawah UserProfile ===
       {
-        path: 'user-profile', // URL Induk -> /user-profile
+        path: 'UserProfile', // URL Induk -> /user-profile
         component: UserProfile,
         // Di dalam komponen UserProfile.vue, kamu perlu menambahkan <router-view />
         // agar anak-anak rute ini bisa ditampilkan.

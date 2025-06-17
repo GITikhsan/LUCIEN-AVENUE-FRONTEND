@@ -43,11 +43,16 @@ watch(isDarkMode, (val) => {
 })
 
 onMounted(() => {
-  const storedUser = localStorage.getItem('user')
+  const storedUser = localStorage.getItem('user_data')
   if (storedUser) {
-    user.value = JSON.parse(storedUser)
-    isLoggedIn.value = true
+    try {
+      user.value = JSON.parse(storedUser)
+      isLoggedIn.value = true
+    } catch (e) {
+      console.error('Failed to parse user from localStorage')
+    }
   }
+
   const storedDark = localStorage.getItem('darkMode')
   isDarkMode.value = storedDark === 'true'
   document.body.classList.toggle('dark-mode', isDarkMode.value)
@@ -58,7 +63,7 @@ onMounted(() => {
   <nav class="navbar navbar-expand-lg shadow-sm sticky-top py-3" :class="isDarkMode ? 'navbar-dark bg-dark' : 'navbar-light bg-white'">
     <div class="container-fluid px-3 px-md-4">
       <RouterLink class="navbar-brand fw-bold text-uppercase" to="/">Lucien Avenue</RouterLink>
-      
+
       <button class="navbar-toggler" type="button" @click="toggleMenu">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -162,16 +167,13 @@ body.dark-mode .dropdown-menu {
   color: #f1f1f1 !important;
   border: 1px solid #444;
 }
-
 body.dark-mode .dropdown-menu .dropdown-item {
   color: #f1f1f1;
 }
-
 body.dark-mode .dropdown-menu .dropdown-item:hover {
   background-color: #444;
   color: #fff;
 }
-
 body.dark-mode .premium-link {
   color: #ddd;
 }
@@ -250,35 +252,14 @@ body.dark-mode .premium-link.active {
 .btn-darkmode-toggle:hover {
   color: #f39c12;
 }
-
-body.dark-mode .navbar {
-  background-color: #111 !important;
-  color: #f5f5f5;
-  border-bottom: 1px solid #333;
-}
-
-body.dark-mode .navbar .nav-link,
-body.dark-mode .navbar-brand,
-body.dark-mode .navbar-toggler-icon {
-  color: #f5f5f5 !important;
-}
-
-body.dark-mode .navbar .nav-link:hover {
-  color: #fff !important;
-}
-
-/* Hilangkan border & shadow */
 .navbar {
   border-top: none !important;
-  border-bottom: none; /* Opsional */
+  border-bottom: none;
   box-shadow: none !important;
 }
-
-/* Pastikan body dan html tidak punya margin/padding/border */
 body, html {
   margin: 0;
   padding: 0;
   border: none;
 }
-
 </style>
