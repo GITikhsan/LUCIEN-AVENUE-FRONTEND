@@ -16,7 +16,7 @@ import AOS from 'aos'
 axios.defaults.baseURL = 'http://127.0.0.1:8000/api';
 
 // Cek apakah ada token otentikasi di penyimpanan lokal browser
-const token = localStorage.getItem('AUTH_TOKEN');
+const token = localStorage.getItem('auth_token');
 
 // Jika token ditemukan, lampirkan sebagai header default di setiap permintaan
 if (token) {
