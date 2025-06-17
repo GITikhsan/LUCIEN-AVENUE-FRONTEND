@@ -31,7 +31,7 @@ const toggleDarkMode = () => {
 }
 
 const logout = () => {
-  localStorage.removeItem('user')
+  localStorage.removeItem('user_data')
   localStorage.removeItem('auth_token')
   isLoggedIn.value = false
   user.value = null
@@ -44,12 +44,13 @@ watch(isDarkMode, (val) => {
 
 onMounted(() => {
   const storedUser = localStorage.getItem('user_data')
-  if (storedUser) {
+  const token = localStorage.getItem('auth_token')
+  if (storedUser && token) {
     try {
       user.value = JSON.parse(storedUser)
       isLoggedIn.value = true
-    } catch (e) {
-      console.error('Failed to parse user from localStorage')
+    } catch {
+      console.warn('Gagal parse user_data')
     }
   }
 
@@ -60,14 +61,25 @@ onMounted(() => {
 </script>
 
 <template>
-  <nav class="navbar navbar-expand-lg shadow-sm sticky-top py-3" :class="isDarkMode ? 'navbar-dark bg-dark' : 'navbar-light bg-white'">
-    <div class="container-fluid px-3 px-md-4">
+  <nav class="navbar navbar-expand-lg sticky-top shadow-sm py-3" :class="isDarkMode ? 'navbar-dark bg-dark' : 'navbar-light bg-white'">
+    <div class="container-fluid px-4">
+      <!-- Brand -->
       <RouterLink class="navbar-brand fw-bold text-uppercase" to="/">Lucien Avenue</RouterLink>
 
+      <!-- Toggler -->
       <button class="navbar-toggler" type="button" @click="toggleMenu">
         <span class="navbar-toggler-icon"></span>
       </button>
 
+      <!-- 💡 Mobile Search (selalu tampil, di luar collapse) -->
+      <form class="d-flex align-items-center my-2 d-flex d-lg-none w-100" @submit.prevent="handleSearch">
+        <div class="glass-search w-100">
+          <i class="bi bi-search"></i>
+          <input v-model="searchQuery" type="text" placeholder="Search..." />
+        </div>
+      </form>
+
+      <!-- Collapse Menu -->
       <div class="collapse navbar-collapse justify-content-between" :class="{ show: isMenuOpen }">
         <ul class="navbar-nav mx-auto gap-3">
           <li v-for="i in items" :key="i.to" class="nav-item">
@@ -77,34 +89,41 @@ onMounted(() => {
           </li>
         </ul>
 
-        <form class="d-flex align-items-center" @submit.prevent="handleSearch">
+        <!-- 💡 Desktop Search -->
+        <form class="d-flex align-items-center d-none d-lg-flex" @submit.prevent="handleSearch">
           <div class="glass-search">
             <i class="bi bi-search"></i>
-            <input v-model="searchQuery" type="text" placeholder="Search Lucien Avenue..." :class="{ 'text-white': isDarkMode }" />
+            <input v-model="searchQuery" type="text" placeholder="Search..." />
           </div>
         </form>
 
+        <!-- Dark Mode Toggle -->
         <button class="btn-darkmode-toggle ms-3" @click="toggleDarkMode">
           <i class="bi" :class="isDarkMode ? 'bi-sun-fill' : 'bi-moon-stars-fill'"></i>
         </button>
 
+        <!-- Auth Menu -->
         <ul class="navbar-nav ms-3">
-          <li v-if="!isLoggedIn" class="nav-item">
-            <RouterLink class="nav-link premium-link" to="/login">Login</RouterLink>
-          </li>
-          <li v-if="!isLoggedIn" class="nav-item">
-            <RouterLink class="nav-link premium-link" to="/register">Register</RouterLink>
-          </li>
-          <li v-else class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" data-bs-toggle="dropdown">
-              <i class="bi bi-person-circle" style="font-size: 1.2rem;"></i>
-              <span>{{ user?.name || 'User' }}</span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-              <li><RouterLink class="dropdown-item" to="/userProfile">Profile</RouterLink></li>
-              <li><button class="dropdown-item" @click="logout">Logout</button></li>
-            </ul>
-          </li>
+          <template v-if="!isLoggedIn">
+            <li class="nav-item">
+              <RouterLink class="nav-link premium-link" to="/login">Login</RouterLink>
+            </li>
+            <li class="nav-item">
+              <RouterLink class="nav-link premium-link" to="/register">Register</RouterLink>
+            </li>
+          </template>
+          <template v-else>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle" style="font-size: 1.2rem;"></i>
+                <span>{{ user?.name || 'User' }}</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                <li><RouterLink class="dropdown-item" to="/userProfile">Profile</RouterLink></li>
+                <li><button class="dropdown-item" @click="logout">Logout</button></li>
+              </ul>
+            </li>
+          </template>
         </ul>
       </div>
     </div>
@@ -156,30 +175,117 @@ onMounted(() => {
   </footer>
 </template>
 
+
 <style scoped>
+/* DARK MODE ELEGAN - GLOBAL */
 body.dark-mode {
-  background-color: #121212;
-  color: #e4e4e4;
+  background: linear-gradient(145deg, #0f0f0f, #1c1c1c);
+  color: #eaeaea;
+  font-family: 'Poppins', sans-serif;
+  transition: background 0.4s ease, color 0.4s ease;
+  background-attachment: fixed;
 }
-body.dark-mode .navbar,
+
+/* NAVBAR */
+body.dark-mode .navbar {
+  background-color: rgba(24, 24, 24, 0.8) !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+body.dark-mode .navbar-brand,
+body.dark-mode .nav-link {
+  color: #eaeaea !important;
+}
+
+body.dark-mode .nav-link:hover,
+body.dark-mode .nav-link.active {
+  color: #ffffff !important;
+}
+
 body.dark-mode .dropdown-menu {
-  background-color: #333 !important;
-  color: #f1f1f1 !important;
-  border: 1px solid #444;
+  background-color: #1e1e1e;
+  border: 1px solid #333;
 }
-body.dark-mode .dropdown-menu .dropdown-item {
-  color: #f1f1f1;
+
+body.dark-mode .dropdown-item {
+  color: #eaeaea;
 }
-body.dark-mode .dropdown-menu .dropdown-item:hover {
-  background-color: #444;
-  color: #fff;
+
+body.dark-mode .dropdown-item:hover {
+  background-color: #2a2a2a;
+}
+
+/* DARK MODE: SEARCH BAR */
+body.dark-mode .glass-search {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #eaeaea;
+}
+
+body.dark-mode .glass-search input {
+  color: #eaeaea;
+}
+
+/* DARK MODE TOGGLE BUTTON */
+body.dark-mode .btn-darkmode-toggle {
+  color: #eaeaea;
+}
+body.dark-mode .btn-darkmode-toggle:hover {
+  color: #f39c12;
+}
+
+/* PREMIUM LINK */
+.premium-link {
+  font-weight: 500;
+  position: relative;
+  transition: color 0.2s ease;
+}
+.premium-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0%;
+  height: 2px;
+  background-color: currentColor;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+.premium-link:hover::after,
+.premium-link.active::after {
+  width: 100%;
+  left: 0;
+}
+.premium-link.active {
+  font-weight: 600;
+}
+
+body:not(.dark-mode) .premium-link {
+  color: #111;
 }
 body.dark-mode .premium-link {
-  color: #ddd;
+  color: #eaeaea;
 }
-body.dark-mode .premium-link.active {
-  color: #fff;
+
+/* FOOTER */
+.footer {
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+body.dark-mode .footer {
+  background-color: #1a1a1a;
+  color: #cccccc;
+}
+
+body.dark-mode .footer a {
+  color: #bbbbbb;
+}
+
+body.dark-mode .footer a:hover {
+  color: #ffffff;
+}
+
+/* ANIMASI */
 .fade-page-enter-active,
 .fade-page-leave-active {
   transition: all 0.4s ease;
@@ -192,74 +298,53 @@ body.dark-mode .premium-link.active {
   opacity: 0;
   transform: translateY(-20px);
 }
-.premium-link {
-  font-weight: 500;
-  color: #111;
-  position: relative;
-  transition: color 0.2s ease;
-}
-.premium-link::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  width: 0%;
-  height: 2px;
-  background-color: #000;
-  transition: width 0.3s ease, left 0.3s ease;
-}
-.premium-link:hover::after {
-  width: 100%;
-  left: 0;
-}
-.premium-link.active {
-  font-weight: 600;
-  color: #000;
-}
-.premium-link.active::after {
-  width: 100%;
-  left: 0;
-}
+
+/* SEARCH BAR (Light & Dark Shared) */
 .glass-search {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 6px 14px;
   border-radius: 30px;
-  background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
   width: 240px;
-  transition: 0.3s ease;
+  transition: all 0.3s ease;
 }
 .glass-search input {
   background: transparent;
   border: none;
   outline: none;
-  color: inherit;
   width: 100%;
 }
-.glass-search i {
-  color: inherit;
-}
+
+/* DARKMODE TOGGLE */
 .btn-darkmode-toggle {
   background: transparent;
   border: none;
   font-size: 1.3rem;
-  color: inherit;
   cursor: pointer;
 }
-.btn-darkmode-toggle:hover {
-  color: #f39c12;
+
+/* Tambahan efek visual elegan di background */
+body.dark-mode::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.03), transparent 50%),
+    radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.02), transparent 50%);
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.4;
 }
-.navbar {
-  border-top: none !important;
-  border-bottom: none;
-  box-shadow: none !important;
+
+html.dark-mode,
+body.dark-mode {
+  background: linear-gradient(145deg, #0f0f0f, #1c1c1c);
+  color: #eaeaea;
 }
-body, html {
-  margin: 0;
-  padding: 0;
-  border: none;
-}
+
 </style>
