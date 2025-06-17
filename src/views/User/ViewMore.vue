@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed } from "vue";
+import axios from 'axios'
 
 const formatPrice = (value) => {
   return new Intl.NumberFormat('id-ID', {
@@ -8,6 +9,14 @@ const formatPrice = (value) => {
     minimumFractionDigits: 0
   }).format(value)
 }
+
+defineProps({
+  products: Array,
+  title: {
+    type: String,
+    default: ''
+  }
+})
 
 
 // --- LOGIKA RESPONSIVE  ---
@@ -72,85 +81,38 @@ const priceRanges = [
 ];
 const colors = ["green", "blue", "pink", "red", "purple", "yellow", "maroon"];
 const brands = ["Nike", "Adidas", "Air Jordan", "Yeezy", "New Balance"];
+const products = ref([])
 
-const products = ref([
-  {
-    id: 1,
-    name: "Air Jordan 1 Retro Low OG SP Travis Scott Canary (Women) ",
-    image: "/images/3JT/3700.webp",
-    price: "3700000",
-    discount: 10,
-    brand: "Air Jordan",
-  },
-  {
-    id: 2,
-    name: "Air Jordan 1 Retro Low OG Swarovski Stealth (Women)",
-    image: "/images/21JT/21510.webp",
-    price: "21510000",
-    discount: 10,
-    brand: "Air Jordan",
-  },
-  {
-    id: 3,
-    name: "Nike Zoom Field Jaxx Travis Scott Leche Blue",
-    image: "/images/2JT/2000.webp",
-    price: "2000000",
-    discount: 10,
-    brand: "Air Jordan",
-  },
-  {
-    id: 4,
-    name: "Air Jordan 1 Low Fragment x Travis Scott",
-    image: "/images/15JT/15000.webp",
-    price: "15000000",
-    discount: 10,
-    brand: "Air Jordan",
-  },
-  {
-    id: 5,
-    name: "Air Jordan Jumpman Jack TR Travis Scott Bright Cactus",
-    image: "/images/3JT/3900.webp",
-    price: "3900000",
-    discount: 10,
-    brand: "Air Jordan",
-  },
-  {
-    id: 6,
-    name: "Air Jordan 1 Retro Low OG Doernbecher (2023)",
-    image: "/images/7JT/7400.webp",
-    price: "7400000",
-    discount: 10,
-    brand: "Air Jordan",
-  },
-  {
-    id: 7,
-    name: "Air Jordan 1 Retro Low OG Mocha",
-    image: "/images/2JT/2200.webp",
-    price: "2200000",
-    discount: 10,
-    brand: "Air Jordan",
-  },
-  {
-    id: 8,
-    name: "Air Jordan 1 Low Illuminates Vivid Orange",
-    image: "/images/3JT/3630.webp",
-    price: "3630000",
-    discount: 10,
-    brand: "Air Jordan",
-  },
-  {
-    id: 9,
-    name: "Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown",
-    image: "/public/images/4JT/4240(1).webp",
-    price: "4240000",
-    discount: 10,
-    brand: "Air Jordan",
-  },
-]);
+  // {
+  //   id: 9,
+  //   name: "Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown",
+  //   image: "/public/images/4JT/4240(1).webp",
+  //   price: "4240000",
+  //   discount: 10,
+  //   brand: "Air Jordan",
+  // },
+
 
 const filteredProducts = computed(() => {
   return products.value; // filter logic bisa ditambahkan nanti
 });
+
+onMounted(async () => {
+  try {
+    const response = await axios.get('http://127.0.0.1:8000/api/products')
+    products.value = response.data.data.data
+
+    // ✅ Pilih produk berdasarkan ID
+    ViewProducts.value = products.value.filter(p => [2, 3, 5, 10].includes(p.produk_id))
+ 
+
+  } catch (error) {
+    console.error('❌ Gagal mengambil produk:', error)
+  }
+})
+
+
+
 </script>
 
 <template>
@@ -402,8 +364,9 @@ const filteredProducts = computed(() => {
           <div
             class="col"
             v-for="product in filteredProducts"
-            :key="product.id"
+            :key="produk_id"
           >
+          <router-link :to="`/Product/${product.produk_id}`" class="stretched-link"></router-link>
             <div
               class="card h-100 border-0 shadow-sm position-relative rounded-4"
             >
@@ -421,17 +384,17 @@ const filteredProducts = computed(() => {
                 <img
                   :src="product.image"
                   class="img-fluid"
-                  :alt="product.name"
+                  :alt="product.nama_sepatu"
                   style="max-height: 160px; object-fit: contain"
                 />
               </div>
 
               <div class="card-body px-3 pt-0 pb-3">
                 <h6 class="card-title mb-1">
-                  {{ product.name }}
+                  {{ product.nama_sepatu }}
                 </h6>
                 <p class="text-success fw-bold mb-0">
-                  {{ formatPrice(product.price) }}
+                  {{ formatPrice(product.harga_retail) }}
                 </p>
               </div>
             </div>

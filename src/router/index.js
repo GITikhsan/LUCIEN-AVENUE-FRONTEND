@@ -36,18 +36,18 @@ const routes = [
         component: Home
       },
       {
-        path: 'product/:id', // Tetap, untuk detail produk -> /product/123
+        path: 'Product/:produk_id', // Tetap, untuk detail produk -> /product/123
         name: 'Product',
         component: Product
       },
       {
-        path: 'view-more', // REVISI: Menggunakan kebab-case, lebih umum untuk URL
-        name: 'ViewMore',
+        path: 'ViewMore', // REVISI: Menggunakan kebab-case, lebih umum untuk URL
+        name: 'View More',
         component: ViewMore
       },
       {
-        path: 'about-us', // REVISI: Menggunakan kebab-case
-        name: 'AboutUs', // Nama bisa tetap spasi
+        path: 'AboutUs', // REVISI: Menggunakan kebab-case
+        name: 'About Us', // Nama bisa tetap spasi
         component: AboutUs
       },
       {
@@ -65,45 +65,16 @@ const routes = [
         name: 'Payment',
         component: Payment
       },
-      // === REVISI UTAMA: Mengelompokkan semua halaman setting di bawah UserProfile ===
-      {
-        path: 'UserProfile', // URL Induk -> /user-profile
-        component: UserProfile,
-        // Di dalam komponen UserProfile.vue, kamu perlu menambahkan <router-view />
-        // agar anak-anak rute ini bisa ditampilkan.
-        children: [
-          {
-            path: '', // Path kosong, jadi halaman default saat buka /user-profile
-            name: 'MyData',
-            component: MyData
-          },
-          {
-            path: 'my-purchases', // URL menjadi -> /user-profile/my-purchases
-            name: 'MyPurchases',
-            component: MyPurchases
-          },
-          {
-            path: 'address', // URL menjadi -> /user-profile/address
-            name: 'Address',
-            component: Address
-          },
-          {
-            path: 'address/add', // URL menjadi -> /user-profile/address/add
-            name: 'AddAddress',
-            component: AddAddress
-          },
-          {
-            path: 'address/edit/:addressId', // URL menjadi -> /user-profile/address/edit/1
-            name: 'EditAddress',
-            component: EditAddress
-          },
-          {
-            path: 'help', // URL menjadi -> /user-profile/help
-            name: 'Help',
-            component: Help
-          },
-        ]
-      }
+      //Profile
+      { path: '/mydata', name: 'My Data', component: MyData },
+      { path: '/myPurchases', name: 'My Purchases', component: MyPurchases },
+      { path: '/address', name: 'Address', component: Address },
+      { path: '/help', name: 'Help', component: Help },
+      { path: '/addAddress', name: 'Add Address', component: AddAddress },
+      { path: '/editAddress', name: 'Edit Address', component: EditAddress },
+      { path: '/userProfile', name: 'Profile', component: UserProfile }
+          
+      
     ]
   },
 

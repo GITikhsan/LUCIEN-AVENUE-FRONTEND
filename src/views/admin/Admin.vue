@@ -1,6 +1,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import api from '@/api/axios'; // Pastikan path ini benar
+const editingProductId = ref(null);
 
 // === 1. STATE MANAGEMENT ===
 
@@ -90,34 +91,39 @@ const removeImage = (index) => {
 // DIUBAH: Fungsi ini sekarang mengirim banyak gambar
 const saveProduct = async () => {
   const formData = new FormData();
-  
-  // Masukkan semua data teks dari form ke FormData
   for (const key in newProduct) {
     formData.append(key, newProduct[key]);
   }
-
-  // Lampirkan semua file gambar jika ada
   if (imageFiles.value.length > 0) {
-    // Looping untuk setiap file
     for (const file of imageFiles.value) {
-        // Gunakan nama 'images[]' agar Laravel membacanya sebagai array
-        formData.append('images[]', file);
+      formData.append('images[]', file);
     }
   }
 
   try {
-    const response = await api.post('/products', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
-    products.value.unshift(response.data.data); // Tambah produk baru ke daftar
-    
-    // Reset form dan semua state terkait gambar
-    document.getElementById('productForm').reset();
-    for(const key in newProduct) { newProduct[key] = '' }
-    imageFiles.value = [];
-    imagePreviews.value = [];
-    
-    alert('Produk berhasil disimpan ke database!');
+    let response;
+    // Cek apakah kita sedang dalam mode UPDATE atau CREATE
+    if (editingProductId.value) {
+      // --- Logika UPDATE ---
+      formData.append('_method', 'PUT'); // Trik untuk Laravel agar mengenali method PUT
+      response = await api.post(`/products/${editingProductId.value}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      // Cari produk yang lama di array dan ganti dengan data baru dari response
+      const index = products.value.findIndex(p => p.produk_id === editingProductId.value);
+      if (index !== -1) {
+        products.value[index] = response.data.data;
+      }
+      alert('Produk berhasil di-update!');
+    } else {
+      // --- Logika CREATE (sama seperti kodemu yang lama) ---
+      response = await api.post('/products', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      products.value.unshift(response.data.data);
+      alert('Produk baru berhasil disimpan!');
+    }
+    resetForm(); // Panggil fungsi reset form setelah semua selesai
   } catch (error) {
     console.error("Gagal menyimpan produk:", error);
     alert("Gagal menyimpan: " + JSON.stringify(error.response?.data?.errors || error.message));
@@ -127,6 +133,57 @@ const saveProduct = async () => {
 // --- Logika lain (tidak diubah) ---
 const savePromo = async () => { alert('Logika simpan promo ke API belum dibuat.'); }
 const saveDiskon = async () => { alert('Logika simpan diskon ke API belum dibuat.'); }
+
+// BARU: Fungsi untuk mereset form dan keluar dari mode edit
+const resetForm = () => {
+    document.getElementById('productForm').reset();
+    // Menggunakan Object.keys untuk mereset semua field di reactive object
+    Object.keys(newProduct).forEach(key => { newProduct[key] = ''; });
+    // Set nilai default lagi jika perlu
+    newProduct.gender = 'Male'; 
+    imageFiles.value = [];
+    imagePreviews.value = [];
+    // Keluar dari mode edit
+    editingProductId.value = null; 
+}
+
+// BARU: Fungsi untuk memulai proses edit saat tombol di tabel diklik
+const startEdit = (product) => {
+  // Salin semua data dari produk yang dipilih ke dalam form 'newProduct'
+  Object.keys(newProduct).forEach(key => {
+    if (product[key] !== undefined) {
+      newProduct[key] = product[key];
+    }
+  });
+  
+  // Tandai bahwa kita sekarang sedang dalam mode edit dengan menyimpan ID produk
+  editingProductId.value = product.produk_id;
+
+  // Kosongkan preview gambar, karena user mungkin tidak ingin mengubah gambar
+  imagePreviews.value = [];
+  imageFiles.value = [];
+  
+  alert(`Mode Edit untuk: ${product.nama_sepatu}. Silakan ubah data di form input.`);
+
+  // Scroll ke atas agar form terlihat
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// BARU: Fungsi untuk menghapus produk saat tombol di tabel diklik
+const deleteProduct = async (id, index) => {
+  if (!confirm('Yakin ingin menghapus produk ini? Aksi ini permanen.')) {
+    return;
+  }
+  try {
+    await api.delete(`/products/${id}`);
+    // Hapus dari array di tampilan agar UI langsung update
+    products.value.splice(index, 1);
+    alert('Produk berhasil dihapus.');
+  } catch (error) {
+    console.error("Gagal menghapus produk:", error);
+    alert('Gagal menghapus produk.');
+  }
+};
 
 // === 3. LIFECYCLE HOOK ===
 onMounted(() => {
@@ -219,8 +276,8 @@ onMounted(() => {
                         <label for="harga" class="ms-2">Price (Rp)</label>
                     </div>
                     <div class="col-md-6 form-floating mb-2">
-                        <input v-model="newProduct.sku" type="text" id="SKU" class="form-control" placeholder="SKU" required>
-                        <label for="SKU" class="ms-2">SKU</label>
+                        <input v-model="newProduct.sku" type="text" id="sku" class="form-control" placeholder="sku" required>
+                        <label for="sku" class="ms-2">SKU</label>
                     </div>
                 </div>
                 <div class="row">
@@ -243,13 +300,13 @@ onMounted(() => {
                         <label for="gender" class="ms-2">Gender</label>
                     </div>
                     <div class="col-md-6 form-floating mb-2">
-                        <input v-model="newProduct.material" type="text" id="material" class="form-control" placeholder="Material">
+                        <input v-model="newProduct.material" type="text" id="material" class="form-control" placeholder="material">
                         <label for="material" class="ms-2">Material</label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6 form-floating mb-2">
-                        <input v-model="newProduct.dimensi" type="text" id="dimensi" class="form-control" placeholder="Dimension">
+                        <input v-model="newProduct.dimensi" type="text" id="dimensi" class="form-control" placeholder="Dimensi">
                         <label for="dimensi" class="ms-2">Dimension</label>
                     </div>
                     <div class="col-md-6 form-floating mb-2">
@@ -268,14 +325,60 @@ onMounted(() => {
           </div>
           
           <div class="card">
-            <div class="card-body">
-              <h5 class="fw-semibold">Existing Products</h5>
-              <div v-if="isLoadingProducts">Loading...</div>
-              <div v-else>
-                  <!-- Di sini Anda bisa menampilkan daftar 'products' dalam bentuk tabel -->
+              <div class="card-body">
+                <h5 class="fw-semibold">Existing Products</h5>
+                <div v-if="isLoadingProducts" class="text-center p-4">
+                  <div class="spinner-border text-success" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+                <div v-else class="table-responsive">
+                  <table class="table table-hover align-middle small">
+                    <thead>
+                      <tr>
+                        <th scope="col">Image</th>
+                        <th scope="col">Shoe Name</th>
+                        <th scope="col">Brand</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">SKU</th>
+                        <th scope="col">Sizes</th>
+                        <th scope="col">Color</th>
+                        <th scope="col">Gender</th>
+                        <th scope="col">Material</th>
+                        <th scope="col">Dimension</th>
+                        <th scope="col">Release Date</th>
+                        <th scope="col" class="text-end">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-if="products.length === 0">
+                        <td colspan="12" class="text-center text-muted py-4">No products found.</td>
+                      </tr>
+                      <tr v-for="(product, index) in products" :key="product.produk_id">
+                        <td>
+                          <img v-if="product.images && product.images.length > 0" :src="product.images[0].image_path" alt="Img" style="width: 50px; height: 50px; object-fit: cover;" class="rounded">
+                          <div v-else class="bg-light border rounded" style="width: 50px; height: 50px;"></div>
+                        </td>
+                        <td class="fw-bold">{{ product.nama_sepatu }}</td>
+                        <td>{{ product.brand }}</td>
+                        <td>Rp {{ new Intl.NumberFormat('id-ID').format(product.harga_retail) }}</td>
+                        <td>{{ product.sku }}</td>
+                        <td>{{ product.ukuran }}</td>
+                        <td>{{ product.warna }}</td>
+                        <td>{{ product.gender }}</td>
+                        <td>{{ product.material }}</td>
+                        <td>{{ product.dimensi }}</td>
+                        <td>{{ product.tanggal_rilis }}</td>
+                        <td class="text-end">
+                          <button @click="startEdit(product)" class="btn btn-sm btn-outline-primary me-1">Edit</button>
+                          <button @click="deleteProduct(product.produk_id, index)" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
-          </div>
         </div>
                 
         <div v-if="activePanel === 'Orders'">... Konten Orders di sini ...</div>
