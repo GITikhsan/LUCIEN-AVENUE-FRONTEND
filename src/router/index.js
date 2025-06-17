@@ -36,18 +36,18 @@ const routes = [
         component: Home
       },
       {
-        path: 'product/:id', // Tetap, untuk detail produk -> /product/123
+        path: 'Product/:produk_id', // Tetap, untuk detail produk -> /product/123
         name: 'Product',
         component: Product
       },
       {
-        path: 'view-more', // REVISI: Menggunakan kebab-case, lebih umum untuk URL
-        name: 'ViewMore',
+        path: 'ViewMore', // REVISI: Menggunakan kebab-case, lebih umum untuk URL
+        name: 'View More',
         component: ViewMore
       },
       {
-        path: 'about-us', // REVISI: Menggunakan kebab-case
-        name: 'AboutUs', // Nama bisa tetap spasi
+        path: 'AboutUs', // REVISI: Menggunakan kebab-case
+        name: 'About Us', // Nama bisa tetap spasi
         component: AboutUs
       },
       {

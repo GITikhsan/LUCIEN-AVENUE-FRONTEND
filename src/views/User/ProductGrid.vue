@@ -54,7 +54,7 @@ defineProps({
     <!-- Tombol Explore More -->
     <div class="mt-4 pt-2 text-center">
       <router-link
-        to="/viewmore"
+        to="/viewMore"
         class="btn btn-dark rounded-pill px-4 py-2 fw-semibold shadow-sm"
         style="font-size: 0.9rem; transition: all 0.3s ease;">
         Explore More
