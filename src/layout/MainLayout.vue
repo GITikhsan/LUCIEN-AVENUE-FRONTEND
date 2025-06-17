@@ -14,7 +14,7 @@ const searchQuery = ref('')
 const items = [
   { to: '/', name: 'Home' },
   { to: '/bag', name: 'Bag' },
-  { to: '/aboutUs', name: 'About Us' }
+  { to: '/about-us', name: 'About Us' }
 ]
 
 const handleSearch = () => {
