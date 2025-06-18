@@ -6,7 +6,7 @@ import api from '@/api/axios'; // Pastikan path ini benar
 // --- STATE MANAGEMENT ---
 
 // PENTING: Sesuaikan dengan URL backend Laravel-mu agar gambar muncul
-const backendUrl = 'http://localhost:8000'; 
+const backendUrl = 'http://127.0.0.1:8000'; 
 
 // Siapkan "kerangka" data produk kosong agar template tidak error saat awal loading.
 const product = ref({
