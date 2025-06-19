@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed } from "vue";
+import { ref, onMounted, onBeforeUnmount, computed, watch } from "vue";
 import axios from 'axios'
 const backendUrl = 'http://127.0.0.1:8000';
 
@@ -62,7 +62,6 @@ const discount = ref("any");
 const priceRange = ref("");
 const selectedColors = ref([]);
 const selectedBrands = ref([]);
-const sortOption = ref("");
 
 const sizes = [
   22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
@@ -83,17 +82,27 @@ const priceRanges = [
 ];
 const colors = ["green", "blue", "pink", "red", "purple", "yellow", "maroon"];
 const brands = ["Nike", "Adidas", "Air Jordan", "Yeezy", "New Balance"];
+
+const sortOption = ref('')
 const products = ref([])
 
-  // {
-  //   id: 9,
-  //   name: "Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown",
-  //   image: "/public/images/4JT/4240(1).webp",
-  //   price: "4240000",
-  //   discount: 10,
-  //   brand: "Air Jordan",
-  // },
+const sortLabel = computed(() => {
+  return sortOption.value || 'Sort by'
+})
 
+function fetchProducts() {
+  axios.get('http://localhost:8000/api/products', {
+    params: sortOption.value ? { sort: sortOption.value } : {}
+  }).then(res => {
+    products.value = res.data
+  }).catch(err => {
+    console.error('Gagal ambil produk:', err)
+  })
+}
+
+onMounted(fetchProducts)
+
+watch(sortOption, fetchProducts)
 
 const filteredProducts = computed(() => {
   return products.value; // filter logic bisa ditambahkan nanti
@@ -173,10 +182,10 @@ onMounted(async () => {
 
           <button
             class="btn w-100 fw-semibold border"
-            :class="gender === 'youth' ? 'btn-youth-active' : 'btn-youth'"
-            @click="gender = 'youth'"
+            :class="gender === 'unisex' ? 'btn-unisex-active' : 'btn-unisex'"
+            @click="gender = 'unisex'"
           >
-            Youth
+            Unisex
           </button>
         </div>
 
@@ -311,7 +320,7 @@ onMounted(async () => {
       <section class="flex-grow-1">
         <div class="d-flex justify-content-between align-items-center mb-4">
           <h5 class="fw-bold">Available Sneakers</h5>
-          <div class="dropdown d-inline-block">
+<div class="dropdown d-inline-block">
             <button
               class="btn btn-light border rounded-pill px-3 py-1 d-flex align-items-center gap-2 shadow-sm"
               type="button"
@@ -515,7 +524,7 @@ onMounted(async () => {
 /* Gender */
 .btn-men,
 .btn-women,
-.btn-youth {
+.btn-unisex {
   background-color: #f8f9fa;
   color: #333;
   border-radius: 8px;
@@ -537,7 +546,7 @@ onMounted(async () => {
   transform: scale(1.03);
 }
 
-.btn-youth-active {
+.btn-unisex-active {
   background-color: #20c997 !important;
   color: #fff !important;
   box-shadow: 0 0 6px rgba(32, 201, 151, 0.4);
