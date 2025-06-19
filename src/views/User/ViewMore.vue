@@ -364,44 +364,42 @@ onMounted(async () => {
 
         <div class="row row-cols-2 row-cols-md-4 g-4">
           <div
-            class="col"
-            v-for="product in filteredProducts"
-            :key="produk_id"
-          >
-          <router-link :to="`/Product/${product.produk_id}`" class="stretched-link"></router-link>
-            <div
-              class="card h-100 border-0 shadow-sm position-relative rounded-4"
+              class="col"
+              v-for="product in filteredProducts"
+              :key="product.produk_id"
             >
-              <div
-                class="position-absolute top-0 start-0 bg-danger text-white px-2 py-1 small rounded-end"
-                style="font-size: 0.75rem"
+              <router-link
+                :to="`/product/${product.produk_id}`"
+                class="text-decoration-none text-dark"
               >
-                {{ product.discount }}%
-              </div>
+                <div class="card h-100 border-0 shadow-sm position-relative rounded-4">
+                  <div
+                    class="position-absolute top-0 start-0 bg-danger text-white px-2 py-1 small rounded-end"
+                    style="font-size: 0.75rem"
+                    v-if="product.discount"
+                  >
+                    {{ product.discount }}%
+                  </div>
 
-              <div
-                class="p-3 d-flex justify-content-center align-items-center"
-                style="height: 200px"
-              >
+                  <div
+                    class="p-3 d-flex justify-content-center align-items-center"
+                    style="height: 200px"
+                  >
+                    <img
+                      v-if="product.images && product.images.length > 0"
+                      :src="backendUrl + product.images[0].image_path"
+                      alt="Product image"
+                      style="max-height: 160px; object-fit: contain"
+                      class="rounded"
+                    />
+                  </div>
 
-              <img
-                v-if="product.images && product.images.length > 0"
-                :src="backendUrl + product.images[0].image_path"
-                alt="Product image"
-                style="max-height: 160px; object-fit: contain"
-                class="rounded"
-              />
-              </div>
-
-              <div class="card-body px-3 pt-0 pb-3">
-                <h6 class="card-title mb-1">
-                  {{ product.nama_sepatu }}
-                </h6>
-                <p class="text-success fw-bold mb-0">
-                  {{ formatPrice(product.harga_retail) }}
-                </p>
-              </div>
-            </div>
+                  <div class="card-body px-3 pt-0 pb-3">
+                    <h6 class="card-title mb-1">{{ product.nama_sepatu }}</h6>
+                    <p class="text-success fw-bold mb-0">{{ formatPrice(product.harga_retail) }}</p>
+                  </div>
+                </div>
+              </router-link>
           </div>
         </div>
       </section>
