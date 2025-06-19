@@ -2,6 +2,8 @@
 import { ref, reactive, onMounted, computed } from 'vue';
 import api from '@/api/axios';
 
+const backendUrl = 'http://127.0.0.1:8000';
+
 // === 1. STATE MANAGEMENT ===
 const activePanel = ref('Home');
 const editingProductId = ref(null);
@@ -260,33 +262,59 @@ onMounted(() => {
               </div>
               <div v-else class="table-responsive">
                 <table class="table table-hover align-middle small">
-                  <thead>
-                    <tr>
-                      <th>Image</th><th>Shoe Name</th><th>Brand</th><th>Price</th><th>SKU</th><th>Sizes</th><th>Color</th><th>Gender</th><th>Material</th><th>Dimension</th><th>Release Date</th><th class="text-end">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-if="filteredProducts.length === 0">
-                      <td colspan="12" class="text-center text-muted py-4">No products found.</td>
-                    </tr>
-                    <tr v-for="product in filteredProducts" :key="product.produk_id">
-                      <td><img v-if="product.images && product.images.length > 0" :src="product.images[0].image_path" alt="Img" style="width: 50px; height: 50px; object-fit: cover;" class="rounded"><div v-else class="bg-light border rounded" style="width: 50px; height: 50px;"></div></td>
-                      <td class="fw-bold">{{ product.nama_sepatu }}</td>
-                      <td>{{ product.brand }}</td>
-                      <td>Rp {{ new Intl.NumberFormat('id-ID').format(product.harga_retail) }}</td>
-                      <td>{{ product.sku }}</td>
-                      <td>{{ product.ukuran }}</td>
-                      <td>{{ product.warna }}</td>
-                      <td>{{ product.gender }}</td>
-                      <td>{{ product.material }}</td>
-                      <td>{{ product.dimensi }}</td>
-                      <td>{{ product.tanggal_rilis }}</td>
-                      <td class="text-end">
-                        <button @click="startEdit(product)" class="btn btn-sm btn-outline-primary me-1">Edit</button>
-                        <button @click="deleteProduct(product.produk_id)" class="btn btn-sm btn-outline-danger">Delete</button>
-                      </td>
-                    </tr>
-                  </tbody>
+                  <!-- BUNGKUS DENGAN DIV SCROLL -->
+<div style="max-height: 400px; overflow-y: auto;">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>Shoe Name</th>
+        <th>Brand</th>
+        <th>Price</th>
+        <th>SKU</th>
+        <th>Sizes</th>
+        <th>Color</th>
+        <th>Gender</th>
+        <th>Material</th>
+        <th>Dimension</th>
+        <th>Release Date</th>
+        <th class="text-end">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr v-if="filteredProducts.length === 0">
+        <td colspan="12" class="text-center text-muted py-4">No products found.</td>
+      </tr>
+      <tr v-for="product in filteredProducts" :key="product.produk_id">
+        <td>
+          <img
+            v-if="product.images && product.images.length > 0"
+            :src="backendUrl + product.images[0].image_path"
+            alt="Product image"
+            style="width: 50px; height: 50px; object-fit: cover;"
+            class="rounded"
+          />
+        </td>
+        <td class="fw-bold">{{ product.nama_sepatu }}</td>
+        <td>{{ product.brand }}</td>
+        <td>Rp {{ new Intl.NumberFormat('id-ID').format(product.harga_retail) }}</td>
+        <td>{{ product.sku }}</td>
+        <td>{{ product.ukuran }}</td>
+        <td>{{ product.warna }}</td>
+        <td>{{ product.gender }}</td>
+        <td>{{ product.material }}</td>
+        <td>{{ product.dimensi }}</td>
+        <td>{{ product.tanggal_rilis }}</td>
+        <td class="text-end">
+          <button @click="startEdit(product)" class="btn btn-sm btn-outline-primary me-1">Edit</button>
+          <button @click="deleteProduct(product.produk_id)" class="btn btn-sm btn-outline-danger">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
                 </table>
               </div>
             </div>
