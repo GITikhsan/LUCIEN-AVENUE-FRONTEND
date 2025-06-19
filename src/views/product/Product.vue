@@ -3,6 +3,49 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import api from '@/api/axios'; // Pastikan path ini benar
 
+const isAddingToCart = ref(false);
+
+async function addToCart() {
+  // Validasi: Pastikan ukuran sudah dipilih
+  if (!selectedSize.value) {
+    alert('Silakan pilih ukuran terlebih dahulu!');
+    return;
+  }
+
+  isAddingToCart.value = true;
+  
+  const token = localStorage.getItem('auth_token');
+  if (!token) {
+    // Ganti alert dengan router.push untuk mengarahkan ke halaman login
+    router.push('/login.vue'); 
+    
+    isAddingToCart.value = false;
+    return;
+  }
+  
+  try {
+    // Siapkan data yang akan dikirim ke backend
+    const payload = {
+      produk_id: route.params.id, // Ambil ID produk dari URL
+      kuantitas: quantity.value,  // Ambil kuantitas dari state
+    };
+
+    // Kirim request POST ke endpoint keranjang Anda
+    const response = await api.post('/carts', payload);
+
+    // Beri notifikasi sukses
+    alert(response.data.message || 'Produk berhasil ditambahkan ke keranjang!');
+
+  } catch (error) {
+    // Tangani jika terjadi error
+    console.error("Gagal menambahkan ke keranjang:", error.response);
+    alert("Gagal menambahkan produk. Coba lagi nanti.");
+  } finally {
+    // Matikan status loading
+    isAddingToCart.value = false;
+  }
+}
+
 // --- STATE MANAGEMENT ---
 
 // PENTING: Sesuaikan dengan URL backend Laravel-mu agar gambar muncul
@@ -177,9 +220,19 @@ const quantity = ref(1);
         </div>
 
         <div class="d-flex flex-column flex-sm-row gap-3 mb-4">
-          <button class="btn btn-dark w-100 py-2 rounded-pill">Add to Cart</button>
-          <button class="btn btn-warning w-100 py-2 rounded-pill text-dark fw-semibold">Buy Now</button>
-        </div>
+  <button 
+    @click="addToCart" 
+    class="btn btn-dark w-100 py-2 rounded-pill" 
+    :disabled="isAddingToCart || !selectedSize"
+  >
+    <span v-if="isAddingToCart" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+    <span v-else>Add to Cart</span>
+  </button>
+  <button class="btn btn-warning w-100 py-2 rounded-pill text-dark fw-semibold">Buy Now</button>
+</div>
+<p v-if="!selectedSize" class="text-danger small mt-2">
+  Please select a size first.
+  </p>
 
         <div class="accordion" id="accordionInfo">
             <div class="accordion-item border-0 border-bottom">
