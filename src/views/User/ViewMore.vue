@@ -91,7 +91,7 @@ const sortLabel = computed(() => {
 })
 
 function fetchProducts() {
-  axios.get('http://localhost:8000/api/products', {
+  axios.get('http://localhost:8000/api/products/filter', {
     params: sortOption.value ? { sort: sortOption.value } : {}
   }).then(res => {
     products.value = res.data
