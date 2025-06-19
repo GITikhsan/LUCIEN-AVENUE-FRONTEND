@@ -13,11 +13,9 @@ onMounted(async () => {
     const response = await axios.get('http://127.0.0.1:8000/api/products')
     products.value = response.data.data.data
 
-    // ✅ Pilih produk berdasarkan ID
-    featuredProducts.value = products.value.filter(p => [2, 3, 5, 10].includes(p.produk_id))
+    featuredProducts.value = products.value.filter(p => [52].includes(p.produk_id))
     featuredMen.value = products.value.filter(p => [5, 6, 7, 10].includes(p.produk_id))
     featuredWomen.value = products.value.filter(p => [1, 2, 3, 4].includes(p.produk_id))
-
   } catch (error) {
     console.error('❌ Gagal mengambil produk:', error)
   }
@@ -38,7 +36,7 @@ onMounted(async () => {
   </header>
 
   <!-- Featured Products -->
-  <section class="py-5 text-center">
+  <section class="py-5 text-center home-section">
     <div class="container">
       <ProductGrid :products="featuredProducts" title="Our Featured Products" />
     </div>
@@ -56,7 +54,7 @@ onMounted(async () => {
   </section>
 
   <!-- Featured Men Products -->
-  <section class="py-5 text-center">
+  <section class="py-5 text-center home-section">
     <div class="container">
       <ProductGrid :products="featuredMen" title="Our Featured Men Products" />
     </div>
@@ -74,9 +72,51 @@ onMounted(async () => {
   </section>
 
   <!-- Featured Women Products -->
-  <section class="py-5 text-center">
+  <section class="py-5 text-center home-section">
     <div class="container">
       <ProductGrid :products="featuredWomen" title="Our Featured Women Products" />
     </div>
   </section>
 </template>
+
+<style>
+/* === DARK MODE: Perluas background ke semua elemen utama === */
+body.dark-mode {
+  background-color: #121212 !important;
+  color: #eaeaea !important;
+}
+
+/* Atur semua section/container agar tidak putih */
+body.dark-mode section,
+body.dark-mode .container,
+body.dark-mode main,
+body.dark-mode .row,
+body.dark-mode .py-5 {
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+/* Pastikan bagian kosong (antar section) tidak putih */
+body.dark-mode .mt-4,
+body.dark-mode .pt-2,
+body.dark-mode .mb-4,
+body.dark-mode .pb-4 {
+  background-color: transparent !important;
+}
+
+/* Tombol Explore More di-dark-mode */
+body.dark-mode .explore-btn {
+  background-color: rgba(255, 255, 255, 0.85);
+  color: #111;
+}
+body.dark-mode .explore-btn:hover {
+  background-color: #ffffff;
+  color: #000;
+}
+
+/* Tambahkan padding bawah agar footer tidak terlalu mepet */
+body.dark-mode footer {
+  background-color: #0e0e0e;
+  padding-bottom: 2rem;
+}
+</style>
