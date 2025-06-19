@@ -1,4 +1,6 @@
 <script setup>
+const backendUrl = 'http://127.0.0.1:8000';
+
 defineProps({
   products: Array,
   title: {
@@ -27,8 +29,9 @@ defineProps({
           <!-- Gambar -->
           <div class="position-relative bg-white d-flex align-items-center justify-content-center" style="aspect-ratio: 4/3; padding: 1rem;">
             <img 
-              :src="product.image" 
-              :alt="product.nama_sepatu" 
+              v-if="product.images && product.images.length > 0"
+              :src="backendUrl + product.images[0].image_path"
+              alt="Product image" 
               class="img-fluid" 
               style="object-fit: contain; max-height: 100%; max-width: 100%;" 
             />

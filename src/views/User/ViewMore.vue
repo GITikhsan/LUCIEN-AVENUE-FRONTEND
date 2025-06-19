@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import axios from 'axios'
+const backendUrl = 'http://127.0.0.1:8000';
+
 
 const formatPrice = (value) => {
   return new Intl.NumberFormat('id-ID', {
@@ -381,12 +383,14 @@ onMounted(async () => {
                 class="p-3 d-flex justify-content-center align-items-center"
                 style="height: 200px"
               >
-                <img
-                  :src="product.image"
-                  class="img-fluid"
-                  :alt="product.nama_sepatu"
-                  style="max-height: 160px; object-fit: contain"
-                />
+
+              <img
+                v-if="product.images && product.images.length > 0"
+                :src="backendUrl + product.images[0].image_path"
+                alt="Product image"
+                style="max-height: 160px; object-fit: contain"
+                class="rounded"
+              />
               </div>
 
               <div class="card-body px-3 pt-0 pb-3">
