@@ -3,33 +3,68 @@ import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 
+onMounted(() => {
+  const token = localStorage.getItem('auth_token');
+
+  if (token) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    fetchCartItems();
+  } else {
+    modalMessage.value = "You need to log in to view your cart. Do you want to log in now?";
+    modalType.value = 'confirm';
+    showModal.value = true;
+
+    // Tindakan jika pengguna klik "Yes"
+    confirmCallback.value = () => {
+      showModal.value = false;
+      router.push('/login');
+    };
+
+    // Untuk tombol "Cancel", kita pindahkan ke template (lihat di bawah)
+  }
+});
+
+const updateQuantity = async (item, delta) => {
+  const newQty = item.kuantitas + delta;
+  if (newQty < 1) return;
+
+  try {
+    await axios.put(`/carts/${item.id}`, { kuantitas: newQty });
+    item.kuantitas = newQty;
+  } catch {
+    showInfo("Failed to update quantity.");
+  }
+};
+
+
+
 const router = useRouter();
 const cartItems = ref([]);
 const isLoading = ref(true);
 const isRemoving = ref(null);
 const error = ref(null);
 
-// Modal States
+// Modal states
 const showModal = ref(false);
 const modalMessage = ref('');
 const modalType = ref('info'); // 'info' | 'error' | 'confirm'
 const confirmCallback = ref(null);
 
-// Grand Total
+// Total Price
 const grandTotal = computed(() => {
   return cartItems.value.reduce((total, item) => {
-    const price = item.product?.price || 0;
-    const quantity = item.quantity || 0;
+    const price = item.product?.harga_retail || 0;
+    const quantity = item.kuantitas || 0;
     return total + price * quantity;
   }, 0);
 });
 
-// Format Currency
+// Format IDR
 const formatCurrency = (value) => {
-  return Number(value).toLocaleString('en-US');
+  return Number(value).toLocaleString('id-ID');
 };
 
-// Fetch Cart Items
+// Fetch cart data
 const fetchCartItems = async () => {
   isLoading.value = true;
   try {
@@ -42,7 +77,7 @@ const fetchCartItems = async () => {
   }
 };
 
-// Show Confirmation Modal
+// Ask for delete confirmation
 const askConfirm = (message, onConfirm) => {
   modalMessage.value = message;
   modalType.value = 'confirm';
@@ -50,7 +85,7 @@ const askConfirm = (message, onConfirm) => {
   showModal.value = true;
 };
 
-// Remove Item
+// Remove item
 const removeItem = async (id) => {
   askConfirm("Are you sure you want to remove this item?", async () => {
     isRemoving.value = id;
@@ -67,7 +102,7 @@ const removeItem = async (id) => {
   });
 };
 
-// Show Info Modal
+// Info modal
 const showInfo = (message) => {
   modalMessage.value = message;
   modalType.value = 'info';
@@ -75,22 +110,8 @@ const showInfo = (message) => {
   showModal.value = true;
 };
 
-// On Component Mount
-onMounted(() => {
-  const token = localStorage.getItem('auth_token');
-  if (token) {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    fetchCartItems();
-  } else {
-    modalMessage.value = "Please log in first. Would you like to log in now?";
-    modalType.value = 'confirm';
-    showModal.value = true;
-    confirmCallback.value = () => {
-      showModal.value = false;
-      router.push('/login');
-    };
-  }
-});
+// On mount: check login
+
 </script>
 
 <template>
@@ -118,10 +139,14 @@ onMounted(() => {
             alt="Product Image"
           />
           <div class="flex-grow-1 text-center text-md-start">
-            <h5 class="fw-semibold">{{ item.product.name }}</h5>
-            <p class="mb-1 text-muted">Quantity: {{ item.quantity }}</p>
-            <p class="fw-bold text-success">$ {{ formatCurrency(item.product.price) }}</p>
-          </div>
+  <h5 class="fw-semibold">{{ item.product.name }}</h5>
+  <div class="d-flex justify-content-center justify-content-md-start align-items-center gap-2">
+    <button class="btn btn-outline-secondary btn-sm" @click="updateQuantity(item, -1)">-</button>
+    <span class="px-2">{{ item.kuantitas }}</span>
+    <button class="btn btn-outline-secondary btn-sm" @click="updateQuantity(item, 1)">+</button>
+  </div>
+  <p class="fw-bold text-success mt-2">Rp {{ formatCurrency(item.product.harga_retail) }}</p>
+</div>
           <button class="btn btn-outline-danger" @click="removeItem(item.id)" :disabled="isRemoving === item.id">
             <span v-if="isRemoving === item.id" class="spinner-border spinner-border-sm"></span>
             <i v-else class="bi bi-trash3"></i>
@@ -129,7 +154,7 @@ onMounted(() => {
         </div>
 
         <div class="d-flex justify-content-between align-items-center bg-white rounded shadow-sm p-4 mt-4">
-          <h4>Total: <span class="text-success">$ {{ formatCurrency(grandTotal) }}</span></h4>
+          <h4>Total: <span class="text-success">Rp {{ formatCurrency(grandTotal) }}</span></h4>
           <router-link to="/checkout" class="btn btn-success btn-lg rounded-pill px-5">Checkout</router-link>
         </div>
       </div>
@@ -150,7 +175,7 @@ onMounted(() => {
           </div>
           <div class="modal-footer justify-content-center border-0 pt-0 pb-4">
             <template v-if="modalType === 'confirm'">
-              <button class="btn btn-secondary px-4" @click="() => { showModal = false; router.push('/') }">Cancel</button>
+              <button class="btn btn-secondary px-4" @click="showModal = false">Cancel</button>
               <button class="btn btn-danger px-4" @click="confirmCallback()">Yes</button>
             </template>
             <template v-else>
