@@ -438,10 +438,11 @@ watch(sortOption, fetchProducts)
                       v-if="product.images && product.images.length > 0"
                       :src="backendUrl + product.images[0].image_path"
                       alt="Product image"
-                      style="max-height: 160px; max-width: 230px; object-fit: contain"
-                      class="rounded"
+                      class="img-fluid rounded"
+                      style="max-height: 160px; object-fit: contain;"
                     />
                   </div>
+
 
                   <div class="card-body px-3 pt-0 pb-3">
                     <h6 class="card-title mb-1">{{ product.nama_sepatu }}</h6>
