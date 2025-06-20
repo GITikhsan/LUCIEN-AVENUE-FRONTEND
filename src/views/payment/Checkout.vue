@@ -4,24 +4,16 @@ import axios from 'axios';
 import { useRouter } from 'vue-router';
 
 // =================================================================
-// BAGIAN PALING PENTING UNTUK MENGATASI ERROR 401
+// Konfigurasi API dan Autentikasi
 // =================================================================
-
-// 1. Tentukan Base URL API Laravel Anda
 const API_BASE_URL = 'http://127.0.0.1:8000/api';
 axios.defaults.baseURL = API_BASE_URL;
 
-// 2. Ambil token dari localStorage (diasumsikan sudah disimpan saat login)
 const token = localStorage.getItem('auth_token');
-
-// 3. Jika token ada, pasang sebagai header default untuk SEMUA request axios
 if (token) {
   axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 } else {
-  // Jika tidak ada token, idealnya jangan biarkan user masuk halaman ini
   console.error("Tidak ada token autentikasi. Harap login terlebih dahulu.");
-  // Anda bisa menambahkan logika untuk redirect ke halaman login di sini
-  // router.push('/login'); 
 }
 
 // =================================================================
@@ -29,9 +21,7 @@ if (token) {
 // =================================================================
 const order = ref(null);
 const address = ref(null);
-const selectedPaymentMethod = ref('');
 const isLoading = ref(true);
-const isProcessing = ref(false);
 const error = ref(null);
 const router = useRouter();
 
@@ -44,7 +34,7 @@ const formatCurrency = (value) => {
 };
 
 // =================================================================
-// API Calls (Memanggil endpoint relatif yang sudah benar)
+// API Calls
 // =================================================================
 const fetchOrderSummary = async () => {
   try {
@@ -62,9 +52,8 @@ const fetchDefaultAddress = async () => {
     const response = await axios.get('/checkout/address');
     address.value = response.data;
   } catch (err) {
-    const errorMessage = err.response?.data?.message || 'Gagal mengambil data alamat.';
-    console.error("Error fetching default address:", err.response);
-    throw new Error(errorMessage);
+    console.warn("Could not fetch default address:", err.response?.data?.message || err.message);
+    address.value = null;
   }
 };
 
@@ -72,17 +61,16 @@ const fetchDefaultAddress = async () => {
 // Lifecycle Hook
 // =================================================================
 onMounted(async () => {
-  // Pastikan ada token sebelum mencoba fetch data
   if (!token) {
-      error.value = "Anda harus login untuk melihat halaman ini.";
-      isLoading.value = false;
-      return; // Hentikan eksekusi jika tidak ada token
+    error.value = "Anda harus login untuk melihat halaman ini.";
+    isLoading.value = false;
+    return;
   }
 
   try {
     await Promise.all([
-        fetchOrderSummary(), 
-        // fetchDefaultAddress()
+      fetchOrderSummary(), 
+      fetchDefaultAddress()
     ]);
   } catch (err) {
     error.value = err.message;
@@ -124,15 +112,13 @@ onMounted(async () => {
                   <p class="mb-0">Rp {{ formatCurrency(product.price) }}</p>
                 </div>
               </div>
-              <hr>
-              <div class="d-flex justify-content-between">
-                <span>Subtotal</span>
-                <span>Rp {{ formatCurrency(order.subtotal) }}</span>
-              </div>
-              <div class="d-flex justify-content-between">
+              
+              <!-- Metode ongkir (Jika ingin digunakan) -->
+
+              <!-- <div class="d-flex justify-content-between">
                 <span>Ongkir</span>
                 <span>Rp {{ formatCurrency(order.shippingCost) }}</span>
-              </div>
+              </div> -->
               <hr>
               <div class="d-flex justify-content-between fw-bold">
                 <span>Total</span>
@@ -143,7 +129,6 @@ onMounted(async () => {
         </div>
 
         <div class="col-lg-5 order-lg-1">
-          <form @submit.prevent="payNow">
             <div class="card text-start border p-1 rounded bg-white">
               <div class="card-header bg-white">
                 <h5 class="mb-0 fw-bold">Alamat Pengiriman</h5>
@@ -161,43 +146,27 @@ onMounted(async () => {
                 </div>
               </div>
               <div v-else class="p-3">
-                  <p>Alamat tidak ditemukan.</p>
+                  <p class="text-muted">Alamat pengiriman utama tidak ditemukan.</p>
               </div>
-              <router-link to="/add-address" class="btn btn-outline-dark mt-3 m-3 px-4 py-2 fw-bold">Tambah Alamat Baru</router-link>
+              <router-link to="/add-address" class="btn btn-outline-dark mt-3 m-3 px-4 py-2 fw-bold">Atur Alamat</router-link>
             </div>
-
-            <h5 class="mt-4">Metode Pembayaran</h5>
-            <div class="card p-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="pembayaran" id="transfer" value="transfer_bank" v-model="selectedPaymentMethod">
-                    <label class="form-check-label" for="transfer">Transfer Bank</label>
-                </div>
-                <hr class="my-2">
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="pembayaran" id="ewallet" value="e-wallet" v-model="selectedPaymentMethod">
-                    <label class="form-check-label" for="ewallet">E-Wallet (OVO, DANA, dll)</label>
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-dark w-100 mt-4 py-2 fw-bold" :disabled="isProcessing">
-              <span v-if="isProcessing" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-              <span v-else>Bayar Sekarang</span>
-            </button>
-          </form>
+            
+            <router-link 
+              to="/payment" 
+              class="btn btn-dark w-100 mt-4 py-2 fw-bold text-white text-decoration-none"
+            >
+              Lanjutkan ke Pembayaran
+            </router-link>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-
-
 <style scoped>
 /* Styling khusus untuk komponen ini jika diperlukan */
-.form-check {
-  padding: 0.5rem 1rem;
-}
-.btn:disabled {
-  cursor: not-allowed;
+.btn-dark {
+    display: block;
+    text-align: center;
 }
 </style>
