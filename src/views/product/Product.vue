@@ -1,7 +1,56 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute,useRouter } from 'vue-router';
 import api from '@/api/axios'; // Pastikan path ini benar
+
+const showLoginModal = ref(false);
+const loginMessage = ref('Silakan login terlebih dahulu untuk melanjutkan.');
+
+function redirectToLogin() {
+  showLoginModal.value = false;
+  router.push('/login');
+}
+
+const isAddingToCart = ref(false);
+const router = useRouter();
+async function addToCart() {
+  // Validasi: Pastikan ukuran sudah dipilih
+  if (!selectedSize.value) {
+    alert('Silakan pilih ukuran terlebih dahulu!');
+    return;
+  }
+
+  isAddingToCart.value = true;
+  
+  const token = localStorage.getItem('auth_token');
+if (!token) {
+  showLoginModal.value = true; // Tampilkan popup login
+  isAddingToCart.value = false;
+  return;
+}
+  
+  try {
+    // Siapkan data yang akan dikirim ke backend
+    const payload = {
+      produk_id: route.params.id, // Ambil ID produk dari URL
+      kuantitas: quantity.value,  // Ambil kuantitas dari state
+    };
+
+    // Kirim request POST ke endpoint keranjang Anda
+    const response = await api.post('/carts', payload);
+
+    // Beri notifikasi sukses
+    router.push('/bag');
+
+  } catch (error) {
+    // Tangani jika terjadi error
+    console.error("Gagal menambahkan ke keranjang:", error.response);
+    alert("Gagal menambahkan produk. Coba lagi nanti.");
+  } finally {
+    // Matikan status loading
+    isAddingToCart.value = false;
+  }
+}
 
 // --- STATE MANAGEMENT ---
 
@@ -177,9 +226,19 @@ const quantity = ref(1);
         </div>
 
         <div class="d-flex flex-column flex-sm-row gap-3 mb-4">
-          <button class="btn btn-dark w-100 py-2 rounded-pill">Add to Cart</button>
-          <button class="btn btn-warning w-100 py-2 rounded-pill text-dark fw-semibold">Buy Now</button>
-        </div>
+  <button 
+    @click="addToCart" 
+    class="btn btn-dark w-100 py-2 rounded-pill" 
+    :disabled="isAddingToCart || !selectedSize"
+  >
+    <span v-if="isAddingToCart" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+    <span v-else>Add to Cart</span>
+  </button>
+  <button class="btn btn-warning w-100 py-2 rounded-pill text-dark fw-semibold">Buy Now</button>
+</div>
+<p v-if="!selectedSize" class="text-danger small mt-2">
+  Please select a size first.
+  </p>
 
         <div class="accordion" id="accordionInfo">
             <div class="accordion-item border-0 border-bottom">
@@ -255,7 +314,25 @@ const quantity = ref(1);
       </div>
     </div>
   </div>
+<div v-if="showLoginModal" class="modal-backdrop fade show"></div>
+<div v-if="showLoginModal" class="modal d-block" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center">
+      <div class="modal-body py-4 px-3">
+        <p class="fs-6 mb-0">{{ loginMessage }}</p>
+      </div>
+      <div class="modal-footer justify-content-center border-0 pt-0 pb-4">
+        <button class="btn btn-secondary px-4" @click="showLoginModal = false">Batal</button>
+        <button class="btn btn-dark px-4" @click="redirectToLogin">Login</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  
 </template>
+
 
 <style scoped>
 /*

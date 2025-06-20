@@ -2,6 +2,8 @@
 import { ref, reactive, onMounted, computed } from 'vue';
 import api from '@/api/axios';
 
+const backendUrl = 'http://127.0.0.1:8000';
+
 // === 1. STATE MANAGEMENT ===
 const activePanel = ref('Home');
 const editingProductId = ref(null);
@@ -155,10 +157,88 @@ const saveProduct = async () => {
   }
 };
 
+const props = defineProps({
+  activePanel: String
+});
+
+const newPromo = reactive({
+  nama_promo: '',
+  kode: '',
+  diskonP: '',
+  mulai_tanggal: '',
+  selesai_tanggal: ''
+});
+
+const formMessage = ref('');
+const formSuccess = ref(false);
+const promotions = ref([]);
+const editingPromoId = ref(null); // ⬅️ Tambahkan ini
+
+
+const fetchPromotions = async () => {
+  try {
+    const response = await api.get('/promotions');
+    promotions.value = response.data.data;
+  } catch (error) {
+    console.error('Failed to fetch promo data:', error);
+    promotions.value = [];
+  }
+};
+
+const savePromo = async () => {
+  try {
+    const response = await api.post('/promotions', newPromo);
+    promotions.value.unshift(response.data.data);
+    formMessage.value = 'Promo successfully added';
+    formSuccess.value = true;
+    Object.keys(newPromo).forEach(key => newPromo[key] = '');
+  } catch (error) {
+    console.error('Failed to save the promo:', error);
+    formMessage.value = 'Failed to add promo';
+    formSuccess.value = false;
+  }
+};
+
+const startEditPromo = (promo) => {
+  Object.keys(newPromo).forEach(key => {
+    let value = promo[key] ?? '';
+    // Format tanggal agar sesuai dengan input[type="date"]
+    if (key === 'mulai_tanggal' || key === 'selesai_tanggal') {
+      value = value.split(' ')[0]; // Ambil hanya "YYYY-MM-DD"
+    }
+    newPromo[key] = value;
+  });
+  editingPromoId.value = promo.promo_id;
+  formMessage.value = 'Edit mode enabled. Make your changes.';
+  formSuccess.value = true;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+
+const deletePromo = async (id) => {
+  if (!confirm("Are you sure you want to delete this promotion?")) return;
+
+  try {
+    await api.delete(`/promotions/${id}`);
+    promotions.value = promotions.value.filter(p => p.promo_id !== id);
+    formMessage.value = 'Promotion deleted';
+    formSuccess.value = true;
+  } catch (error) {
+    console.error("Failed to delete promotion:", error);
+    formMessage.value = 'Failed to delete promotion';
+    formSuccess.value = false;
+  }
+};
+
+const isPromoActive = (promo) => {
+  const today = new Date().toISOString().slice(0, 10);
+  return promo.mulai_tanggal <= today && promo.selesai_tanggal >= today;
+};
 // === 4. LIFECYCLE HOOK ===
 onMounted(() => {
   fetchProducts();
-});
+  fetchPromotions();
+  });
 </script>
 
 <template>
@@ -260,33 +340,59 @@ onMounted(() => {
               </div>
               <div v-else class="table-responsive">
                 <table class="table table-hover align-middle small">
-                  <thead>
-                    <tr>
-                      <th>Image</th><th>Shoe Name</th><th>Brand</th><th>Price</th><th>SKU</th><th>Sizes</th><th>Color</th><th>Gender</th><th>Material</th><th>Dimension</th><th>Release Date</th><th class="text-end">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-if="filteredProducts.length === 0">
-                      <td colspan="12" class="text-center text-muted py-4">No products found.</td>
-                    </tr>
-                    <tr v-for="product in filteredProducts" :key="product.produk_id">
-                      <td><img v-if="product.images && product.images.length > 0" :src="product.images[0].image_path" alt="Img" style="width: 50px; height: 50px; object-fit: cover;" class="rounded"><div v-else class="bg-light border rounded" style="width: 50px; height: 50px;"></div></td>
-                      <td class="fw-bold">{{ product.nama_sepatu }}</td>
-                      <td>{{ product.brand }}</td>
-                      <td>Rp {{ new Intl.NumberFormat('id-ID').format(product.harga_retail) }}</td>
-                      <td>{{ product.sku }}</td>
-                      <td>{{ product.ukuran }}</td>
-                      <td>{{ product.warna }}</td>
-                      <td>{{ product.gender }}</td>
-                      <td>{{ product.material }}</td>
-                      <td>{{ product.dimensi }}</td>
-                      <td>{{ product.tanggal_rilis }}</td>
-                      <td class="text-end">
-                        <button @click="startEdit(product)" class="btn btn-sm btn-outline-primary me-1">Edit</button>
-                        <button @click="deleteProduct(product.produk_id)" class="btn btn-sm btn-outline-danger">Delete</button>
-                      </td>
-                    </tr>
-                  </tbody>
+                  <!-- BUNGKUS DENGAN DIV SCROLL -->
+<div style="max-height: 400px; overflow-y: auto;">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>Shoe Name</th>
+        <th>Brand</th>
+        <th>Price</th>
+        <th>SKU</th>
+        <th>Sizes</th>
+        <th>Color</th>
+        <th>Gender</th>
+        <th>Material</th>
+        <th>Dimension</th>
+        <th>Release Date</th>
+        <th class="text-end">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr v-if="filteredProducts.length === 0">
+        <td colspan="12" class="text-center text-muted py-4">No products found.</td>
+      </tr>
+      <tr v-for="product in filteredProducts" :key="product.produk_id">
+        <td>
+          <img
+            v-if="product.images && product.images.length > 0"
+            :src="backendUrl + product.images[0].image_path"
+            alt="Product image"
+            style="width: 50px; height: 50px; object-fit: cover;"
+            class="rounded"
+          />
+        </td>
+        <td class="fw-bold">{{ product.nama_sepatu }}</td>
+        <td>{{ product.brand }}</td>
+        <td>Rp {{ new Intl.NumberFormat('id-ID').format(product.harga_retail) }}</td>
+        <td>{{ product.sku }}</td>
+        <td>{{ product.ukuran }}</td>
+        <td>{{ product.warna }}</td>
+        <td>{{ product.gender }}</td>
+        <td>{{ product.material }}</td>
+        <td>{{ product.dimensi }}</td>
+        <td>{{ product.tanggal_rilis }}</td>
+        <td class="text-end">
+          <button @click="startEdit(product)" class="btn btn-sm btn-outline-primary me-1">Edit</button>
+          <button @click="deleteProduct(product.produk_id)" class="btn btn-sm btn-outline-danger">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
                 </table>
               </div>
             </div>
@@ -294,7 +400,94 @@ onMounted(() => {
         </div>
                 
         <div v-if="activePanel === 'Orders'">... Konten Orders di sini ...</div>
-        <div v-if="activePanel === 'promo'">... Konten form Promo di sini ...</div>
+        <div v-if="activePanel === 'promo'">
+<div class="card mx-auto mb-5" style="max-width: 700px;">
+  <div class="card-body">
+    <h5 class="mb-4 fw-semibold">Promo Input</h5>
+    <form @submit.prevent="savePromo">
+      <div class="row">
+        <div class="col-md-6 form-floating mb-2">
+          <input v-model="newPromo.nama_promo" type="text" id="nama_promo" class="form-control" placeholder="x" required>
+          <label for="nama_promo" class="ms-2">Promo Name</label>
+        </div>
+        <div class="col-md-6 form-floating mb-2">
+          <input v-model="newPromo.kode" type="text" id="kode" class="form-control" placeholder="x" required>
+          <label for="kode" class="ms-2">Code</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 form-floating mb-2">
+          <input v-model="newPromo.diskonP" type="number" id="diskonP" class="form-control" placeholder="x" min="1" max="100" required>
+          <label for="diskonP" class="ms-2">Discount (%)</label>
+        </div>
+        <div class="col-md-6 form-floating mb-2">
+          <input v-model="newPromo.mulai_tanggal" type="date" id="mulai_tanggal" class="form-control" placeholder="x" required>
+          <label for="mulai_tanggal" class="ms-2">Start Date</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 form-floating mb-2">
+          <input v-model="newPromo.selesai_tanggal" type="date" id="selesai_tanggal" class="form-control" placeholder="x" required>
+          <label for="selesai_tanggal" class="ms-2">End Date</label>
+        </div>
+      </div>
+
+      <div class="d-grid gap-2 mt-3">
+        <button type="submit" class="btn btn-success">Save Promo</button>
+      </div>
+      <p v-if="formMessage" class="mt-2 text-sm" :class="{ 'text-success': formSuccess, 'text-danger': !formSuccess }">
+        {{ formMessage }}
+      </p>
+    </form>
+  </div>
+</div>
+
+<!-- Promo Table -->
+<div class="card">
+  <div class="card-body">
+    <h5 class="fw-semibold mb-3">Promo List</h5>
+    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+      <table class="table table-hover align-middle small">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Promo Name</th>
+            <th>Discount</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Status</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="promotions.length === 0">
+            <td colspan="7" class="text-center text-muted py-4">No promotions available.</td>
+          </tr>
+          <tr v-for="promo in promotions" :key="promo.promo_id">
+            <td>{{ promo.kode }}</td>
+            <td>{{ promo.nama_promo }}</td>
+            <td>{{ promo.diskonP }}%</td>
+            <td>{{ promo.mulai_tanggal }}</td>
+            <td>{{ promo.selesai_tanggal }}</td>
+            <td>
+              <span :class="isPromoActive(promo) ? 'text-success' : 'text-muted'">
+                {{ isPromoActive(promo) ? 'Active' : 'Expired' }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-primary me-2" @click="startEditPromo(promo)">Edit</button>
+              <button class="btn btn-sm btn-danger" @click="deletePromo(promo.promo_id)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+      
+        </div>
         <div v-if="activePanel === 'diskon'">... Konten form Diskon di sini ...</div>
       </main>
     </div>

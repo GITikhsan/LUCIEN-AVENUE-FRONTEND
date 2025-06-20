@@ -268,21 +268,52 @@ body.dark-mode .premium-link {
 }
 
 /* FOOTER */
-.footer {
-  transition: background-color 0.3s ease, color 0.3s ease;
+/* FOOTER DARK MODE */
+body.dark-mode footer {
+  background-color: #181818;
+  color: #f0f0f0;
+  border-top: 1px solid #2a2a2a;
+  padding: 3rem 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
 }
 
-body.dark-mode .footer {
-  background-color: #1a1a1a;
-  color: #cccccc;
+/* Judul & teks footer */
+body.dark-mode footer h5,
+body.dark-mode footer p,
+body.dark-mode footer li,
+body.dark-mode footer a,
+body.dark-mode footer span {
+  color: #dcdcdc;
 }
 
-body.dark-mode .footer a {
-  color: #bbbbbb;
-}
-
-body.dark-mode .footer a:hover {
+/* Judul tim dan kontak */
+body.dark-mode footer p.fw-semibold {
   color: #ffffff;
+  font-weight: 600;
+}
+
+/* Hover efek link */
+body.dark-mode footer a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+/* Divider agar terlihat */
+body.dark-mode footer .border-top {
+  border-color: #333 !important;
+}
+
+/* Logo partner agar terlihat pas */
+body.dark-mode footer img {
+  filter: brightness(1.2);
+}
+/* Tulisan copyright bawah biar kontras */
+body.dark-mode footer .text-muted,
+body.dark-mode footer small,
+body.dark-mode footer .text-center {
+  color: #bfbfbf !important;
+  font-weight: 500;
+  letter-spacing: 0.3px;
 }
 
 /* ANIMASI */

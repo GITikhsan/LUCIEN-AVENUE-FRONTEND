@@ -1,6 +1,7 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed } from "vue";
+import { ref, onMounted, onBeforeUnmount, computed, watch } from "vue";
 import axios from 'axios'
+const backendUrl = 'http://127.0.0.1:8000';
 
 const formatPrice = (value) => {
   return new Intl.NumberFormat('id-ID', {
@@ -82,29 +83,61 @@ const priceRanges = [
 const colors = ["green", "blue", "pink", "red", "purple", "yellow", "maroon"];
 const brands = ["Nike", "Adidas", "Air Jordan", "Yeezy", "New Balance"];
 const products = ref([])
-
-  // {
-  //   id: 9,
-  //   name: "Air Jordan 1 Retro Low OG SP Travis Scott Velvet Brown",
-  //   image: "/public/images/4JT/4240(1).webp",
-  //   price: "4240000",
-  //   discount: 10,
-  //   brand: "Air Jordan",
-  // },
-
-
+////////////////////////////////////////
 const filteredProducts = computed(() => {
-  return products.value; // filter logic bisa ditambahkan nanti
+  return products.value.filter(product => {
+    const matchGender = gender.value === "" || product.gender === gender.value;
+    const matchSize = size.value === null || product.ukuran == size.value;
+    const matchDiscount =
+      discount.value === "any" || product.discount >= discount.value;
+    
+    const matchPrice = (() => {
+      if (!priceRange.value) return true;
+      const [min, max] = priceRange.value.includes("+")
+        ? [parseInt(priceRange.value), Infinity]
+        : priceRange.value.split("-").map(Number);
+      return product.harga_retail >= min && product.harga_retail <= max;
+    })();
+
+    const matchColor =
+      selectedColors.value.length === 0 ||
+      selectedColors.value.includes(product.warna);
+
+    const matchBrand =
+      selectedBrands.value.length === 0 ||
+      selectedBrands.value.includes(product.brand);
+
+    return (
+      matchGender &&
+      matchSize &&
+      matchDiscount &&
+      matchPrice &&
+      matchColor &&
+      matchBrand
+    );
+  });
 });
+const selectedLabel = ref("");
+const selectPriceRange = (range) => {
+  priceRange.value = range.value;
+  selectedLabel.value = range.label;
+};
+//////////////////////////////////
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/api/products')
-    products.value = response.data.data.data
-
-    // ✅ Pilih produk berdasarkan ID
-    ViewProducts.value = products.value.filter(p => [2, 3, 5, 10].includes(p.produk_id))
- 
+    const response = await axios.get('http://127.0.0.1:8000/api/products', {
+  params: {
+    gender: gender.value,
+    ukuran: size.value,
+    discount: discount.value !== "any" ? discount.value : null,
+    price_range: priceRange.value,
+    colors: selectedColors.value.join(','),
+    brands: selectedBrands.value.join(','),
+    sort: sortOption.value,
+  }
+})
+products.value = response.data.data.data
 
   } catch (error) {
     console.error('❌ Gagal mengambil produk:', error)
@@ -112,8 +145,26 @@ onMounted(async () => {
 })
 
 
+const sortLabel = computed(() => {
+  return sortOption.value || 'Sort by'
+})
+
+function fetchProducts() {
+  axios.get('http://localhost:8000/api/products/filter', {
+    params: sortOption.value ? { sort: sortOption.value } : {}
+  }).then(res => {
+    products.value = res.data
+  }).catch(err => {
+    console.error('Gagal ambil produk:', err)
+  })
+}
+
+onMounted(fetchProducts)
+
+watch(sortOption, fetchProducts)
 
 </script>
+
 
 <template>
   <div class="container-fluid py-5">
@@ -171,10 +222,10 @@ onMounted(async () => {
 
           <button
             class="btn w-100 fw-semibold border"
-            :class="gender === 'youth' ? 'btn-youth-active' : 'btn-youth'"
-            @click="gender = 'youth'"
+            :class="gender === 'unisex' ? 'btn-unisex-active' : 'btn-unisex'"
+            @click="gender = 'unisex'"
           >
-            Youth
+            Unisex
           </button>
         </div>
 
@@ -309,7 +360,7 @@ onMounted(async () => {
       <section class="flex-grow-1">
         <div class="d-flex justify-content-between align-items-center mb-4">
           <h5 class="fw-bold">Available Sneakers</h5>
-          <div class="dropdown d-inline-block">
+<div class="dropdown d-inline-block">
             <button
               class="btn btn-light border rounded-pill px-3 py-1 d-flex align-items-center gap-2 shadow-sm"
               type="button"
@@ -362,42 +413,42 @@ onMounted(async () => {
 
         <div class="row row-cols-2 row-cols-md-4 g-4">
           <div
-            class="col"
-            v-for="product in filteredProducts"
-            :key="produk_id"
-          >
-          <router-link :to="`/Product/${product.produk_id}`" class="stretched-link"></router-link>
-            <div
-              class="card h-100 border-0 shadow-sm position-relative rounded-4"
+              class="col"
+              v-for="product in filteredProducts"
+              :key="product.produk_id"
             >
-              <div
-                class="position-absolute top-0 start-0 bg-danger text-white px-2 py-1 small rounded-end"
-                style="font-size: 0.75rem"
+              <router-link
+                :to="`/product/${product.produk_id}`"
+                class="text-decoration-none text-dark"
               >
-                {{ product.discount }}%
-              </div>
+                <div class="card h-100 border-0 shadow-sm position-relative rounded-4">
+                  <div
+                    class="position-absolute top-0 start-0 bg-danger text-white px-2 py-1 small rounded-end"
+                    style="font-size: 0.75rem"
+                    v-if="product.discount"
+                  >
+                    {{ product.discount }}%
+                  </div>
 
-              <div
-                class="p-3 d-flex justify-content-center align-items-center"
-                style="height: 200px"
-              >
-                <img
-                  :src="product.image"
-                  class="img-fluid"
-                  :alt="product.nama_sepatu"
-                  style="max-height: 160px; object-fit: contain"
-                />
-              </div>
+                  <div
+                    class="p-3 d-flex justify-content-center align-items-center"
+                    style="height: 200px"
+                  >
+                    <img
+                      v-if="product.images && product.images.length > 0"
+                      :src="backendUrl + product.images[0].image_path"
+                      alt="Product image"
+                      style="max-height: 160px; max-width: 230px; object-fit: contain"
+                      class="rounded"
+                    />
+                  </div>
 
-              <div class="card-body px-3 pt-0 pb-3">
-                <h6 class="card-title mb-1">
-                  {{ product.nama_sepatu }}
-                </h6>
-                <p class="text-success fw-bold mb-0">
-                  {{ formatPrice(product.harga_retail) }}
-                </p>
-              </div>
-            </div>
+                  <div class="card-body px-3 pt-0 pb-3">
+                    <h6 class="card-title mb-1">{{ product.nama_sepatu }}</h6>
+                    <p class="text-success fw-bold mb-0">{{ formatPrice(product.harga_retail) }}</p>
+                  </div>
+                </div>
+              </router-link>
           </div>
         </div>
       </section>
@@ -513,7 +564,7 @@ onMounted(async () => {
 /* Gender */
 .btn-men,
 .btn-women,
-.btn-youth {
+.btn-unisex {
   background-color: #f8f9fa;
   color: #333;
   border-radius: 8px;
@@ -535,7 +586,7 @@ onMounted(async () => {
   transform: scale(1.03);
 }
 
-.btn-youth-active {
+.btn-unisex-active {
   background-color: #20c997 !important;
   color: #fff !important;
   box-shadow: 0 0 6px rgba(32, 201, 151, 0.4);
