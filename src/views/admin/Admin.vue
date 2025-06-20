@@ -178,9 +178,13 @@ const editingPromoId = ref(null); // ⬅️ Tambahkan ini
 const fetchPromotions = async () => {
   try {
     const response = await api.get('/promotions');
-    promotions.value = response.data.data;
+    const raw = response.data.data;
+
+    // Filter data yang null/undefined
+    promotions.value = Array.isArray(raw) ? raw.filter(p => p && p.promo_id) : [];
+
   } catch (error) {
-    console.error('Failed to fetch promo data:', error);
+    console.error('Gagal mengambil data promo:', error);
     promotions.value = [];
   }
 };
@@ -475,27 +479,27 @@ onMounted(() => {
             <th class="text-center">Actions</th>
           </tr>
         </thead>
-        <tbody>
-          <tr v-if="promotions.length === 0">
-            <td colspan="7" class="text-center text-muted py-4">No promotions available.</td>
-          </tr>
-          <tr v-for="promo in promotions" :key="promo.promo_id">
-            <td>{{ promo.kode }}</td>
-            <td>{{ promo.nama_promo }}</td>
-            <td>{{ promo.diskonP }}%</td>
-            <td>{{ promo.mulai_tanggal }}</td>
-            <td>{{ promo.selesai_tanggal }}</td>
-            <td>
-              <span :class="isPromoActive(promo) ? 'text-success' : 'text-muted'">
-                {{ isPromoActive(promo) ? 'Active' : 'Expired' }}
-              </span>
-            </td>
-            <td>
-              <button class="btn btn-sm btn-primary me-2" @click="startEditPromo(promo)">Edit</button>
-              <button class="btn btn-sm btn-danger" @click="deletePromo(promo.promo_id)">Delete</button>
-            </td>
-          </tr>
-        </tbody>
+          <tbody>
+            <tr v-if="promotions.length === 0">
+              <td colspan="7" class="text-center text-muted py-4">No promotion available.</td>
+            </tr>
+            <tr v-for="promo in promotions.filter(p => p)" :key="promo.promo_id">
+              <td>{{ promo.kode }}</td>
+              <td>{{ promo.nama_promo }}</td>
+              <td>{{ promo.diskonP }}%</td>
+              <td>{{ promo.mulai_tanggal }}</td>
+              <td>{{ promo.selesai_tanggal }}</td>
+              <td>
+                <span :class="isPromoActive(promo) ? 'text-success' : 'text-muted'">
+                  {{ isPromoActive(promo) ? 'Active' : 'Expired' }}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary me-2" @click="startEditPromo(promo)"> Edit</button>
+                <button class="btn btn-sm btn-outline-danger" @click="deletePromo(promo.promo_id)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
       </table>
     </div>
   </div>
