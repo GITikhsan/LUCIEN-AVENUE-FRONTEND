@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed, watch } from "vue";
 import axios from 'axios'
+import { useProductStore } from '@/stores/productStores'
+const productStore = useProductStore()
 const backendUrl = 'http://127.0.0.1:8000';
 
 const formatPrice = (value) => {
@@ -117,6 +119,19 @@ const filteredProducts = computed(() => {
     );
   });
 });
+
+const combinedProducts = computed(() => {
+  const searched = productStore.products || []
+
+  return [
+    ...searched,
+    ...filteredProducts.value.filter(
+      p => !searched.find(s => s.produk_id === p.produk_id)
+    )
+  ]
+})
+
+
 const selectedLabel = ref("");
 const selectPriceRange = (range) => {
   priceRange.value = range.value;
@@ -412,11 +427,12 @@ watch(sortOption, fetchProducts)
         </div>
 
         <div class="row row-cols-2 row-cols-md-4 g-4">
-          <div
+          <div 
               class="col"
-              v-for="product in filteredProducts"
+              v-for="product in combinedProducts"
               :key="product.produk_id"
             >
+
               <router-link
                 :to="`/product/${product.produk_id}`"
                 class="text-decoration-none text-dark"

@@ -11,6 +11,14 @@ import 'aos/dist/aos.css'
 import './assets/global.css'
 
 import AOS from 'aos'
+import { createPinia } from 'pinia'
+
+const app = createApp(App)
+app.use(createPinia()) //  Pinia diaktifkan
+app.use(router)        //  Router diaktifkan
+app.mount('#app')      //  Baru dimount
+
+
 
 // Atur base URL untuk semua request. Sesuaikan port jika berbeda.
 axios.defaults.baseURL = 'http://127.0.0.1:8000/api';
@@ -23,9 +31,5 @@ if (token) {
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 }
 
-const app = createApp(App)
-
-app.use(router)
-app.mount('#app')
 
 AOS.init({ duration: 800, once: true })

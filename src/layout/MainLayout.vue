@@ -1,9 +1,13 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute, RouterLink, RouterView } from 'vue-router'
+import { useProductStore } from '@/stores/productStores'
+
 
 const router = useRouter()
 const route = useRoute()
+
+const store = useProductStore()
 
 const user = ref(null)
 const isLoggedIn = ref(false)
@@ -18,8 +22,11 @@ const items = [
 ]
 
 const handleSearch = () => {
-  alert(`Mencari: ${searchQuery.value}`)
+  if (!store.searchQuery) return
+  store.fetchProducts()
+  router.push('/viewMore')
 }
+
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value
@@ -75,9 +82,10 @@ onMounted(() => {
       <form class="d-flex align-items-center my-2 d-flex d-lg-none w-100" @submit.prevent="handleSearch">
         <div class="glass-search w-100">
           <i class="bi bi-search"></i>
-          <input v-model="searchQuery" type="text" placeholder="Search..." />
+          <input v-model="store.searchQuery" type="text" placeholder="Search..." />
         </div>
       </form>
+
 
       <!-- Collapse Menu -->
       <div class="collapse navbar-collapse justify-content-between" :class="{ show: isMenuOpen }">
@@ -91,11 +99,15 @@ onMounted(() => {
 
         <!-- 💡 Desktop Search -->
         <form class="d-flex align-items-center d-none d-lg-flex" @submit.prevent="handleSearch">
-          <div class="glass-search">
-            <i class="bi bi-search"></i>
-            <input v-model="searchQuery" type="text" placeholder="Search..." />
-          </div>
-        </form>
+  <div class="glass-search">
+    <i class="bi bi-search"></i>
+    <input
+      v-model="store.searchQuery"
+      type="text"
+      placeholder="Search..."
+    />
+  </div>
+</form>
 
         <!-- Dark Mode Toggle -->
         <button class="btn-darkmode-toggle ms-3" @click="toggleDarkMode">
