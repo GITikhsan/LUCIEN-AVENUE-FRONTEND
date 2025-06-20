@@ -1,8 +1,6 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed, watch } from "vue";
+import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import axios from 'axios'
-const backendUrl = 'http://127.0.0.1:8000';
-
 
 const formatPrice = (value) => {
   return new Intl.NumberFormat('id-ID', {
@@ -62,6 +60,7 @@ const discount = ref("any");
 const priceRange = ref("");
 const selectedColors = ref([]);
 const selectedBrands = ref([]);
+const sortOption = ref("");
 
 const sizes = [
   22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
@@ -82,49 +81,71 @@ const priceRanges = [
 ];
 const colors = ["green", "blue", "pink", "red", "purple", "yellow", "maroon"];
 const brands = ["Nike", "Adidas", "Air Jordan", "Yeezy", "New Balance"];
-
-const sortOption = ref('')
 const products = ref([])
-
-const sortLabel = computed(() => {
-  return sortOption.value || 'Sort by'
-})
-
-function fetchProducts() {
-  axios.get('http://localhost:8000/api/products/filter', {
-    params: sortOption.value ? { sort: sortOption.value } : {}
-  }).then(res => {
-    products.value = res.data
-  }).catch(err => {
-    console.error('Gagal ambil produk:', err)
-  })
-}
-
-onMounted(fetchProducts)
-
-watch(sortOption, fetchProducts)
-
+////////////////////////////////////////
 const filteredProducts = computed(() => {
-  return products.value; // filter logic bisa ditambahkan nanti
+  return products.value.filter(product => {
+    const matchGender = gender.value === "" || product.gender === gender.value;
+    const matchSize = size.value === null || product.ukuran == size.value;
+    const matchDiscount =
+      discount.value === "any" || product.discount >= discount.value;
+    
+    const matchPrice = (() => {
+      if (!priceRange.value) return true;
+      const [min, max] = priceRange.value.includes("+")
+        ? [parseInt(priceRange.value), Infinity]
+        : priceRange.value.split("-").map(Number);
+      return product.harga_retail >= min && product.harga_retail <= max;
+    })();
+
+    const matchColor =
+      selectedColors.value.length === 0 ||
+      selectedColors.value.includes(product.warna);
+
+    const matchBrand =
+      selectedBrands.value.length === 0 ||
+      selectedBrands.value.includes(product.brand);
+
+    return (
+      matchGender &&
+      matchSize &&
+      matchDiscount &&
+      matchPrice &&
+      matchColor &&
+      matchBrand
+    );
+  });
 });
+const selectedLabel = ref("");
+const selectPriceRange = (range) => {
+  priceRange.value = range.value;
+  selectedLabel.value = range.label;
+};
+//////////////////////////////////
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/api/products')
-    products.value = response.data.data.data
-
-    // ✅ Pilih produk berdasarkan ID
-    ViewProducts.value = products.value.filter(p => [2, 3, 5, 10].includes(p.produk_id))
- 
+    const response = await axios.get('http://127.0.0.1:8000/api/products', {
+  params: {
+    gender: gender.value,
+    ukuran: size.value,
+    discount: discount.value !== "any" ? discount.value : null,
+    price_range: priceRange.value,
+    colors: selectedColors.value.join(','),
+    brands: selectedBrands.value.join(','),
+    sort: sortOption.value,
+  }
+})
+products.value = response.data.data.data
 
   } catch (error) {
     console.error('❌ Gagal mengambil produk:', error)
   }
 })
-
-
+/////////////////////////////////////////////////////////////
 
 </script>
+
 
 <template>
   <div class="container-fluid py-5">
