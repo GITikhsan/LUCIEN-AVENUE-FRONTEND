@@ -82,7 +82,7 @@ onMounted(async () => {
   try {
     await Promise.all([
         fetchOrderSummary(), 
-        fetchDefaultAddress()
+        // fetchDefaultAddress()
     ]);
   } catch (err) {
     error.value = err.message;

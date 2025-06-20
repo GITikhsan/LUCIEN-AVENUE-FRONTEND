@@ -187,17 +187,31 @@ const fetchPromotions = async () => {
 
 const savePromo = async () => {
   try {
-    const response = await api.post('/promotions', newPromo);
-    promotions.value.unshift(response.data.data);
-    formMessage.value = 'Promo successfully added';
+    if (editingPromoId.value) {
+      // === UPDATE PROMO ===
+      const response = await api.put(`/promotions/${editingPromoId.value}`, newPromo);
+      // Update item di list
+      const index = promotions.value.findIndex(p => p.promo_id === editingPromoId.value);
+      if (index !== -1) {
+        promotions.value[index] = response.data.data;
+      }
+      formMessage.value = 'Promo updated successfully';
+    } else {
+      // === CREATE PROMO ===
+      const response = await api.post('/promotions', newPromo);
+      promotions.value.unshift(response.data.data);
+      formMessage.value = 'Promo added successfully';
+    }
     formSuccess.value = true;
     Object.keys(newPromo).forEach(key => newPromo[key] = '');
+    editingPromoId.value = null;
   } catch (error) {
-    console.error('Failed to save the promo:', error);
-    formMessage.value = 'Failed to add promo';
+    console.error('Gagal menyimpan promo:', error);
+    formMessage.value = 'Failed to save promo';
     formSuccess.value = false;
   }
 };
+
 
 const startEditPromo = (promo) => {
   Object.keys(newPromo).forEach(key => {
