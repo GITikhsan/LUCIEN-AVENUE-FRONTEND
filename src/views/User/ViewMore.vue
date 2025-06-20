@@ -1,6 +1,7 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed } from "vue";
+import { ref, onMounted, onBeforeUnmount, computed, watch } from "vue";
 import axios from 'axios'
+const backendUrl = 'http://127.0.0.1:8000';
 
 const formatPrice = (value) => {
   return new Intl.NumberFormat('id-ID', {
@@ -142,7 +143,25 @@ products.value = response.data.data.data
     console.error('❌ Gagal mengambil produk:', error)
   }
 })
-/////////////////////////////////////////////////////////////
+
+
+const sortLabel = computed(() => {
+  return sortOption.value || 'Sort by'
+})
+
+function fetchProducts() {
+  axios.get('http://localhost:8000/api/products/filter', {
+    params: sortOption.value ? { sort: sortOption.value } : {}
+  }).then(res => {
+    products.value = res.data
+  }).catch(err => {
+    console.error('Gagal ambil produk:', err)
+  })
+}
+
+onMounted(fetchProducts)
+
+watch(sortOption, fetchProducts)
 
 </script>
 
@@ -419,7 +438,7 @@ products.value = response.data.data.data
                       v-if="product.images && product.images.length > 0"
                       :src="backendUrl + product.images[0].image_path"
                       alt="Product image"
-                      style="max-height: 160px; object-fit: contain"
+                      style="max-height: 160px; max-width: 230px; object-fit: contain"
                       class="rounded"
                     />
                   </div>
