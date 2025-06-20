@@ -1,10 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute,useRouter } from 'vue-router';
 import api from '@/api/axios'; // Pastikan path ini benar
 
 const isAddingToCart = ref(false);
-
+const router = useRouter();
 async function addToCart() {
   // Validasi: Pastikan ukuran sudah dipilih
   if (!selectedSize.value) {
@@ -34,7 +34,7 @@ async function addToCart() {
     const response = await api.post('/carts', payload);
 
     // Beri notifikasi sukses
-    alert(response.data.message || 'Produk berhasil ditambahkan ke keranjang!');
+    router.push('/bag');
 
   } catch (error) {
     // Tangani jika terjadi error
