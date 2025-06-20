@@ -3,6 +3,14 @@ import { ref, onMounted } from 'vue';
 import { useRoute,useRouter } from 'vue-router';
 import api from '@/api/axios'; // Pastikan path ini benar
 
+const showLoginModal = ref(false);
+const loginMessage = ref('Silakan login terlebih dahulu untuk melanjutkan.');
+
+function redirectToLogin() {
+  showLoginModal.value = false;
+  router.push('/login');
+}
+
 const isAddingToCart = ref(false);
 const router = useRouter();
 async function addToCart() {
@@ -15,13 +23,11 @@ async function addToCart() {
   isAddingToCart.value = true;
   
   const token = localStorage.getItem('auth_token');
-  if (!token) {
-    // Ganti alert dengan router.push untuk mengarahkan ke halaman login
-    router.push('/login.vue'); 
-    
-    isAddingToCart.value = false;
-    return;
-  }
+if (!token) {
+  showLoginModal.value = true; // Tampilkan popup login
+  isAddingToCart.value = false;
+  return;
+}
   
   try {
     // Siapkan data yang akan dikirim ke backend
@@ -308,7 +314,25 @@ const quantity = ref(1);
       </div>
     </div>
   </div>
+<div v-if="showLoginModal" class="modal-backdrop fade show"></div>
+<div v-if="showLoginModal" class="modal d-block" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center">
+      <div class="modal-body py-4 px-3">
+        <p class="fs-6 mb-0">{{ loginMessage }}</p>
+      </div>
+      <div class="modal-footer justify-content-center border-0 pt-0 pb-4">
+        <button class="btn btn-secondary px-4" @click="showLoginModal = false">Batal</button>
+        <button class="btn btn-dark px-4" @click="redirectToLogin">Login</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  
 </template>
+
 
 <style scoped>
 /*
