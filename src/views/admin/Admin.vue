@@ -189,23 +189,38 @@ const fetchPromotions = async () => {
   }
 };
 
+const formatToDateTime = (input) => {
+  const date = new Date(input);
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const hh = String(date.getHours()).padStart(2, '0');
+  const min = String(date.getMinutes()).padStart(2, '0');
+  const ss = String(date.getSeconds()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+};
+
 const savePromo = async () => {
   try {
+    const promoToSave = {
+      ...newPromo,
+      mulai_tanggal: formatToDateTime(newPromo.mulai_tanggal),
+      selesai_tanggal: formatToDateTime(newPromo.selesai_tanggal)
+    };
+
     if (editingPromoId.value) {
-      // === UPDATE PROMO ===
-      const response = await api.put(`/promotions/${editingPromoId.value}`, newPromo);
-      // Update item di list
+      const response = await api.put(`/promotions/${editingPromoId.value}`, promoToSave);
       const index = promotions.value.findIndex(p => p.promo_id === editingPromoId.value);
       if (index !== -1) {
         promotions.value[index] = response.data.data;
       }
       formMessage.value = 'Promo updated successfully';
     } else {
-      // === CREATE PROMO ===
-      const response = await api.post('/promotions', newPromo);
+      const response = await api.post('/promotions', promoToSave);
       promotions.value.unshift(response.data.data);
       formMessage.value = 'Promo added successfully';
     }
+
     formSuccess.value = true;
     Object.keys(newPromo).forEach(key => newPromo[key] = '');
     editingPromoId.value = null;
@@ -220,9 +235,9 @@ const savePromo = async () => {
 const startEditPromo = (promo) => {
   Object.keys(newPromo).forEach(key => {
     let value = promo[key] ?? '';
-    // Format tanggal agar sesuai dengan input[type="date"]
+    // Format datetime agar sesuai dengan input[type="datetime-local"]
     if (key === 'mulai_tanggal' || key === 'selesai_tanggal') {
-      value = value.split(' ')[0]; // Ambil hanya "YYYY-MM-DD"
+      value = new Date(value).toISOString().slice(0, 16); // Format untuk datetime-local input
     }
     newPromo[key] = value;
   });
@@ -231,7 +246,6 @@ const startEditPromo = (promo) => {
   formSuccess.value = true;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
-
 
 const deletePromo = async (id) => {
   if (!confirm("Are you sure you want to delete this promotion?")) return;
@@ -440,14 +454,14 @@ onMounted(() => {
           <label for="diskonP" class="ms-2">Discount (%)</label>
         </div>
         <div class="col-md-6 form-floating mb-2">
-          <input v-model="newPromo.mulai_tanggal" type="date" id="mulai_tanggal" class="form-control" placeholder="x" required>
+          <input v-model="newPromo.mulai_tanggal" type="datetime-local" class="form-control" required>
           <label for="mulai_tanggal" class="ms-2">Start Date</label>
         </div>
       </div>
 
       <div class="row">
         <div class="col-md-6 form-floating mb-2">
-          <input v-model="newPromo.selesai_tanggal" type="date" id="selesai_tanggal" class="form-control" placeholder="x" required>
+          <input v-model="newPromo.selesai_tanggal" type="datetime-local" class="form-control" required>
           <label for="selesai_tanggal" class="ms-2">End Date</label>
         </div>
       </div>
