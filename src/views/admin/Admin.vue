@@ -172,6 +172,8 @@ const newPromo = reactive({
 const formMessage = ref('');
 const formSuccess = ref(false);
 const promotions = ref([]);
+const editingPromoId = ref(null); // ⬅️ Tambahkan ini
+
 
 const fetchPromotions = async () => {
   try {
@@ -193,6 +195,37 @@ const savePromo = async () => {
   } catch (error) {
     console.error('Failed to save the promo:', error);
     formMessage.value = 'Failed to add promo';
+    formSuccess.value = false;
+  }
+};
+
+const startEditPromo = (promo) => {
+  Object.keys(newPromo).forEach(key => {
+    let value = promo[key] ?? '';
+    // Format tanggal agar sesuai dengan input[type="date"]
+    if (key === 'mulai_tanggal' || key === 'selesai_tanggal') {
+      value = value.split(' ')[0]; // Ambil hanya "YYYY-MM-DD"
+    }
+    newPromo[key] = value;
+  });
+  editingPromoId.value = promo.promo_id;
+  formMessage.value = 'Edit mode enabled. Make your changes.';
+  formSuccess.value = true;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+
+const deletePromo = async (id) => {
+  if (!confirm("Are you sure you want to delete this promotion?")) return;
+
+  try {
+    await api.delete(`/promotions/${id}`);
+    promotions.value = promotions.value.filter(p => p.promo_id !== id);
+    formMessage.value = 'Promotion deleted';
+    formSuccess.value = true;
+  } catch (error) {
+    console.error("Failed to delete promotion:", error);
+    formMessage.value = 'Failed to delete promotion';
     formSuccess.value = false;
   }
 };
@@ -425,13 +458,14 @@ onMounted(() => {
             <th>Start</th>
             <th>End</th>
             <th>Status</th>
+            <th class="text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="promotions.length === 0">
-            <td colspan="6" class="text-center text-muted py-4">No promotions available.</td>
+            <td colspan="7" class="text-center text-muted py-4">No promotions available.</td>
           </tr>
-          <tr v-for="promo in promotions" :key="promo.promotion_id">
+          <tr v-for="promo in promotions" :key="promo.promo_id">
             <td>{{ promo.kode }}</td>
             <td>{{ promo.nama_promo }}</td>
             <td>{{ promo.diskonP }}%</td>
@@ -441,6 +475,10 @@ onMounted(() => {
               <span :class="isPromoActive(promo) ? 'text-success' : 'text-muted'">
                 {{ isPromoActive(promo) ? 'Active' : 'Expired' }}
               </span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-primary me-2" @click="startEditPromo(promo)">Edit</button>
+              <button class="btn btn-sm btn-danger" @click="deletePromo(promo.promo_id)">Delete</button>
             </td>
           </tr>
         </tbody>
