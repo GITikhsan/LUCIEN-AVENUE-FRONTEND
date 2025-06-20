@@ -3,41 +3,7 @@ import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 
-onMounted(() => {
-  const token = localStorage.getItem('auth_token');
-
-  if (token) {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    fetchCartItems();
-  } else {
-    modalMessage.value = "You need to log in to view your cart. Do you want to log in now?";
-    modalType.value = 'confirm';
-    showModal.value = true;
-
-    // Tindakan jika pengguna klik "Yes"
-    confirmCallback.value = () => {
-      showModal.value = false;
-      router.push('/login');
-    };
-
-    // Untuk tombol "Cancel", kita pindahkan ke template (lihat di bawah)
-  }
-});
-
-const updateQuantity = async (item, delta) => {
-  const newQty = item.kuantitas + delta;
-  if (newQty < 1) return;
-
-  try {
-    await axios.put(`/carts/${item.id}`, { kuantitas: newQty });
-    item.kuantitas = newQty;
-  } catch {
-    showInfo("Failed to update quantity.");
-  }
-};
-
-
-
+// State Management
 const router = useRouter();
 const cartItems = ref([]);
 const isLoading = ref(true);
@@ -50,7 +16,7 @@ const modalMessage = ref('');
 const modalType = ref('info'); // 'info' | 'error' | 'confirm'
 const confirmCallback = ref(null);
 
-// Total Price
+// Computed Property untuk Total Harga
 const grandTotal = computed(() => {
   return cartItems.value.reduce((total, item) => {
     const price = item.product?.harga_retail || 0;
@@ -59,15 +25,16 @@ const grandTotal = computed(() => {
   }, 0);
 });
 
-// Format IDR
+// Helper Functions
 const formatCurrency = (value) => {
   return Number(value).toLocaleString('id-ID');
 };
 
-// Fetch cart data
+// API Calls
 const fetchCartItems = async () => {
   isLoading.value = true;
   try {
+    // Diasumsikan API_BASE_URL sudah diatur secara global
     const res = await axios.get('/carts');
     cartItems.value = res.data.data;
   } catch (err) {
@@ -77,7 +44,20 @@ const fetchCartItems = async () => {
   }
 };
 
-// Ask for delete confirmation
+const updateQuantity = async (item, delta) => {
+  const newQty = item.kuantitas + delta;
+  if (newQty < 1) return;
+
+  try {
+    await axios.put(`/carts/${item.id}`, { kuantitas: newQty });
+    // Update kuantitas secara lokal agar UI responsif
+    item.kuantitas = newQty; 
+  } catch {
+    showInfo("Failed to update quantity.");
+  }
+};
+
+// Modal Functions
 const askConfirm = (message, onConfirm) => {
   modalMessage.value = message;
   modalType.value = 'confirm';
@@ -85,14 +65,28 @@ const askConfirm = (message, onConfirm) => {
   showModal.value = true;
 };
 
-// Remove item
-const removeItem = async (id) => {
-  askConfirm("Are you sure you want to remove this item?", async () => {
-    isRemoving.value = id;
+const showInfo = (message) => {
+  modalMessage.value = message;
+  modalType.value = 'info';
+  confirmCallback.value = null;
+  showModal.value = true;
+};
+
+// [PERUBAHAN 1] Fungsi removeItem sekarang menerima seluruh objek 'item'
+const removeItem = async (item) => {
+  // Ambil nama produk. Dari database sepertinya 'nama_sepatu'.
+  // Kita coba 'nama_sepatu' dulu, jika tidak ada, baru 'name'.
+  const productName = item.product?.nama_sepatu || item.product?.name || 'this item';
+  
+  // [PERUBAHAN 2] Buat pesan konfirmasi yang dinamis
+  const confirmationMessage = `Are you sure you want to remove "${productName}" from your cart?`;
+
+  askConfirm(confirmationMessage, async () => {
+    isRemoving.value = item.id;
     showModal.value = false;
     try {
-      await axios.delete(`/carts/${id}`);
-      await fetchCartItems();
+      await axios.delete(`/carts/${item.id}`);
+      await fetchCartItems(); // Muat ulang keranjang setelah berhasil hapus
       showInfo("Item removed successfully!");
     } catch {
       showInfo("Failed to remove item.");
@@ -102,15 +96,24 @@ const removeItem = async (id) => {
   });
 };
 
-// Info modal
-const showInfo = (message) => {
-  modalMessage.value = message;
-  modalType.value = 'info';
-  confirmCallback.value = null;
-  showModal.value = true;
-};
+// Lifecycle Hook
+onMounted(() => {
+  const token = localStorage.getItem('auth_token');
 
-// On mount: check login
+  if (token) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    fetchCartItems();
+  } else {
+    modalMessage.value = "You need to log in to view your cart. Do you want to log in now?";
+    modalType.value = 'confirm';
+    showModal.value = true;
+
+    confirmCallback.value = () => {
+      showModal.value = false;
+      router.push('/login');
+    };
+  }
+});
 
 </script>
 
@@ -139,15 +142,16 @@ const showInfo = (message) => {
             alt="Product Image"
           />
           <div class="flex-grow-1 text-center text-md-start">
-  <h5 class="fw-semibold">{{ item.product.name }}</h5>
-  <div class="d-flex justify-content-center justify-content-md-start align-items-center gap-2">
-    <button class="btn btn-outline-secondary btn-sm" @click="updateQuantity(item, -1)">-</button>
-    <span class="px-2">{{ item.kuantitas }}</span>
-    <button class="btn btn-outline-secondary btn-sm" @click="updateQuantity(item, 1)">+</button>
-  </div>
-  <p class="fw-bold text-success mt-2">Rp {{ formatCurrency(item.product.harga_retail) }}</p>
-</div>
-          <button class="btn btn-outline-danger" @click="removeItem(item.id)" :disabled="isRemoving === item.id">
+            <h5 class="fw-semibold">{{ item.product.nama_sepatu || item.product.name }}</h5>
+            <div class="d-flex justify-content-center justify-content-md-start align-items-center gap-2">
+              <button class="btn btn-outline-secondary btn-sm" @click="updateQuantity(item, -1)">-</button>
+              <span class="px-2">{{ item.kuantitas }}</span>
+              <button class="btn btn-outline-secondary btn-sm" @click="updateQuantity(item, 1)">+</button>
+            </div>
+            <p class="fw-bold text-success mt-2">Rp {{ formatCurrency(item.product.harga_retail) }}</p>
+          </div>
+          
+          <button class="btn btn-outline-danger" @click="removeItem(item)" :disabled="isRemoving === item.id">
             <span v-if="isRemoving === item.id" class="spinner-border spinner-border-sm"></span>
             <i v-else class="bi bi-trash3"></i>
           </button>
@@ -165,7 +169,6 @@ const showInfo = (message) => {
       </div>
     </div>
 
-    <!-- Modal -->
     <div v-if="showModal" class="modal-backdrop fade show"></div>
     <div v-if="showModal" class="modal d-block" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">

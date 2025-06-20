@@ -24,6 +24,10 @@ const address = ref(null);
 const isLoading = ref(true);
 const error = ref(null);
 const router = useRouter();
+const promoCode = ref('');
+const isApplyingPromo = ref(false);
+const promoMessage = ref('');
+const promoMessageType = ref('error'); // 'error' atau 'success'
 
 // =================================================================
 // Helper Functions
@@ -37,14 +41,33 @@ const formatCurrency = (value) => {
 // API Calls
 // =================================================================
 const fetchOrderSummary = async () => {
-  try {
-    const response = await axios.get('/checkout/summary');
-    order.value = response.data;
-  } catch (err) {
-    const errorMessage = err.response?.data?.message || 'Gagal mengambil data pesanan.';
-    console.error("Error fetching order summary:", err.response);
-    throw new Error(errorMessage);
-  }
+  try {
+    const response = await axios.get('/checkout/summary');
+
+    // Inisialisasi properti diskon jika tidak ada dari API
+    if (!response.data.hasOwnProperty('discount')) {
+        response.data.discount = 0;
+    }
+
+    // HITUNG SUBTOTAL SECARA MANUAL (LEBIH AMAN)
+    const calculatedSubtotal = response.data.products.reduce((acc, product) => {
+        return acc + (product.price * product.quantity);
+    }, 0);
+    
+    // Tetapkan subtotal dan total awal
+    response.data.subtotal = calculatedSubtotal;
+    // Jika API tidak memberikan total, kita bisa set dari subtotal
+    if (!response.data.hasOwnProperty('total')) {
+        response.data.total = calculatedSubtotal;
+    }
+
+    order.value = response.data;
+
+  } catch (err) {
+    const errorMessage = err.response?.data?.message || 'Gagal mengambil data pesanan.';
+    console.error("Error fetching order summary:", err.response);
+    throw new Error(errorMessage);
+  }
 };
 
 const fetchDefaultAddress = async () => {
@@ -56,6 +79,57 @@ const fetchDefaultAddress = async () => {
     address.value = null;
   }
 };
+
+// ... di dalam file komponen Vue.js Anda
+
+const applyPromoCode = async () => {
+    if (!promoCode.value.trim() || !order.value.products) return;
+
+    isApplyingPromo.value = true;
+    promoMessage.value = '';
+
+    try {
+        // =================================================================
+        // PERBAIKI BAGIAN INI
+        // =================================================================
+
+        // 1. Kumpulkan produk dengan format { productId, quantity }
+        const productsWithQuantity = order.value.products.map(p => ({
+            productId: p.productId, // Pastikan nama properti ini sesuai dengan data 'order' Anda
+            quantity: p.quantity    // Pastikan nama properti ini juga sesuai
+        }));
+
+        // 2. Siapkan payload baru dengan struktur yang benar
+        const payload = {
+            coupon_code: promoCode.value,
+            products: productsWithQuantity // Kirim array objek, bukan array ID
+        };
+        
+        // =================================================================
+        // AKHIR DARI PERBAIKAN
+        // =================================================================
+        
+        // 3. Panggil endpoint (baris ini tidak perlu diubah)
+        const response = await axios.post('/promotions/apply-coupon', payload);
+        
+        // ... sisa kodenya tidak perlu diubah ...
+        if (response.data.success) {
+            order.value.discount = response.data.discount;
+            order.value.total = response.data.final_total;
+            
+            promoMessageType.value = 'success';
+            promoMessage.value = response.data.message;
+        }
+
+    } catch (err) {
+        promoMessageType.value = 'error';
+        // Ini akan menampilkan pesan error dari Laravel dengan lebih baik
+        promoMessage.value = err.response?.data?.message || 'Gagal menerapkan kode promo.';
+    } finally {
+        isApplyingPromo.value = false;
+    }
+};
+
 
 // =================================================================
 // Lifecycle Hook
@@ -102,9 +176,9 @@ onMounted(async () => {
             </div>
             <div class="card-body">
               <div v-for="product in order.products" :key="product.productId" class="d-flex mb-3">
-                <img :src="product.image" class="me-3 rounded" style="width: 100px; height: 100px; object-fit: cover;" :alt="product.name">
+                <img :src="product.image" class="me-3 rounded" style="width: 100px; height: 100px; object-fit: cover;" :alt="product.nama_sepatu">
                 <div>
-                  <h6 class="mb-1">{{ product.name }}</h6>
+                  <h6 class="mb-1">{{ product.nama_sepatu }}</h6>
                   <small v-if="product.size">Ukuran: {{ product.size }}</small><br>
                   <small>Jumlah: {{ product.quantity }}</small>
                 </div>
@@ -112,14 +186,46 @@ onMounted(async () => {
                   <p class="mb-0">Rp {{ formatCurrency(product.price) }}</p>
                 </div>
               </div>
-              
-              <!-- Metode ongkir (Jika ingin digunakan) -->
-
-              <!-- <div class="d-flex justify-content-between">
-                <span>Ongkir</span>
-                <span>Rp {{ formatCurrency(order.shippingCost) }}</span>
-              </div> -->
+            
               <hr>
+
+              <div class="mb-3">
+                 <label for="promoCode" class="form-label">Kode Promo</label>
+                 <div class="input-group">
+                   <input 
+                     type="text" 
+                     id="promoCode"
+                     class="form-control" 
+                     placeholder="Masukkan kode promo" 
+                     v-model="promoCode"
+                     :disabled="isApplyingPromo">
+                   <button 
+                     class="btn btn-outline-dark" 
+                     type="button" 
+                     @click="applyPromoCode" 
+                     :disabled="isApplyingPromo || !promoCode.trim()">
+                     <span v-if="isApplyingPromo" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                     <span v-else>Apply</span>
+                   </button>
+                 </div>
+                 <div v-if="promoMessage" :class="`mt-2 small text-${promoMessageType === 'success' ? 'success' : 'danger'}`">
+                   {{ promoMessage }}
+                 </div>
+              </div>
+              
+              <hr>
+
+              <div class="d-flex justify-content-between">
+                <span>Subtotal</span>
+                <span>Rp {{ formatCurrency(order.subtotal) }}</span>
+              </div>
+              <div v-if="order.discount > 0" class="d-flex justify-content-between text-success">
+                <span>Diskon</span>
+                <span>- Rp {{ formatCurrency(order.discount) }}</span>
+              </div>
+
+              <hr class="my-2">
+
               <div class="d-flex justify-content-between fw-bold">
                 <span>Total</span>
                 <span>Rp {{ formatCurrency(order.total) }}</span>
@@ -129,34 +235,34 @@ onMounted(async () => {
         </div>
 
         <div class="col-lg-5 order-lg-1">
-            <div class="card text-start border p-1 rounded bg-white">
-              <div class="card-header bg-white">
-                <h5 class="mb-0 fw-bold">Alamat Pengiriman</h5>
-              </div>
-              <div v-if="address" class="d-flex justify-content-between mb-2 p-1 m-2">
-                <div>
-                  <p class="mb-1 fw-medium">{{ address.recipientName }}</p>
-                  <p class="mb-1 text-muted">{{ address.email }}</p>
-                  <p class="mb-1 text-muted">{{ address.phoneNumber }}</p>
-                  <p class="mb-1">{{ address.fullAddress }}</p>
-                  <span v-if="address.isDefault" class="badge bg-dark border mt-2">Alamat pengiriman default</span>
-                </div>
-                <div>
-                  <router-link to="/edit-address" class="text-decoration-underline small">Edit</router-link>
-                </div>
-              </div>
-              <div v-else class="p-3">
-                  <p class="text-muted">Alamat pengiriman utama tidak ditemukan.</p>
-              </div>
-              <router-link to="/add-address" class="btn btn-outline-dark mt-3 m-3 px-4 py-2 fw-bold">Atur Alamat</router-link>
+          <div class="card text-start border p-1 rounded bg-white">
+            <div class="card-header bg-white">
+              <h5 class="mb-0 fw-bold">Alamat Pengiriman</h5>
             </div>
-            
-            <router-link 
-              to="/payment" 
-              class="btn btn-dark w-100 mt-4 py-2 fw-bold text-white text-decoration-none"
-            >
-              Lanjutkan ke Pembayaran
-            </router-link>
+            <div v-if="address" class="d-flex justify-content-between mb-2 p-1 m-2">
+              <div>
+                <p class="mb-1 fw-medium">{{ address.recipientName }}</p>
+                <p class="mb-1 text-muted">{{ address.email }}</p>
+                <p class="mb-1 text-muted">{{ address.phoneNumber }}</p>
+                <p class="mb-1">{{ address.fullAddress }}</p>
+                <span v-if="address.isDefault" class="badge bg-dark border mt-2">Alamat pengiriman default</span>
+              </div>
+              <div>
+                <router-link to="/edit-address" class="text-decoration-underline small">Edit</router-link>
+              </div>
+            </div>
+            <div v-else class="p-3">
+                <p class="text-muted">Alamat pengiriman utama tidak ditemukan.</p>
+            </div>
+            <router-link to="/add-address" class="btn btn-outline-dark mt-3 m-3 px-4 py-2 fw-bold">Atur Alamat</router-link>
+          </div>
+          
+          <router-link 
+            to="/payment" 
+            class="btn btn-dark w-100 mt-4 py-2 fw-bold text-white text-decoration-none"
+          >
+            Lanjutkan ke Pembayaran
+          </router-link>
         </div>
       </div>
     </div>
@@ -168,5 +274,11 @@ onMounted(async () => {
 .btn-dark {
     display: block;
     text-align: center;
+}
+.text-success {
+    color: #198754 !important;
+}
+.text-danger {
+    color: #dc3545 !important;
 }
 </style>
