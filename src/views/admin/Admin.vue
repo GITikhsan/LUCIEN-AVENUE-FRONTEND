@@ -22,6 +22,7 @@ const newProduct = reactive({
   gender: '',
   material: '',
   dimensi: '',
+  stok: '',
   tanggal_rilis: '',
   deskripsi: ''
 });
@@ -350,6 +351,7 @@ onMounted(() => {
                 </div>
                 <div class="row">
                   <div class="col-md-6 form-floating mb-2"><input v-model="newProduct.dimensi" type="text" id="dimensi" class="form-control" placeholder="x"><label for="dimensi" class="ms-2">Dimension</label></div>
+                  <div class="col-md-6 form-floating mb-2"><input v-model="newProduct.stok" type="number" id="stok" class="form-control" placeholder="x"><label for="stok" class="ms-2">Quantity</label></div>
                   <div class="col-md-6 form-floating mb-2"><input v-model="newProduct.tanggal_rilis" type="date" id="tanggal_rilis" class="form-control" placeholder="x"><label for="tanggal_rilis" class="ms-2">Release Date</label></div>
                 </div>
                 <div class="form-floating mb-2"><textarea v-model="newProduct.deskripsi" class="form-control" placeholder="x" id="Description" style="height: 100px"></textarea><label for="Description">Description</label></div>
@@ -387,6 +389,7 @@ onMounted(() => {
         <th>Gender</th>
         <th>Material</th>
         <th>Dimension</th>
+        <th>Quantity</th>
         <th>Release Date</th>
         <th class="text-end">Actions</th>
       </tr>
@@ -415,6 +418,7 @@ onMounted(() => {
         <td>{{ product.gender }}</td>
         <td>{{ product.material }}</td>
         <td>{{ product.dimensi }}</td>
+        <td>{{ product.stok }}</td>
         <td>{{ product.tanggal_rilis }}</td>
         <td class="text-end">
           <button @click="startEdit(product)" class="btn btn-sm btn-outline-primary me-1">Edit</button>

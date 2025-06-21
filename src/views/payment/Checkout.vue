@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
-
+const backendUrl = 'http://127.0.0.1:8000';
 // =================================================================
 // Konfigurasi API dan Autentikasi
 // =================================================================
@@ -176,7 +176,11 @@ onMounted(async () => {
             </div>
             <div class="card-body">
               <div v-for="product in order.products" :key="product.productId" class="d-flex mb-3">
-                <img :src="product.image" class="me-3 rounded" style="width: 100px; height: 100px; object-fit: cover;" :alt="product.nama_sepatu">
+                <img v-if="product.images && product.images.length > 0"
+     :src="backendUrl + product.images[0].image_path"
+     alt="Product image"
+     class="img-fluid rounded me-3"
+     style="width: 60px; height: 60px; object-fit: contain;">
                 <div>
                   <h6 class="mb-1">{{ product.nama_sepatu }}</h6>
                   <small v-if="product.size">Ukuran: {{ product.size }}</small><br>

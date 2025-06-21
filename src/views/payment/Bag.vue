@@ -2,6 +2,10 @@
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+const backendUrl = 'http://127.0.0.1:8000';
+
+
+
 
 // State Management
 const router = useRouter();
@@ -15,104 +19,142 @@ const showModal = ref(false);
 const modalMessage = ref('');
 const modalType = ref('info'); // 'info' | 'error' | 'confirm'
 const confirmCallback = ref(null);
+const cancelCallback = ref(null); // [TAMBAHAN] State untuk callback tombol cancel
 
 // Computed Property untuk Total Harga
 const grandTotal = computed(() => {
-  return cartItems.value.reduce((total, item) => {
-    const price = item.product?.harga_retail || 0;
-    const quantity = item.kuantitas || 0;
-    return total + price * quantity;
-  }, 0);
+  return cartItems.value.reduce((total, item) => {
+    const price = item.product?.harga_retail || 0;
+    const quantity = item.kuantitas || 0;
+    return total + price * quantity;
+  }, 0);
 });
 
 // Helper Functions
 const formatCurrency = (value) => {
-  return Number(value).toLocaleString('id-ID');
+  return Number(value).toLocaleString('id-ID');
 };
 
 // API Calls
 const fetchCartItems = async () => {
-  isLoading.value = true;
-  try {
-    // Diasumsikan API_BASE_URL sudah diatur secara global
-    const res = await axios.get('/carts');
-    cartItems.value = res.data.data;
-  } catch (err) {
-    error.value = err.response?.data?.message || 'Failed to load cart.';
-  } finally {
-    isLoading.value = false;
-  }
+  console.log('Cart items:', cartItems.value)
+  isLoading.value = true;
+  try {
+    const res = await axios.get('/carts');
+    cartItems.value = res.data.data;
+  } catch (err) {
+    error.value = err.response?.data?.message || 'Failed to load cart.';
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 const updateQuantity = async (item, delta) => {
-  const newQty = item.kuantitas + delta;
-  if (newQty < 1) return;
+  const newQty = item.kuantitas + delta;
+  // Tidak perlu 'if (newQty < 1) return;' karena validasi sudah ada di setQuantity
+  await setQuantity(item, newQty);
+};
+
+// [TAMBAHAN] Fungsi baru ini menjadi pusat logika untuk validasi dan update
+const setQuantity = async (item, quantity) => {
+  const stock = item.product?.stok || 0;
+  let newQty = Number(quantity); // Pastikan tipenya angka
+
+  // Validasi: kuantitas tidak boleh kurang dari 1
+  if (isNaN(newQty) || newQty < 1) {
+    // Jika tidak valid (misal: pengguna menghapus angka), jangan lakukan apa-apa atau reset ke 1
+    // Untuk pengalaman terbaik, kita biarkan validasi @change yang menanganinya,
+    // tapi untuk tombol, kita pastikan tidak di bawah 1.
+    if (quantity < 1) return; // Untuk klik tombol minus di angka 1
+    newQty = 1;
+  }
+  
+  // Validasi: kuantitas tidak boleh melebihi stok
+  if (newQty > stock) {
+    newQty = stock;
+    showInfo(`Maximum stock for this item is ${stock}.`);
+  }
+
+  // Update nilai di frontend agar input field sinkron
+  item.kuantitas = newQty;
 
   try {
+    // Kirim request ke backend hanya dengan nilai yang sudah divalidasi
     await axios.put(`/carts/${item.id}`, { kuantitas: newQty });
-    // Update kuantitas secara lokal agar UI responsif
-    item.kuantitas = newQty; 
   } catch {
     showInfo("Failed to update quantity.");
+    // Jika gagal, ambil ulang data dari server agar konsisten
+    fetchCartItems();
   }
+};
+
+
+// [PERUBAHAN] Fungsi closeModal untuk menjadi default action
+const closeModal = () => {
+  showModal.value = false;
 };
 
 // Modal Functions
 const askConfirm = (message, onConfirm) => {
-  modalMessage.value = message;
-  modalType.value = 'confirm';
-  confirmCallback.value = onConfirm;
-  showModal.value = true;
+  modalMessage.value = message;
+  modalType.value = 'confirm';
+  confirmCallback.value = onConfirm;
+  // [PERUBAHAN] Atur callback cancel ke default (hanya tutup modal)
+  cancelCallback.value = closeModal; 
+  showModal.value = true;
 };
 
 const showInfo = (message) => {
-  modalMessage.value = message;
-  modalType.value = 'info';
-  confirmCallback.value = null;
-  showModal.value = true;
+  modalMessage.value = message;
+  modalType.value = 'info';
+  confirmCallback.value = null;
+  showModal.value = true;
 };
 
-// [PERUBAHAN 1] Fungsi removeItem sekarang menerima seluruh objek 'item'
 const removeItem = async (item) => {
-  // Ambil nama produk. Dari database sepertinya 'nama_sepatu'.
-  // Kita coba 'nama_sepatu' dulu, jika tidak ada, baru 'name'.
-  const productName = item.product?.nama_sepatu || item.product?.name || 'this item';
-  
-  // [PERUBAHAN 2] Buat pesan konfirmasi yang dinamis
-  const confirmationMessage = `Are you sure you want to remove "${productName}" from your cart?`;
+  const productName = item.product?.nama_sepatu || item.product?.name || 'this item';
+  const confirmationMessage = `Are you sure you want to remove "${productName}" from your cart?`;
 
-  askConfirm(confirmationMessage, async () => {
-    isRemoving.value = item.id;
-    showModal.value = false;
-    try {
-      await axios.delete(`/carts/${item.id}`);
-      await fetchCartItems(); // Muat ulang keranjang setelah berhasil hapus
-      showInfo("Item removed successfully!");
-    } catch {
-      showInfo("Failed to remove item.");
-    } finally {
-      isRemoving.value = null;
-    }
-  });
+  askConfirm(confirmationMessage, async () => {
+    isRemoving.value = item.id;
+    showModal.value = false;
+    try {
+      await axios.delete(`/carts/${item.id}`);
+      await fetchCartItems();
+      showInfo("Item removed successfully!");
+    } catch {
+      showInfo("Failed to remove item.");
+    } finally {
+      isRemoving.value = null;
+    }
+  });
 };
 
 // Lifecycle Hook
 onMounted(() => {
-  const token = localStorage.getItem('auth_token');
+  const token = localStorage.getItem('auth_token');
 
-  if (token) {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    fetchCartItems();
-  } else {
-    modalMessage.value = "You need to log in to view your cart. Do you want to log in now?";
-    modalType.value = 'confirm';
-    showModal.value = true;
+  if (token) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    fetchCartItems();
+  } else {
+    // [PERUBAHAN] Logika untuk modal saat belum login
+    modalMessage.value = "You need to log in to view your cart. Do you want to log in now?";
+    modalType.value = 'confirm';
+    showModal.value = true;
 
-    confirmCallback.value = () => {
+    // Aksi untuk tombol "Yes" -> ke halaman login
+    confirmCallback.value = () => {
+      showModal.value = false;
+      router.push('/login');
+    };
+
+    // [PERUBAHAN] Aksi untuk tombol "Cancel" -> ke halaman home
+    cancelCallback.value = () => {
       showModal.value = false;
-      router.push('/login');
+      router.push('/'); // Mengarahkan ke homepage
     };
-  }
+  }
 });
 
 </script>
@@ -137,20 +179,43 @@ onMounted(() => {
           class="bg-white p-4 rounded shadow-sm d-flex flex-column flex-md-row gap-4 align-items-center"
         >
           <img
-            :src="item.product.image_url"
-            class="rounded shadow cart-img"
-            alt="Product Image"
+            v-if="item.product && item.product.images && item.product.images.length > 0"
+            :src="backendUrl + item.product.images[0].image_path"
+            alt="Product image"
+            class="img-fluid rounded shadow cart-img"
+            style="max-height: 160px; object-fit: contain;"
           />
+
           <div class="flex-grow-1 text-center text-md-start">
             <h5 class="fw-semibold">{{ item.product.nama_sepatu || item.product.name }}</h5>
-            <div class="d-flex justify-content-center justify-content-md-start align-items-center gap-2">
-              <button class="btn btn-outline-secondary btn-sm" @click="updateQuantity(item, -1)">-</button>
-              <span class="px-2">{{ item.kuantitas }}</span>
-              <button class="btn btn-outline-secondary btn-sm" @click="updateQuantity(item, 1)">+</button>
-            </div>
+            <small class="text-muted">Stock: {{ item.product?.stok }}</small>
+            
+            <div class="d-flex justify-content-center justify-content-md-start align-items-center gap-2 mt-2">
+  <button 
+    class="btn btn-outline-secondary btn-sm" 
+    @click="updateQuantity(item, -1)" 
+    :disabled="item.kuantitas <= 1"
+  >-</button>
+
+  <input
+    type="number"
+    class="form-control form-control-sm text-center"
+    style="width: 65px;"
+    v-model.number="item.kuantitas"
+    @change="setQuantity(item, $event.target.value)"
+    min="1"
+    :max="item.product?.stok || 1"
+  />
+  <button 
+    class="btn btn-outline-secondary btn-sm" 
+    @click="updateQuantity(item, 1)" 
+    :disabled="item.kuantitas >= (item.product?.stok || 0)"
+  >+</button>
+</div>
+
             <p class="fw-bold text-success mt-2">Rp {{ formatCurrency(item.product.harga_retail) }}</p>
           </div>
-          
+   
           <button class="btn btn-outline-danger" @click="removeItem(item)" :disabled="isRemoving === item.id">
             <span v-if="isRemoving === item.id" class="spinner-border spinner-border-sm"></span>
             <i v-else class="bi bi-trash3"></i>
@@ -178,7 +243,7 @@ onMounted(() => {
           </div>
           <div class="modal-footer justify-content-center border-0 pt-0 pb-4">
             <template v-if="modalType === 'confirm'">
-              <button class="btn btn-secondary px-4" @click="showModal = false">Cancel</button>
+              <button class="btn btn-secondary px-4" @click="cancelCallback">Cancel</button>  
               <button class="btn btn-danger px-4" @click="confirmCallback()">Yes</button>
             </template>
             <template v-else>
@@ -198,6 +263,17 @@ onMounted(() => {
   object-fit: contain;
   background-color: #f8f9fa;
   padding: 8px;
+}
+/* Menghilangkan panah di Chrome, Safari, Edge, dan Opera */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Menghilangkan panah di Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }
 @media (max-width: 768px) {
   .cart-img {

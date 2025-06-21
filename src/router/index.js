@@ -94,7 +94,11 @@ const routes = [
   {
     path: '/admin',
     name: 'Admin',
-    component: Admin
+    component: Admin,
+    meta: {
+      requiresAuth: true,
+      role: 'admin'
+    }
   },
 ]
 
@@ -106,5 +110,25 @@ const router = createRouter({
     return { top: 0 }
   }
 })
+
+// Proteksi akses halaman
+router.beforeEach((to, from, next) => {
+  const isLoggedIn = !!localStorage.getItem('auth_token')
+  const user = JSON.parse(localStorage.getItem('user_data'))
+
+  // Kalau butuh login tapi belum login
+  if (to.meta.requiresAuth && !isLoggedIn) {
+    return next('/')
+  }
+
+  // Kalau route khusus admin tapi user bukan admin
+  if (to.meta.role === 'admin' && user?.role !== 'admin') {
+    return next('/') // Atau redirect ke halaman lain
+  }
+
+  // Lanjut ke halaman
+  next()
+})
+
 
 export default router
