@@ -4,14 +4,17 @@ import axios from 'axios';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const API_BASE_URL = 'http://127.0.0.1:8000/index.php/api';
 
-const countries = ref([]);
+// Pastikan URL ini menunjuk ke backend Laravel Anda
+const API_BASE_URL = 'http://127.0.0.1:8000/api';
+
+// --- State untuk data wilayah ---
 const provinces = ref([]);
 const cities = ref([]);
 const districts = ref([]);
 const subdistricts = ref([]);
 
+// --- State untuk form binding ---
 const form = ref({
   name: '',
   surname: '',
@@ -27,8 +30,8 @@ const form = ref({
   isDefault: false
 });
 
+// --- State untuk UI (loading & error) ---
 const isLoading = ref({
-  countries: true,
   provinces: false,
   cities: false,
   districts: false,
@@ -37,94 +40,69 @@ const isLoading = ref({
 });
 const errorMessage = ref('');
 
-async function fetchProvinces() {
-  isLoading.value.provinces = true;
+// --- Fungsi untuk mengambil data wilayah dari backend Laravel ---
+async function fetchWilayah(endpoint, targetRef, loadingKey, errorText) {
+  isLoading.value[loadingKey] = true;
   errorMessage.value = '';
   try {
-    const response = await axios.get(`${API_BASE_URL}/wilayah/provinsi`);
-    console.log("DATA PROVINCE:", response.data);
-    provinces.value = response.data.decoded || [];
+    const response = await axios.get(`${API_BASE_URL}/wilayah/${endpoint}`);
+    console.log("Data yang diterima dari backend:", response.data);
+    if (response.data.success) {
+      // Data dari backend ada di dalam `response.data.data`
+      targetRef.value = response.data.data;
+    } else {
+      throw new Error(response.data.message || errorText);
+    }
   } catch (error) {
-    console.error("Failed to fetch provinces:", error);
-    errorMessage.value = "Gagal memuat daftar provinsi.";
+    console.error(`Gagal fetch ${endpoint}:`, error);
+    errorMessage.value = errorText;
   } finally {
-    isLoading.value.provinces = false;
+    isLoading.value[loadingKey] = false;
   }
 }
 
-onMounted(async () => {
-  try {
-    const response = await axios.get('https://restcountries.com/v3.1/all?fields=name,cca2,idd');
-    countries.value = response.data.sort((a, b) => a.name.common.localeCompare(b.name.common));
-    if (form.value.country === 'Indonesia') await fetchProvinces();
-  } catch (error) {
-    console.error("Failed to fetch countries:", error);
-    errorMessage.value = "Gagal memuat daftar negara.";
-  } finally {
-    isLoading.value.countries = false;
-  }
+// Ambil data provinsi saat komponen pertama kali dimuat
+onMounted(() => {
+  fetchWilayah('provinsi', provinces, 'provinces', 'Gagal memuat provinsi.');
 });
 
-watch(() => form.value.country, (newVal) => {
-  provinces.value = [];
-  cities.value = [];
-  districts.value = [];
-  subdistricts.value = [];
-  form.value.province_id = '';
-  form.value.city_id = '';
-  form.value.district_id = '';
-  form.value.subdistrict_id = '';
-  if (newVal === 'Indonesia') fetchProvinces();
-});
+// --- Watcher untuk dropdown dinamis ---
 
-watch(() => form.value.province_id, async (id) => {
+watch(() => form.value.province_id, (id) => {
+  // Reset dropdown anak
   cities.value = [];
   districts.value = [];
   subdistricts.value = [];
   form.value.city_id = '';
-  if (!id) return;
-  isLoading.value.cities = true;
-  try {
-    const res = await axios.get(`${API_BASE_URL}/wilayah/kota/${id}`);
-    cities.value = res.data;
-  } catch (err) {
-    errorMessage.value = "Gagal memuat kota.";
-  } finally {
-    isLoading.value.cities = false;
+  form.value.district_id = '';
+  form.value.subdistrict_id = '';
+
+  if (id) {
+    fetchWilayah(`kabupaten/${id}`, cities, 'cities', 'Gagal memuat kota/kabupaten.');
   }
 });
 
-watch(() => form.value.city_id, async (id) => {
+watch(() => form.value.city_id, (id) => {
   districts.value = [];
   subdistricts.value = [];
   form.value.district_id = '';
-  if (!id) return;
-  isLoading.value.districts = true;
-  try {
-    const res = await axios.get(`${API_BASE_URL}/wilayah/kecamatan/${id}`);
-    districts.value = res.data;
-  } catch (err) {
-    errorMessage.value = "Gagal memuat kecamatan.";
-  } finally {
-    isLoading.value.districts = false;
+  form.value.subdistrict_id = '';
+  
+  if (id) {
+    fetchWilayah(`kecamatan/${id}`, districts, 'districts', 'Gagal memuat kecamatan.');
   }
 });
 
-watch(() => form.value.district_id, async (id) => {
+watch(() => form.value.district_id, (id) => {
   subdistricts.value = [];
   form.value.subdistrict_id = '';
-  if (!id) return;
-  isLoading.value.subdistricts = true;
-  try {
-    const res = await axios.get(`${API_BASE_URL}/wilayah/desa/${id}`);
-    subdistricts.value = res.data;
-  } catch (err) {
-    errorMessage.value = "Gagal memuat desa.";
-  } finally {
-    isLoading.value.subdistricts = false;
+
+  if (id) {
+    fetchWilayah(`kelurahan/${id}`, subdistricts, 'subdistricts', 'Gagal memuat kelurahan/desa.');
   }
 });
 
+// --- Fungsi untuk submit form ---
 async function submitAddress() {
   isLoading.value.submit = true;
   errorMessage.value = '';
@@ -143,9 +121,10 @@ async function submitAddress() {
   };
 
   try {
+    // Mengirim data ke endpoint `POST /api/address` di Laravel
     const res = await axios.post(`${API_BASE_URL}/address`, payload, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        'Authorization': `Bearer ${localStorage.getItem('authToken')}` // Pastikan token ada
       }
     });
     alert(res.data.message || "Alamat berhasil disimpan!");
@@ -155,7 +134,7 @@ async function submitAddress() {
       const errors = err.response.data.errors;
       errorMessage.value = Object.values(errors).map(msg => `- ${msg[0]}`).join('\n');
     } else {
-      errorMessage.value = 'Terjadi kesalahan saat menyimpan alamat.';
+      errorMessage.value = err.response?.data?.message || 'Terjadi kesalahan saat menyimpan alamat.';
     }
   } finally {
     isLoading.value.submit = false;
@@ -167,74 +146,68 @@ async function submitAddress() {
   <div class="container py-5">
     <h2 class="fw-bold mb-4 text-center">ADD ADDRESS</h2>
 
-    <div v-if="isLoading.countries" class="text-center">
-      <div class="spinner-border" role="status"></div>
-      <p>Loading initial data...</p>
-    </div>
+    <div v-if="errorMessage" class="alert alert-danger" style="white-space: pre-line;">{{ errorMessage }}</div>
 
-    <div v-if="errorMessage" class="alert alert-danger white-space-pre-line">{{ errorMessage }}</div>
-
-    <form v-else class="mx-auto text-start" style="max-width: 500px" @submit.prevent="submitAddress">
+    <form class="mx-auto text-start" style="max-width: 500px" @submit.prevent="submitAddress">
       <input v-model="form.name" type="text" placeholder="First name" class="form-control mb-3" required />
       <input v-model="form.surname" type="text" placeholder="Last name" class="form-control mb-3" />
 
       <div class="input-group mb-3">
-        <select v-model="form.phone_code" class="form-select" style="max-width: 120px">
-          <option v-for="country in countries" :key="country.cca2" :value="country.idd.root + (country.idd.suffixes?.[0] || '')">
-            {{ country.cca2 }} ({{ country.idd.root }}{{ country.idd.suffixes?.[0] || '' }})
-          </option>
-        </select>
+        <span class="input-group-text">+62</span>
         <input v-model="form.mobile" type="tel" placeholder="Mobile" class="form-control" required />
       </div>
 
-      <select v-model="form.country" class="form-select mb-3" required>
-        <option disabled value="">Select Country</option>
-        <option v-for="country in countries" :key="country.cca2" :value="country.name.common">
-          {{ country.name.common }}
+      <select v-model="form.country" class="form-select mb-3" disabled>
+        <option value="Indonesia">Indonesia</option>
+      </select>
+
+      <select v-model="form.province_id" class="form-select mb-3" :disabled="isLoading.provinces" required>
+        <option disabled value="">
+          {{ isLoading.provinces ? 'Memuat provinsi...' : 'Pilih Provinsi' }}
+        </option>
+        <option v-for="province in provinces" :key="province.id" :value="province.id">
+          {{ province.name }}
         </option>
       </select>
 
-      <div v-if="form.country === 'Indonesia'">
-        <select v-model="form.province_id" class="form-select mb-3" required>
-          <option disabled value="">Select Province</option>
-          <option v-for="province in provinces" :key="province.id" :value="province.id">
-            {{ province.name }}
-          </option>
-        </select>
+      <select v-model="form.city_id" class="form-select mb-3" :disabled="isLoading.cities || !form.province_id" required>
+        <option disabled value="">
+          {{ isLoading.cities ? 'Memuat kota...' : (form.province_id ? 'Pilih Kabupaten/Kota' : 'Pilih Provinsi Dahulu') }}
+        </option>
+        <option v-for="city in cities" :key="city.id" :value="city.id">
+          {{ city.name }}
+        </option>
+      </select>
 
-        <select v-model="form.city_id" class="form-select mb-3" required>
-          <option disabled value="">Select City/Regency</option>
-          <option v-for="city in cities" :key="city.id" :value="city.id">
-            {{ city.name }}
-          </option>
-        </select>
+      <select v-model="form.district_id" class="form-select mb-3" :disabled="isLoading.districts || !form.city_id" required>
+        <option disabled value="">
+          {{ isLoading.districts ? 'Memuat kecamatan...' : (form.city_id ? 'Pilih Kecamatan' : 'Pilih Kota Dahulu') }}
+        </option>
+        <option v-for="district in districts" :key="district.id" :value="district.id">
+          {{ district.name }}
+        </option>
+      </select>
 
-        <select v-model="form.district_id" class="form-select mb-3" required>
-          <option disabled value="">Select District</option>
-          <option v-for="district in districts" :key="district.id" :value="district.id">
-            {{ district.name }}
-          </option>
-        </select>
-
-        <select v-model="form.subdistrict_id" class="form-select mb-3" required>
-          <option disabled value="">Select Subdistrict/Village</option>
-          <option v-for="subdistrict in subdistricts" :key="subdistrict.id" :value="subdistrict.id">
-            {{ subdistrict.name }}
-          </option>
-        </select>
-      </div>
+      <select v-model="form.subdistrict_id" class="form-select mb-3" :disabled="isLoading.subdistricts || !form.district_id" required>
+        <option disabled value="">
+          {{ isLoading.subdistricts ? 'Memuat kelurahan...' : (form.district_id ? 'Pilih Kelurahan/Desa' : 'Pilih Kecamatan Dahulu') }}
+        </option>
+        <option v-for="subdistrict in subdistricts" :key="subdistrict.id" :value="subdistrict.id">
+          {{ subdistrict.name }}
+        </option>
+      </select>
 
       <input v-model="form.postcode" type="text" placeholder="Postal code" class="form-control mb-3" required />
-      <textarea v-model="form.address" placeholder="Street address, block, house no." class="form-control mb-3" rows="3" required></textarea>
+      <textarea v-model="form.address" placeholder="Nama Jalan, Gedung, No. Rumah" class="form-control mb-3" rows="3" required></textarea>
 
       <div class="form-check mb-3">
         <input v-model="form.isDefault" class="form-check-input" type="checkbox" id="defaultCheck" />
-        <label class="form-check-label" for="defaultCheck">Make this your primary shipping address</label>
+        <label class="form-check-label" for="defaultCheck">Jadikan alamat utama</label>
       </div>
 
       <button type="submit" class="btn btn-dark w-100" :disabled="isLoading.submit">
-        <span v-if="isLoading.submit" class="spinner-border spinner-border-sm"></span>
-        {{ isLoading.submit ? 'Saving...' : 'Save Address' }}
+        <span v-if="isLoading.submit" class="spinner-border spinner-border-sm me-2"></span>
+        {{ isLoading.submit ? 'Menyimpan...' : 'Simpan Alamat' }}
       </button>
     </form>
   </div>
