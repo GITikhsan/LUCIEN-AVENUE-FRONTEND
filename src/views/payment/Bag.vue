@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+const backendUrl = 'http://127.0.0.1:8000';
 
 // State Management
 const router = useRouter();
@@ -32,6 +33,7 @@ const formatCurrency = (value) => {
 
 // API Calls
 const fetchCartItems = async () => {
+  console.log('Cart items:', cartItems.value)
   isLoading.value = true;
   try {
     // Diasumsikan API_BASE_URL sudah diatur secara global
@@ -137,10 +139,13 @@ onMounted(() => {
           class="bg-white p-4 rounded shadow-sm d-flex flex-column flex-md-row gap-4 align-items-center"
         >
           <img
-            :src="item.product.image_url"
-            class="rounded shadow cart-img"
-            alt="Product Image"
+            v-if="item.product && item.product.images && item.product.images.length > 0"
+            :src="backendUrl + item.product.images[0].image_path"
+            alt="Product image"
+            class="img-fluid rounded shadow cart-img"
+            style="max-height: 160px; object-fit: contain;"
           />
+
           <div class="flex-grow-1 text-center text-md-start">
             <h5 class="fw-semibold">{{ item.product.nama_sepatu || item.product.name }}</h5>
             <div class="d-flex justify-content-center justify-content-md-start align-items-center gap-2">
