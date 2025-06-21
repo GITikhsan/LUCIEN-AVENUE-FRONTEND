@@ -148,14 +148,25 @@ onMounted(() => {
 
           <div class="flex-grow-1 text-center text-md-start">
             <h5 class="fw-semibold">{{ item.product.nama_sepatu || item.product.name }}</h5>
-            <div class="d-flex justify-content-center justify-content-md-start align-items-center gap-2">
-              <button class="btn btn-outline-secondary btn-sm" @click="updateQuantity(item, -1)">-</button>
+            <small class="text-muted">Stock: {{ item.product?.stok }}</small>
+            
+            <div class="d-flex justify-content-center justify-content-md-start align-items-center gap-2 mt-2">
+              <button 
+                class="btn btn-outline-secondary btn-sm" 
+                @click="updateQuantity(item, -1)" 
+                :disabled="item.kuantitas <= 1"
+              >-</button>
               <span class="px-2">{{ item.kuantitas }}</span>
-              <button class="btn btn-outline-secondary btn-sm" @click="updateQuantity(item, 1)">+</button>
+              <button 
+                class="btn btn-outline-secondary btn-sm" 
+                @click="updateQuantity(item, 1)" 
+                :disabled="item.kuantitas >= (item.product?.stok || 0)"
+              >+</button>
             </div>
+
             <p class="fw-bold text-success mt-2">Rp {{ formatCurrency(item.product.harga_retail) }}</p>
           </div>
-          
+   
           <button class="btn btn-outline-danger" @click="removeItem(item)" :disabled="isRemoving === item.id">
             <span v-if="isRemoving === item.id" class="spinner-border spinner-border-sm"></span>
             <i v-else class="bi bi-trash3"></i>
