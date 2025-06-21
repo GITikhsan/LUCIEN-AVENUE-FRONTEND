@@ -10,13 +10,19 @@ const featuredWomen = ref([])
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/api/products')
+    const response = await axios.get('http://127.0.0.1:8000/api/products', {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
     products.value = response.data.data.data
 
     // ✅ Pilih produk berdasarkan ID
-    featuredProducts.value = products.value.filter(p => [2, 3, 5, 10].includes(p.produk_id))
-    featuredMen.value = products.value.filter(p => [5, 6, 7, 10].includes(p.produk_id))
-    featuredWomen.value = products.value.filter(p => [1, 2, 3, 4].includes(p.produk_id))
+    // Contoh: Ambil 4 produk pertama sebagai featuredProducts
+    featuredProducts.value = products.value.slice(0, 8)
+    featuredMen.value = products.value.filter(p => p.gender === 'Pria').slice(0, 8)
+    featuredWomen.value = products.value.filter(p => p.gender === 'Wanita').slice(0, 8)
 
   } catch (error) {
     console.error('❌ Gagal mengambil produk:', error)

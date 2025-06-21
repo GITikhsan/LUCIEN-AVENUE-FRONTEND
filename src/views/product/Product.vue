@@ -71,7 +71,8 @@ const product = ref({
     release: '',
     color: '',
     dimension: '',
-    retail: ''
+    retail: '',
+    gender: ''
   },
   images: []
 });
@@ -124,6 +125,7 @@ const fetchProduct = async (productId) => {
         release: apiData.tanggal_rilis,
         color: apiData.warna,
         dimension: apiData.dimensi,
+        gender: apiData.gender,
         retail: formatCurrency(apiData.harga_retail)
       },
       // Mengambil URL gambar dari relasi 'images' dan menggabungkannya dengan URL backend
@@ -280,6 +282,10 @@ const quantity = ref(1);
           <p class="text-muted">{{ product.details.material }}</p>
           <p class="small text-muted mt-3 mb-1">Release Date</p>
           <p class="text-muted">{{ product.details.release }}</p>
+          <!---  !//////////////////////////////////////////////////////////////-->
+          <p class="small text-muted mt-3 mb-1">Gender</p>
+          <p class="text-muted">{{ product.details.gender }}</p>
+             <!---  !//////////////////////////////////////////////////////////////-->
         </div>
         <div class="col-md-6">
           <p class="small text-muted mb-1">Color</p>
