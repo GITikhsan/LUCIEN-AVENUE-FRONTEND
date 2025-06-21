@@ -58,8 +58,7 @@ onBeforeUnmount(() => {
 
 // --- DATA FILTER & PRODUK ---
 const gender = ref("");
-const size = ref(null);
-const discount = ref("any");
+const size = ref([]);
 const priceRange = ref("");
 const selectedColors = ref([]);
 const selectedBrands = ref([]);
@@ -69,12 +68,7 @@ const sizes = [
   22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
   41, 42, 43, 44, 45,
 ];
-const discounts = [
-  { label: "Any", value: "any" },
-  { label: "10%+", value: 10 },
-  { label: "25%+", value: 25 },
-  { label: "50%+", value: 50 },
-];
+
 const priceRanges = [
   { value: "0-1000000", label: "Below IDR 1.000.000" },
   { value: "1000000-3000000", label: "IDR 1.000.000 – 3.000.000" },
@@ -89,9 +83,8 @@ const products = ref([])
 const filteredProducts = computed(() => {
   return products.value.filter(product => {
     const matchGender = gender.value === "" || product.gender === gender.value;
-    const matchSize = size.value === null || product.ukuran == size.value;
-    const matchDiscount =
-      discount.value === "any" || product.discount >= discount.value;
+    const matchSize = size.value.length === 0 || size.value.map(Number).includes(Number(product.ukuran));
+  
     
     const matchPrice = (() => {
       if (!priceRange.value) return true;
@@ -112,7 +105,6 @@ const filteredProducts = computed(() => {
     return (
       matchGender &&
       matchSize &&
-      matchDiscount &&
       matchPrice &&
       matchColor &&
       matchBrand
@@ -145,7 +137,6 @@ onMounted(async () => {
   params: {
     gender: gender.value,
     ukuran: size.value,
-    discount: discount.value !== "any" ? discount.value : null,
     price_range: priceRange.value,
     colors: selectedColors.value.join(','),
     brands: selectedBrands.value.join(','),
@@ -248,51 +239,18 @@ watch(sortOption, fetchProducts)
         <div class="row row-cols-4 g-3 mb-3">
           <div class="col" v-for="n in sizes" :key="n">
             <input
-              type="radio"
+              type="checkbox"
               class="visually-hidden"
               :id="'size' + n"
-              name="size"
               :value="n"
               v-model="size"
             />
             <label
               class="size-clean w-100 text-center"
               :for="'size' + n"
-              :class="{ selected: size === n }"
+              :class="{ selected: size.includes(n) }"
             >
               {{ n }}
-            </label>
-          </div>
-        </div>
-
-        <h6 class="fw-semibold mb-3">Discount</h6>
-        <div class="row row-cols-2 row-cols-md-4 g-3 mb-3">
-          <div
-            class="col"
-            v-for="d in discounts.filter((dis) => dis.value !== 'any')"
-            :key="d.label"
-          >
-            <input
-              type="radio"
-              class="btn-check"
-              :id="'discount' + d.value"
-              name="discount"
-              :value="d.value"
-              v-model="discount"
-            />
-            <label
-              class="btn w-100 py-2 fw-semibold rounded-3 discount-tile"
-              :for="'discount' + d.value"
-              :class="[
-                discount === d.value ? 'active-tile' : '',
-                {
-                  'bg-success text-white': d.value === 10,
-                  'bg-primary text-white': d.value === 25,
-                  'bg-danger text-white': d.value === 50,
-                },
-              ]"
-            >
-              {{ d.label }}
             </label>
           </div>
         </div>
