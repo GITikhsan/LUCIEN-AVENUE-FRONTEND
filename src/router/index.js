@@ -118,7 +118,7 @@ router.beforeEach((to, from, next) => {
 
   // Kalau butuh login tapi belum login
   if (to.meta.requiresAuth && !isLoggedIn) {
-    return next('/login')
+    return next('/')
   }
 
   // Kalau route khusus admin tapi user bukan admin
