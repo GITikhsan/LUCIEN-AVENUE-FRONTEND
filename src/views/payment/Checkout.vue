@@ -162,7 +162,7 @@ const applyPromoCode = async () => {
     window.snap.pay(snapToken, {
       onSuccess: (result) => {
         console.log('Pembayaran sukses:', result);
-        router.push('/order-success');
+        router.push('/PaymentSuccess');
       },
       onPending: (result) => {
         console.log('Menunggu pembayaran:', result);
@@ -175,6 +175,7 @@ const applyPromoCode = async () => {
       onClose: () => {
   console.log('Popup Midtrans ditutup oleh pengguna.');
   alert('Anda menutup jendela pembayaran. Pesanan Anda telah dibuat dan menunggu pembayaran. Anda bisa melihat detailnya di halaman riwayat pesanan.');
+  router.push('/myPurchases');
   // Jika Anda ingin mengarahkannya ke halaman tertentu setelah alert ditutup,
   // Anda bisa tambahkan router.push di sini, misalnya kembali ke keranjang.
   // router.push('/cart'); 
@@ -213,6 +214,7 @@ onMounted(async () => {
 </script>
 
 <template>
+  
   <div class="bg-light py-5">
     <div class="container">
       <div v-if="isLoading" class="text-center">

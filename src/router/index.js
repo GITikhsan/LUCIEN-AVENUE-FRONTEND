@@ -23,6 +23,7 @@ import EditAddress from '@/components/UserSetting/EditAddress.vue'
 import Bag from '@/views/payment/Bag.vue'
 import Checkout from '@/views/payment/Checkout.vue'
 import Payment from '@/views/payment/Payment.vue'
+import PaymentSuccess from '@/views/payment/PaymentSuccess.vue'
 
 const routes = [
   // --- GRUP RUTE UTAMA (YANG PAKAI NAVBAR & FOOTER) ---
@@ -66,6 +67,11 @@ const routes = [
         name: 'Payment',
         component: Payment
       },
+      {
+        path: 'paymentsuccess', // path ini akan menjadi -> /order-success
+        name: 'PaymentSuccess',
+        component: PaymentSuccess
+      },
       //Profile
       { path: '/mydata', name: 'My Data', component: MyData },
       { path: '/myPurchases', name: 'My Purchases', component: MyPurchases },
