@@ -29,6 +29,8 @@ const isApplyingPromo = ref(false);
 const promoMessage = ref('');
 const promoMessageType = ref('error'); // 'error' atau 'success'
 
+
+
 // =================================================================
 // Helper Functions
 // =================================================================
@@ -129,6 +131,58 @@ const applyPromoCode = async () => {
         isApplyingPromo.value = false;
     }
 };
+
+
+  const startPayment = async () => {
+  try {
+    if (!address.value) {
+      alert("Alamat belum tersedia.");
+      return;
+    }
+
+    // 1. Buat order dari cart
+    const orderResponse = await axios.post('/order/create-from-cart');
+    const pesananId = orderResponse.data.pesanan_id;
+
+    // 2. Simpan pesanan_id ke order state
+    order.value.pesanan_id = pesananId;
+
+    // 3. Kirim ke Midtrans
+    const response = await axios.post('/payment', {
+      amount: order.value.total,
+      name: address.value?.recipientName || 'Customer',
+      email: address.value?.email || 'test@email.com',
+      pesanan_id: pesananId,
+      metode_pembayaran: 'midtrans'
+    });
+
+    const snapToken = response.data.token;
+
+    // 4. Panggil popup Midtrans
+    window.snap.pay(snapToken, {
+      onSuccess: (result) => {
+        console.log('Pembayaran sukses:', result);
+        router.push('/order-success');
+      },
+      onPending: (result) => {
+        console.log('Menunggu pembayaran:', result);
+        router.push('/order-pending');
+      },
+      onError: (result) => {
+        console.error('Pembayaran gagal:', result);
+        alert("Pembayaran gagal. Silakan coba lagi.");
+      },
+      onClose: () => {
+        console.log('Popup Midtrans ditutup tanpa menyelesaikan pembayaran.');
+      }
+    });
+
+  } catch (err) {
+    console.error("Gagal memulai pembayaran:", err.response?.data?.message || err.message);
+    alert("Terjadi kesalahan saat memproses pembayaran.");
+  }
+};
+
 
 
 // =================================================================
@@ -258,15 +312,16 @@ onMounted(async () => {
             <div v-else class="p-3">
                 <p class="text-muted">Alamat pengiriman utama tidak ditemukan.</p>
             </div>
-            <router-link to="/add-address" class="btn btn-outline-dark mt-3 m-3 px-4 py-2 fw-bold">Atur Alamat</router-link>
+            <router-link to="/addaddress" class="btn btn-outline-dark mt-3 m-3 px-4 py-2 fw-bold">Atur Alamat</router-link>
           </div>
           
-          <router-link 
-            to="/payment" 
-            class="btn btn-dark w-100 mt-4 py-2 fw-bold text-white text-decoration-none"
-          >
-            Lanjutkan ke Pembayaran
-          </router-link>
+          <button 
+  class="btn btn-dark w-100 mt-4 py-2 fw-bold text-white"
+  @click="startPayment"
+  :disabled="!order || !address"
+>
+  Pay now
+</button>
         </div>
       </div>
     </div>
