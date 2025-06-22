@@ -212,24 +212,24 @@ watch(sortOption, fetchProducts)
         <div class="d-flex justify-content-between mb-3 gap-2">
           <button
             class="btn w-100 fw-semibold border"
-            :class="gender === 'men' ? 'btn-men-active' : 'btn-men'"
-            @click="gender = 'men'"
+            :class="gender === 'Pria' ? 'btn-men-active' : 'btn-men'"
+             @click="gender = gender === 'Pria' ? '' : 'Pria'"
           >
             Men
           </button>
 
           <button
             class="btn w-100 fw-semibold border"
-            :class="gender === 'women' ? 'btn-women-active' : 'btn-women'"
-            @click="gender = 'women'"
+            :class="gender === 'Wanita' ? 'btn-women-active' : 'btn-women'"
+            @click="gender = gender === 'Wanita' ? '' : 'Wanita'"
           >
             Women
           </button>
 
           <button
             class="btn w-100 fw-semibold border"
-            :class="gender === 'unisex' ? 'btn-unisex-active' : 'btn-unisex'"
-            @click="gender = 'unisex'"
+            :class="gender === 'Unisex' ? 'btn-unisex-active' : 'btn-unisex'"
+            @click="gender = gender === 'Unisex' ? '' : 'Unisex'"
           >
             Unisex
           </button>
