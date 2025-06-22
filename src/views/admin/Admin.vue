@@ -1,6 +1,7 @@
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, reactive, onMounted, computed, watch, nextTick } from 'vue';
 import api from '@/api/axios';
+import Chart from 'chart.js/auto';
 
 const backendUrl = 'http://127.0.0.1:8000';
 
@@ -267,11 +268,64 @@ const isPromoActive = (promo) => {
   const today = new Date().toISOString().slice(0, 10);
   return promo.mulai_tanggal <= today && promo.selesai_tanggal >= today;
 };
+
+const totalProducts = ref(0);
+const totalPromotions = ref(0);
+const stockPerBrand = ref({});
+
+const fetchDashboardSummary = async () => {
+  try {
+    const response = await api.get('/dashboard/summary');
+    const data = response.data;
+
+    totalProducts.value = data.total_products;
+    totalPromotions.value = data.total_promotions;
+    stockPerBrand.value = data.stock_per_brand;
+
+    renderStockChart();
+  } catch (error) {
+    console.error('Failed to fetch dashboard summary:', error);
+  }
+};
+
+const renderStockChart = () => {
+  const canvas = document.getElementById('stockChart');
+  if (!canvas) return;
+
+  // Hapus chart lama jika ada
+  if (Chart.getChart(canvas)) {
+    Chart.getChart(canvas).destroy();
+  }
+
+  new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(stockPerBrand.value),
+      datasets: [{
+        label: 'Stock per Brand',
+        data: Object.values(stockPerBrand.value),
+        backgroundColor: '#00BFFF'
+      }]
+    }
+  });
+};
+
+
 // === 4. LIFECYCLE HOOK ===
 onMounted(() => {
   fetchProducts();
   fetchPromotions();
+  fetchDashboardSummary();
   });
+
+watch(() => activePanel.value, (newVal) => {
+  if (newVal === 'Home') {
+    nextTick(() => {
+      fetchDashboardSummary(); // refresh data & grafik
+    });
+  }
+});
+
 </script>
 
 <template>
@@ -287,34 +341,54 @@ onMounted(() => {
           <a href="#" @click.prevent="activePanel = 'Product'" class="nav-link" :class="{'active text-success fw-bold': activePanel === 'Product', 'text-dark': activePanel !== 'Product'}">Product</a>
           <a href="#" @click.prevent="activePanel = 'Orders'" class="nav-link" :class="{'active text-success fw-bold': activePanel === 'Orders', 'text-dark': activePanel !== 'Orders'}">Orders</a>
           <a href="#" @click.prevent="activePanel = 'promo'" class="nav-link" :class="{'active text-success fw-bold': activePanel === 'promo', 'text-dark': activePanel !== 'promo'}">Promo</a>
-          <a href="#" @click.prevent="activePanel = 'diskon'" class="nav-link" :class="{'active text-success fw-bold': activePanel === 'diskon', 'text-dark': activePanel !== 'diskon'}">Discount</a>
         </nav>
       </aside>
 
       <main class="flex-grow-1 p-4 overflow-auto">
         <div v-if="activePanel === 'Home'">
           <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="h5 fw-semibold">Activity</h2>
+            <h2 class="h5 fw-semibold">Admin Dashboard</h2>
           </div>
+
           <div class="row g-3 mb-4">
-            <div v-for="label in ['New Orders', 'Ready to Ship', 'New Chats', 'New Discussions', 'New Reviews']" :key="label" class="col-6 col-sm-3 col-lg-2">
+            <div class="col-6 col-sm-3 col-lg-2">
               <div class="card text-center">
                 <div class="card-body p-3">
-                  <p class="text-muted small">{{ label }}</p>
-                  <p class="h6 fw-bold">0</p>
+                  <p class="text-muted small">Total Products</p>
+                  <p class="h6 fw-bold">{{ totalProducts }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6 col-sm-3 col-lg-2">
+              <div class="card text-center">
+                <div class="card-body p-3">
+                  <p class="text-muted small">Active Promotions</p>
+                  <p class="h6 fw-bold">{{ totalPromotions }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div v-for="(stock, brand) in stockPerBrand" :key="brand" class="col-6 col-sm-3 col-lg-2">
+              <div class="card text-center">
+                <div class="card-body p-3">
+                  <p class="text-muted small">Stock - {{ brand }}</p>
+                  <p class="h6 fw-bold">{{ stock }}</p>
                 </div>
               </div>
             </div>
           </div>
+
           <div class="card mb-4">
             <div class="card-body">
-              <h5 class="fw-semibold mb-2">Store and Product Analysis</h5>
-              <p class="text-muted small">Last update:</p>
-              <div class="bg-light rounded mt-3 p-5 text-center text-muted">[Chart Placeholder]</div>
+              <h5 class="fw-semibold mb-2">Product Stock Analysis</h5>
+              <p class="text-muted small">Real-time stock data by brand</p>
+              <div class="bg-light rounded mt-3 p-5 text-center text-muted">
+                <canvas id="stockChart" style="width: 100%; height: 400px;"></canvas>
+              </div>
             </div>
           </div>
         </div>
-
         <div v-if="activePanel === 'Product'">
           <div class="card mx-auto mb-5" style="max-width: 700px;">
             <div class="card-body">
@@ -524,7 +598,6 @@ onMounted(() => {
 </div>
       
         </div>
-        <div v-if="activePanel === 'diskon'">... Konten form Diskon di sini ...</div>
       </main>
     </div>
   </div>
