@@ -76,8 +76,13 @@ const priceRanges = [
   { value: "5000000-10000000", label: "IDR 5.000.000 – 10.000.000" },
   { value: "10000000+", label: "Above IDR 10.000.000" },
 ];
-const colors = ["green", "blue", "pink", "red", "purple", "yellow", "maroon"];
-const brands = ["Nike", "Adidas", "Air Jordan", "Yeezy", "New Balance"];
+const colors = [
+  "black", "white", "red", "green", "blue", "yellow",
+  "orange", "purple", "pink", "brown", "gray", "cyan"
+];
+const brands = [
+  "Adidas", "Air Jordan", "Nike", "Yeezy"
+];
 const products = ref([])
 ////////////////////////////////////////
 const filteredProducts = computed(() => {
@@ -168,6 +173,8 @@ function fetchProducts() {
 onMounted(fetchProducts)
 
 watch(sortOption, fetchProducts)
+watch(size, fetchProducts)
+
 
 </script>
 
@@ -284,7 +291,7 @@ watch(sortOption, fetchProducts)
         <div class="row g-3 mb-4">
           <div
             class="col-2 d-flex justify-content-center"
-            v-for="(color, i) in colors.slice(0, 6)"
+            v-for="(color, i) in colors.slice(0, 12)"
             :key="i"
           >
             <div class="position-relative">
