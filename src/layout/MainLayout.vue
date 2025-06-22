@@ -21,6 +21,35 @@ const items = [
   { to: '/aboutUs', name: 'About Us' }
 ]
 
+/**
+ * Fungsi terpusat untuk memeriksa status otentikasi dari localStorage.
+ */
+const checkAuthStatus = () => {
+  const storedUser = localStorage.getItem('user_data')
+  const token = localStorage.getItem('auth_token')
+
+  if (storedUser && token) {
+    try {
+      user.value = JSON.parse(storedUser)
+      isLoggedIn.value = true
+    } catch {
+      console.warn('Gagal parse user_data, melakukan logout paksa.')
+      logout() // Jika data di localStorage rusak, otomatis logout
+    }
+  } else {
+    isLoggedIn.value = false
+    user.value = null
+  }
+}
+
+/**
+ * Mengawasi perubahan path URL. Setiap kali URL berubah,
+ * panggil checkAuthStatus() untuk memastikan header selalu update.
+ */
+watch(() => route.path, () => {
+  checkAuthStatus()
+})
+
 const handleSearch = () => {
   if (!store.searchQuery) return
   store.fetchProducts()
