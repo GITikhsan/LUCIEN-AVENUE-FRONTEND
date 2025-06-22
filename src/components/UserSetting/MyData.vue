@@ -104,10 +104,6 @@ async function toggleEdit(index) {
             </a>
           </div>
         </div>
-
-        <div class="col-12 border-top pt-3">
-          <a href="#" class="text-decoration-underline text-danger small">Delete Account</a>
-        </div>
       </div>
     </div>
   </div>
