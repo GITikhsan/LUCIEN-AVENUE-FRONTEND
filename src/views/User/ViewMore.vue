@@ -411,7 +411,7 @@ watch(priceRange, fetchProducts)
                 :to="`/product/${product.produk_id}`"
                 class="text-decoration-none text-dark"
               >
-                <div class="card h-100 border-0 shadow-sm position-relative rounded-4">
+                <div class="card h-100 border-0 shadow-sm position-relative rounded-4 product-card-similar">
                   <div
                     class="position-absolute top-0 start-0 bg-danger text-white px-2 py-1 small rounded-end"
                     style="font-size: 0.75rem"
@@ -666,4 +666,10 @@ watch(priceRange, fetchProducts)
   background-color: #f8f9fa;
   transition: background 0.2s ease;
 }
+
+.product-card-similar:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+}
+
 </style>
