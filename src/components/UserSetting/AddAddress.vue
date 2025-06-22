@@ -114,16 +114,6 @@ async function submitAddress() {
       <input v-model="form.name" type="text" placeholder="First Name" class="form-control mb-3" required />
       <input v-model="form.surname" type="text" placeholder="Last Name" class="form-control mb-3" />
 
-      <div class="input-group mb-3">
-        <select v-model="form.phone_code" class="form-select" style="max-width: 120px" :disabled="isLoadingCountries">
-            <option v-if="isLoadingCountries" value="">...</option>
-            <option v-for="country in countries" :key="country.cca2 + '-phone'" :value="country.idd.root + (country.idd.suffixes?.[0] || '')">
-                {{ country.idd.root }}{{ country.idd.suffixes?.[0] || '' }}
-            </option>
-        </select>
-        <input v-model="form.mobile" type="tel" placeholder="Mobile Number" class="form-control" required />
-      </div>
-
       <select v-model="form.country" class="form-select mb-3" :disabled="isLoadingCountries" required>
         <option disabled value="">
             {{ isLoadingCountries ? 'Loading countries...' : 'Select Country' }}
@@ -140,6 +130,16 @@ async function submitAddress() {
       
       <input v-model="form.postcode" type="text" placeholder="Postal Code" class="form-control mb-3" required />
       <textarea v-model="form.address" placeholder="Street Address, Building, House No." class="form-control mb-3" rows="3" required></textarea>
+
+      <div class="input-group mb-3">
+        <select v-model="form.phone_code" class="form-select" style="max-width: 120px" :disabled="isLoadingCountries">
+            <option v-if="isLoadingCountries" value="">...</option>
+            <option v-for="country in countries" :key="country.cca2 + '-phone'" :value="country.idd.root + (country.idd.suffixes?.[0] || '')">
+                {{ country.idd.root }}{{ country.idd.suffixes?.[0] || '' }}
+            </option>
+        </select>
+        <input v-model="form.mobile" type="tel" placeholder="Mobile Number" class="form-control" required />
+      </div>
 
       <div class="form-check mb-3">
         <input v-model="form.isDefault" class="form-check-input" type="checkbox" id="defaultCheck" />
