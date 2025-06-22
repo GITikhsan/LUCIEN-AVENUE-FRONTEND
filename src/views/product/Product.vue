@@ -120,6 +120,7 @@ const fetchProduct = async (productId) => {
       description: apiData.deskripsi,
       // Memetakan data ke object 'details' yang nested
       details: {
+        brand: apiData.brand,
         sku: apiData.sku,
         material: apiData.material,
         release: apiData.tanggal_rilis,
@@ -274,25 +275,29 @@ const quantity = ref(1);
     <div class="mt-5 border-top pt-4">
       <h3 class="h5 fw-bold">Description</h3>
       <p class="text-muted">{{ product.description }}</p>
-      <div class="row bg-light rounded p-4 mt-4">
-        <div class="col-md-6">
-          <p class="small text-muted mb-1">SKU</p>
-          <p class="fw-bold">{{ product.details.sku }}</p>
-          <p class="small text-muted mt-3 mb-1">Material</p>
-          <p class="text-muted">{{ product.details.material }}</p>
-          <p class="small text-muted mt-3 mb-1">Release Date</p>
-          <p class="text-muted">{{ product.details.release }}</p>
-          <!---  !//////////////////////////////////////////////////////////////-->
-          <p class="small text-muted mt-3 mb-1">Gender</p>
-          <p class="text-muted">{{ product.details.gender }}</p>
-             <!---  !//////////////////////////////////////////////////////////////-->
+      <div class="row bg-light rounded p-3 g-3 md-4 mt-4">
+        <div class="col-6 col-md-3 mb-3">
+          <p class="fw-bold mt-3 mb-1">Brand</p>
+          <p class="text-muted">{{ product.details.brand }}</p>
+          <p class="fw-bold mt-3 mb-1">SKU</p>
+          <p class="text-muted">{{ product.details.sku }}</p>
         </div>
-        <div class="col-md-6">
-          <p class="small text-muted mb-1">Color</p>
-          <p class="fw-bold">{{ product.details.color }}</p>
-          <p class="small text-muted mt-3 mb-1">Dimension</p>
+        <div class="col-6 col-md-3 mb-3">
+          <p class="fw-bold mt-3 mb-1">Material</p>
+          <p class="text-muted">{{ product.details.material }}</p>
+          <p class="fw-bold mt-3 mb-1">Release Date</p>
+          <p class="text-muted">{{ product.details.release }}</p>
+        </div>
+        <div class="col-6 col-md-3 mb-3">
+          <p class="fw-bold mt-3 mb-1">Gender</p>
+          <p class="text-muted">{{ product.details.gender }}</p>
+          <p class="fw-bold mb-1">Color</p>
+          <p class="text-muted">{{ product.details.color }}</p>
+        </div>
+        <div class="col-6 col-md-3 mb-3">
+          <p class="fw-bold mt-3 mb-1">Dimension</p>
           <p class="text-muted">{{ product.details.dimension }}</p>
-          <p class="small text-muted mt-3 mb-1">Retail (approx.)</p>
+          <p class="fw-bold mt-3 mb-1">Retail (approx.)</p>
           <p class="text-muted">{{ product.details.retail }}</p>
         </div>
       </div>
