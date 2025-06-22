@@ -166,15 +166,19 @@ const applyPromoCode = async () => {
       },
       onPending: (result) => {
         console.log('Menunggu pembayaran:', result);
-        router.push('/order-pending');
+        router.push('/myPurchases');
       },
       onError: (result) => {
         console.error('Pembayaran gagal:', result);
         alert("Pembayaran gagal. Silakan coba lagi.");
       },
       onClose: () => {
-        console.log('Popup Midtrans ditutup tanpa menyelesaikan pembayaran.');
-      }
+  console.log('Popup Midtrans ditutup oleh pengguna.');
+  alert('Anda menutup jendela pembayaran. Pesanan Anda telah dibuat dan menunggu pembayaran. Anda bisa melihat detailnya di halaman riwayat pesanan.');
+  // Jika Anda ingin mengarahkannya ke halaman tertentu setelah alert ditutup,
+  // Anda bisa tambahkan router.push di sini, misalnya kembali ke keranjang.
+  // router.push('/cart'); 
+}
     });
 
   } catch (err) {
