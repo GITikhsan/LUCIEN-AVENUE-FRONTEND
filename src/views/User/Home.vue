@@ -21,8 +21,8 @@ onMounted(async () => {
     // ✅ Pilih produk berdasarkan ID
     // Contoh: Ambil 4 produk pertama sebagai featuredProducts
     featuredProducts.value = products.value.slice(0, 8)
-    featuredMen.value = products.value.filter(p => p.gender === 'Pria').slice(0, 8)
-    featuredWomen.value = products.value.filter(p => p.gender === 'Wanita').slice(0, 8)
+    featuredMen.value = products.value.filter(p => p.gender === 'Male').slice(0, 8)
+    featuredWomen.value = products.value.filter(p => p.gender === 'Female').slice(0, 8)
 
   } catch (error) {
     console.error('❌ Gagal mengambil produk:', error)
