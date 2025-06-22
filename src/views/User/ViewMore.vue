@@ -65,8 +65,8 @@ const selectedBrands = ref([]);
 const sortOption = ref("");
 
 const sizes = [
-  22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-  41, 42, 43, 44, 45,
+  22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,
+  41,42,43,44,45,
 ];
 
 const priceRanges = [
@@ -75,6 +75,7 @@ const priceRanges = [
   { value: "3000000-5000000", label: "IDR 3.000.000 – 5.000.000" },
   { value: "5000000-10000000", label: "IDR 5.000.000 – 10.000.000" },
   { value: "10000000+", label: "Above IDR 10.000.000" },
+  { value: "", label: "Reset Price Range" },
 ];
 const colors = [
   "black", "white", "red", "green", "blue", "yellow",
@@ -127,8 +128,10 @@ const combinedProducts = computed(() => {
     )
   ]
 })
-
-
+const resetPriceRange = () => {
+  priceRange.value = "";
+  selectedLabel.value = "";
+};
 const selectedLabel = ref("");
 const selectPriceRange = (range) => {
   priceRange.value = range.value;
@@ -155,11 +158,6 @@ products.value = response.data.data.data
   }
 })
 
-
-const sortLabel = computed(() => {
-  return sortOption.value || 'Sort by'
-})
-
 function fetchProducts() {
   axios.get('http://localhost:8000/api/products/filter', {
     params: sortOption.value ? { sort: sortOption.value } : {}
@@ -174,6 +172,10 @@ onMounted(fetchProducts)
 
 watch(sortOption, fetchProducts)
 watch(size, fetchProducts)
+watch(priceRange, fetchProducts)
+
+
+
 
 
 </script>
@@ -286,7 +288,7 @@ watch(size, fetchProducts)
             </li>
           </ul>
         </div>
-
+        
         <h6 class="fw-semibold mb-3">Color</h6>
         <div class="row g-3 mb-4">
           <div
