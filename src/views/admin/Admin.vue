@@ -318,11 +318,11 @@ onMounted(() => {
   fetchDashboardSummary();
   });
 
-watch(activePanel, async (newPanel) => {
-  if (newPanel === 'Home') {
-    await fetchDashboardSummary(); // ambil data ringkasan dashboard
-    await nextTick(); // pastikan DOM <canvas> sudah dirender
-    renderStockChart();    // baru render chart
+watch(() => activePanel.value, (newVal) => {
+  if (newVal === 'Home') {
+    nextTick(() => {
+      fetchDashboardSummary(); // refresh data & grafik
+    });
   }
 });
 
@@ -341,7 +341,6 @@ watch(activePanel, async (newPanel) => {
           <a href="#" @click.prevent="activePanel = 'Product'" class="nav-link" :class="{'active text-success fw-bold': activePanel === 'Product', 'text-dark': activePanel !== 'Product'}">Product</a>
           <a href="#" @click.prevent="activePanel = 'Orders'" class="nav-link" :class="{'active text-success fw-bold': activePanel === 'Orders', 'text-dark': activePanel !== 'Orders'}">Orders</a>
           <a href="#" @click.prevent="activePanel = 'promo'" class="nav-link" :class="{'active text-success fw-bold': activePanel === 'promo', 'text-dark': activePanel !== 'promo'}">Promo</a>
-          <a href="#" @click.prevent="activePanel = 'diskon'" class="nav-link" :class="{'active text-success fw-bold': activePanel === 'diskon', 'text-dark': activePanel !== 'diskon'}">Discount</a>
         </nav>
       </aside>
 
@@ -385,7 +384,7 @@ watch(activePanel, async (newPanel) => {
               <h5 class="fw-semibold mb-2">Product Stock Analysis</h5>
               <p class="text-muted small">Real-time stock data by brand</p>
               <div class="bg-light rounded mt-3 p-5 text-center text-muted">
-                <canvas id="stockChart"></canvas>
+                <canvas id="stockChart" style="width: 100%; height: 400px;"></canvas>
               </div>
             </div>
           </div>
@@ -599,7 +598,6 @@ watch(activePanel, async (newPanel) => {
 </div>
       
         </div>
-        <div v-if="activePanel === 'diskon'">... Konten form Diskon di sini ...</div>
       </main>
     </div>
   </div>
