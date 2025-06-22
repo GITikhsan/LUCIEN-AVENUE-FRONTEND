@@ -86,35 +86,42 @@ const brands = [
 ];
 const products = ref([])
 ////////////////////////////////////////
+////////////////////////////////////////
 const filteredProducts = computed(() => {
-  return products.value.filter(product => {
-    const matchGender = gender.value === "" || product.gender === gender.value;
-    const matchSize = size.value.length === 0 || size.value.map(Number).includes(Number(product.ukuran));
-  
+ return products.value.filter(product => {
+ const matchGender = gender.value === "" || product.gender === gender.value;
     
-    const matchPrice = (() => {
-      if (!priceRange.value) return true;
-      const [min, max] = priceRange.value.includes("+")
-        ? [parseInt(priceRange.value), Infinity]
-        : priceRange.value.split("-").map(Number);
-      return product.harga_retail >= min && product.harga_retail <= max;
+    // --- INI BAGIAN YANG SUDAH DIPERBAIKI ---
+ const matchSize = size.value.length === 0 || (() => {
+      if (!product.ukuran) return false; // Jaga-jaga jika produk tidak punya ukuran
+      const productSizesAsArray = product.ukuran.split(',').map(s => parseInt(s.trim()));
+      return size.value.some(filterSize => productSizesAsArray.includes(filterSize));
+    })();
+    // ------------------------------------
+
+ const matchPrice = (() => {
+    if (!priceRange.value) return true;
+    const [min, max] = priceRange.value.includes("+")
+    ? [parseInt(priceRange.value), Infinity]
+    : priceRange.value.split("-").map(Number);
+    return product.harga_retail >= min && product.harga_retail <= max;
     })();
 
     const matchColor =
-      selectedColors.value.length === 0 ||
-      selectedColors.value.includes(product.warna);
+    selectedColors.value.length === 0 ||
+    selectedColors.value.includes(product.warna);
 
     const matchBrand =
-      selectedBrands.value.length === 0 ||
-      selectedBrands.value.includes(product.brand);
+    selectedBrands.value.length === 0 ||
+    selectedBrands.value.includes(product.brand);
 
     return (
-      matchGender &&
-      matchSize &&
-      matchPrice &&
-      matchColor &&
-      matchBrand
-    );
+    matchGender &&
+    matchSize &&
+    matchPrice &&
+    matchColor &&
+    matchBrand
+   );
   });
 });
 
