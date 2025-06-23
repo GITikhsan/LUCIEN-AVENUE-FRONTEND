@@ -78,14 +78,18 @@ const formatDate = (dateString) => {
 
 onMounted(async () => {
   try {
-    const response = await axios.get('/orders')
-    orders.value = response.data
+    const response = await axios.get('/orders');
+    
+    // TAMBAHKAN INI UNTUK MELIHAT DATA DI CONSOLE BROWSER
+    console.log('Data pesanan yang diterima:', response.data); 
+    
+    orders.value = response.data;
   } catch (err) {
-    error.value = 'Gagal memuat riwayat pembelian.'
+    error.value = 'Gagal memuat riwayat pembelian.';
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-})
+});
 </script>
 
 
@@ -156,24 +160,43 @@ onMounted(async () => {
           </div>
         </div>
 
-        <div class="card-footer d-flex justify-content-between align-items-center">
-  <strong>Total: Rp {{ formatCurrency(order.jumlah_total) }}</strong>
+        <div class="card-footer">
+  <div class="row align-items-center">
+    <div class="col-md-6 mb-2 mb-md-0">
+      <button
+        v-if="order.status_pesanan === 'pending'"
+        @click="handleCancelOrder(order)"
+        class="btn btn-sm btn-outline-danger me-2"
+      >
+        Batalkan Pesanan
+      </button>
+      <button
+        v-if="order.status_pesanan === 'dibatalkan' || order.status_pesanan === 'dibayar'"
+        @click="handleDeleteHistory(order.pesanan_id)"
+        class="btn btn-sm btn-outline-secondary"
+      >
+        Hapus
+      </button>
+    </div>
 
-          <div> <button
-      v-if="order.status_pesanan === 'pending'"
-      @click="handleCancelOrder(order)"
-      class="btn btn-sm btn-outline-danger me-2"> Batalkan Pesanan
-    </button>
-          
-          <button
-      v-if="order.status_pesanan === 'dibatalkan' || order.status_pesanan === 'dibayar'"
-      @click="handleDeleteHistory(order.pesanan_id)"
-      class="btn btn-sm btn-outline-secondary">
-      Hapus
-    </button>
-          
-        </div>
-      </div> 
+    <div class="col-md-6 text-md-end">
+        <div v-if="order.discount && order.discount > 0">
+      <div class="price-row">         <span>Subtotal:</span>
+        <span>Rp {{ formatCurrency(order.subtotal) }}</span>
+      </div>
+      <div class="price-row text-success">         <span>Diskon:</span>
+                <span>- Rp {{ formatCurrency(order.discount) }}</span>
+      </div>
+      <hr class="my-1" />
+    </div>
+    
+    <div class="d-flex justify-content-between justify-content-md-end">
+      <strong class="me-3 fs-5">Total:</strong>
+      <strong class="fs-5">Rp {{ formatCurrency(order.jumlah_total) }}</strong>
+    </div>
+</div>
+  </div>
+</div>
     </div>
   </div>
   </div>

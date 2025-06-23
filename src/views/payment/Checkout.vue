@@ -21,7 +21,7 @@ if (token) {
 // =================================================================
 const order = ref(null);
 const address = ref(null);
-const isLoading = ref(true);
+
 const error = ref(null);
 const router = useRouter();
 const promoCode = ref("");
@@ -141,7 +141,11 @@ const startPayment = async () => {
     }
 
     // 1. Buat order dari cart
-    const orderResponse = await axios.post("/order/create-from-cart");
+    const orderResponse = await axios.post('/order/create-from-cart', {
+  // Kirim data diskon dan total akhir ke backend
+  discount: order.value.discount || 0,
+  final_total: order.value.total,
+});
     const pesananId = orderResponse.data.pesanan_id;
 
     // 2. Simpan pesanan_id ke order state
