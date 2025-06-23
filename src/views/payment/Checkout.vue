@@ -309,7 +309,7 @@ onMounted(async () => {
                 <span v-if="address.isDefault" class="badge bg-dark border mt-2">Default shipping address</span>
               </div>
               <div>
-                <router-link to="/edit-address" class="text-decoration-underline small">Edit</router-link>
+                <router-link to="/EditAddress" class="text-decoration-underline small">Edit</router-link>
               </div>
             </div>
             <div v-else class="p-3">

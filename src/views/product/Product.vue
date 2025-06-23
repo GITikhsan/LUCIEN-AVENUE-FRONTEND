@@ -6,51 +6,72 @@ import api from '@/api/axios'; // Pastikan path ini benar
 const showLoginModal = ref(false);
 const loginMessage = ref('Silakan login terlebih dahulu untuk melanjutkan.');
 
+async function performAddToCartRequest() {
+  try {
+    const payload = {
+      produk_id: route.params.id,
+      kuantitas: quantity.value,
+    };
+    await api.post('/carts', payload);
+    return true; // Sukses
+  } catch (error) {
+    console.error("Gagal menambahkan ke keranjang:", error.response);
+    alert("Gagal menambahkan produk. Coba lagi nanti.");
+    return false; // Gagal
+  }
+}
+
+
 function redirectToLogin() {
   showLoginModal.value = false;
   router.push('/login');
 }
-
+const isBuyingNow = ref(false);
 const isAddingToCart = ref(false);
 const router = useRouter();
-async function addToCart() {
-  // Validasi: Pastikan ukuran sudah dipilih
+
+async function handleAddToCart() {
+  // Validasi umum (ukuran & login)
   if (!selectedSize.value) {
     alert('Silakan pilih ukuran terlebih dahulu!');
     return;
   }
+  const token = localStorage.getItem('auth_token');
+  if (!token) {
+    showLoginModal.value = true;
+    return;
+  }
 
   isAddingToCart.value = true;
-  
-  const token = localStorage.getItem('auth_token');
-if (!token) {
-  showLoginModal.value = true; // Tampilkan popup login
-  isAddingToCart.value = false;
-  return;
-}
-  
-  try {
-    // Siapkan data yang akan dikirim ke backend
-    const payload = {
-      produk_id: route.params.id, // Ambil ID produk dari URL
-      kuantitas: quantity.value,  // Ambil kuantitas dari state
-    };
-
-    // Kirim request POST ke endpoint keranjang Anda
-    const response = await api.post('/carts', payload);
-
-    // Beri notifikasi sukses
-    router.push('/bag');
-
-  } catch (error) {
-    // Tangani jika terjadi error
-    console.error("Gagal menambahkan ke keranjang:", error.response);
-    alert("Gagal menambahkan produk. Coba lagi nanti.");
-  } finally {
-    // Matikan status loading
-    isAddingToCart.value = false;
+  const success = await performAddToCartRequest(); // Memanggil fungsi inti
+  if (success) {
+    router.push('/bag'); // Redirect ke halaman keranjang
   }
+  isAddingToCart.value = false;
 }
+
+
+async function handleBuyNow() {
+  // Validasi umum (ukuran & login)
+  if (!selectedSize.value) {
+    alert('Silakan pilih ukuran terlebih dahulu!');
+    return;
+  }
+  const token = localStorage.getItem('auth_token');
+  if (!token) {
+    showLoginModal.value = true;
+    return;
+  }
+
+  isBuyingNow.value = true;
+  const success = await performAddToCartRequest(); // Memanggil fungsi inti yang sama
+  if (success) {
+    // Perbedaan utama: redirect ke halaman checkout
+    router.push('/checkout'); 
+  }
+  isBuyingNow.value = false;
+}
+
 
 // --- STATE MANAGEMENT ---
 
@@ -228,17 +249,25 @@ const quantity = ref(1);
           </div>
         </div>
 
-        <div class="d-flex flex-column flex-sm-row gap-3 mb-4">
-  <button 
-    @click="addToCart" 
-    class="btn btn-dark w-100 py-2 rounded-pill" 
-    :disabled="isAddingToCart || !selectedSize"
-  >
-    <span v-if="isAddingToCart" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-    <span v-else>Add to Cart</span>
-  </button>
-  <button class="btn btn-warning w-100 py-2 rounded-pill text-dark fw-semibold">Buy Now</button>
-</div>
+        <button
+  @click="handleAddToCart"
+  class="btn btn-dark w-100 py-2 rounded-pill"
+  :disabled="isAddingToCart || isBuyingNow || !selectedSize"
+>
+  <span v-if="isAddingToCart" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+  <span v-else>Add to Cart</span>
+</button>
+
+<button
+  @click="handleBuyNow"
+  class="btn btn-warning w-100 py-2 rounded-pill text-dark fw-semibold mt-2"
+  :disabled="isAddingToCart || isBuyingNow || !selectedSize"
+>
+  <span v-if="isBuyingNow" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+  <span v-else>Buy Now</span>
+</button>
+
+
 <p v-if="!selectedSize" class="text-danger small mt-2">
   Please select a size first.
   </p>
