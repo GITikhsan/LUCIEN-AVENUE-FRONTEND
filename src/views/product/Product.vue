@@ -1,10 +1,10 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute,useRouter } from 'vue-router';
-import api from '@/api/axios'; // Pastikan path ini benar
+import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import api from "@/api/axios"; // Pastikan path ini benar
 
 const showLoginModal = ref(false);
-const loginMessage = ref('Silakan login terlebih dahulu untuk melanjutkan.');
+const loginMessage = ref("Silakan login terlebih dahulu untuk melanjutkan.");
 
 async function performAddToCartRequest() {
   try {
@@ -12,7 +12,7 @@ async function performAddToCartRequest() {
       produk_id: route.params.id,
       kuantitas: quantity.value,
     };
-    await api.post('/carts', payload);
+    await api.post("/carts", payload);
     return true; // Sukses
   } catch (error) {
     console.error("Gagal menambahkan ke keranjang:", error.response);
@@ -21,10 +21,9 @@ async function performAddToCartRequest() {
   }
 }
 
-
 function redirectToLogin() {
   showLoginModal.value = false;
-  router.push('/login');
+  router.push("/login");
 }
 const isBuyingNow = ref(false);
 const isAddingToCart = ref(false);
@@ -33,10 +32,10 @@ const router = useRouter();
 async function handleAddToCart() {
   // Validasi umum (ukuran & login)
   if (!selectedSize.value) {
-    alert('Silakan pilih ukuran terlebih dahulu!');
+    alert("Silakan pilih ukuran terlebih dahulu!");
     return;
   }
-  const token = localStorage.getItem('auth_token');
+  const token = localStorage.getItem("auth_token");
   if (!token) {
     showLoginModal.value = true;
     return;
@@ -45,19 +44,18 @@ async function handleAddToCart() {
   isAddingToCart.value = true;
   const success = await performAddToCartRequest(); // Memanggil fungsi inti
   if (success) {
-    router.push('/bag'); // Redirect ke halaman keranjang
+    router.push("/bag"); // Redirect ke halaman keranjang
   }
   isAddingToCart.value = false;
 }
 
-
 async function handleBuyNow() {
   // Validasi umum (ukuran & login)
   if (!selectedSize.value) {
-    alert('Silakan pilih ukuran terlebih dahulu!');
+    alert("Silakan pilih ukuran terlebih dahulu!");
     return;
   }
-  const token = localStorage.getItem('auth_token');
+  const token = localStorage.getItem("auth_token");
   if (!token) {
     showLoginModal.value = true;
     return;
@@ -67,35 +65,34 @@ async function handleBuyNow() {
   const success = await performAddToCartRequest(); // Memanggil fungsi inti yang sama
   if (success) {
     // Perbedaan utama: redirect ke halaman checkout
-    router.push('/checkout'); 
+    router.push("/checkout");
   }
   isBuyingNow.value = false;
 }
 
-
 // --- STATE MANAGEMENT ---
 
 // PENTING: Sesuaikan dengan URL backend Laravel-mu agar gambar muncul
-const backendUrl = 'http://127.0.0.1:8000'; 
+const backendUrl = "http://127.0.0.1:8000";
 
 // Siapkan "kerangka" data produk kosong agar template tidak error saat awal loading.
 const product = ref({
-  name: '',
-  price: '0',
+  name: "",
+  price: "0",
   originalPrice: null,
   discount: 0,
   sizes: [],
-  description: '',
+  description: "",
   details: {
-    sku: '',
-    material: '',
-    release: '',
-    color: '',
-    dimension: '',
-    retail: '',
-    gender: ''
+    sku: "",
+    material: "",
+    release: "",
+    color: "",
+    dimension: "",
+    retail: "",
+    gender: "",
   },
-  images: []
+  images: [],
 });
 
 const isLoading = ref(true);
@@ -103,12 +100,47 @@ const error = ref(null);
 
 // Data similarProducts kita biarkan statis sesuai kodemu
 const similarProducts = ref([
-    { name: 'Air Jordan 1 Retro Low OG SP Travis Scott Canary (Women)', price: '3,700,000', image: '/images/3JT/3700.webp' },
-    { name: 'Air Jordan 1 Retro Low OG Swarovski Stealth (Women)', price: '21,510,000', image: '/images/21JT/21510.webp' },
-    { name: 'Nike Zoom Field Jaxx Travis Scott Leche Blue', price: '2,000,000', image: '/images/2JT/2000.webp' },
-    { name: 'Air Jordan 1 Low Fragment x Travis Scott', price: '15,000,000', image: '/images/15JT/15000.webp' },
+  {
+    name: "Air Jordan 1 Low Year of the Dragon (2024) (Women's)",
+    price: "2,260,000",
+    image: "/images/2JT/2260.webp",
+  },
+  {
+    name: "Air Jordan 1 Retro Low OG Swarovski Stealth (Women)",
+    price: "21,510,000",
+    image: "/images/21JT/21510.webp",
+  },
+  {
+    name: "Nike Zoom Field Jaxx Travis Scott Leche Blue",
+    price: "2,000,000",
+    image: "/images/2JT/2000.webp",
+  },
+  {
+    name: "Air Jordan 1 Low SB Midnight Navy",
+    price: "6,500,000",
+    image: "/images/6JT/6500.webp",
+  },
+  {
+    name: "Air Jordan 1 Low Sail Rattan (Women's)",
+    price: "1,890,000",
+    image: "/images/1JT/1890.webp",
+  },
+  {
+    name: "Air Jordan 1 Low Premium Pale Ivory Off Noir Baroque Brown",
+    price: "2,500,000",
+    image: "/images/2JT/2500.webp",
+  },
+  {
+    name: "Air Jordan 1 Retro High OG Rare Air Deep Royal Blue",
+    price: "1,600,000",
+    image: "/images/1JT/1600.webp",
+  },
+  {
+    name: "Air Jordan 1 Retro High OG Rare Air Cinnabar (Women's)",
+    price: "2,400,000",
+    image: "/images/2JT/2400.webp",
+  },
 ]);
-
 
 // --- ROUTER & API CALL ---
 
@@ -116,9 +148,9 @@ const route = useRoute();
 
 // Fungsi format Rupiah (tidak diubah dari kodemu)
 const formatCurrency = (value) => {
-  if (!value) return '0';
+  if (!value) return "0";
   const numberValue = Math.floor(parseFloat(value));
-  return new Intl.NumberFormat('id-ID').format(numberValue);
+  return new Intl.NumberFormat("id-ID").format(numberValue);
 };
 
 // Fungsi untuk mengambil dan MEMETAKAN data produk dari API
@@ -135,9 +167,13 @@ const fetchProduct = async (productId) => {
       name: apiData.nama_sepatu,
       price: formatCurrency(apiData.harga_retail),
       // Contoh jika ada harga diskon, sesuaikan dengan field di database-mu
-      originalPrice: apiData.harga_coret ? formatCurrency(apiData.harga_coret) : null, 
+      originalPrice: apiData.harga_coret
+        ? formatCurrency(apiData.harga_coret)
+        : null,
       discount: apiData.diskon_persen || 0,
-      sizes: apiData.ukuran ? apiData.ukuran.split(',').map(s => s.trim()) : [],
+      sizes: apiData.ukuran
+        ? apiData.ukuran.split(",").map((s) => s.trim())
+        : [],
       description: apiData.deskripsi,
       // Memetakan data ke object 'details' yang nested
       details: {
@@ -148,14 +184,14 @@ const fetchProduct = async (productId) => {
         color: apiData.warna,
         dimension: apiData.dimensi,
         gender: apiData.gender,
-        retail: formatCurrency(apiData.harga_retail)
+        retail: formatCurrency(apiData.harga_retail),
       },
       // Mengambil URL gambar dari relasi 'images' dan menggabungkannya dengan URL backend
-      images: apiData.images && apiData.images.length > 0 
-        ? apiData.images.map(img => backendUrl + img.image_path) 
-        : [] // Jika tidak ada gambar, berikan array kosong
+      images:
+        apiData.images && apiData.images.length > 0
+          ? apiData.images.map((img) => backendUrl + img.image_path)
+          : [], // Jika tidak ada gambar, berikan array kosong
     };
-
   } catch (err) {
     console.error("Gagal mengambil detail produk:", err);
     error.value = "Produk tidak ditemukan atau terjadi kesalahan pada server.";
@@ -182,7 +218,11 @@ const quantity = ref(1);
 </script>
 
 <template>
-  <div v-if="isLoading" class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div
+    v-if="isLoading"
+    class="d-flex justify-content-center align-items-center"
+    style="min-height: 80vh"
+  >
     <div class="spinner-border text-dark" role="status">
       <span class="visually-hidden">Loading...</span>
     </div>
@@ -195,8 +235,15 @@ const quantity = ref(1);
   <div v-else-if="product" class="container py-5">
     <div class="row g-5">
       <div class="col-md-6">
-        <div class="position-relative mt-4" style="max-width: 420px; margin: 0 auto;">
-          <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div
+          class="position-relative mt-4"
+          style="max-width: 420px; margin: 0 auto"
+        >
+          <div
+            id="productCarousel"
+            class="carousel slide"
+            data-bs-ride="carousel"
+          >
             <div class="carousel-inner">
               <div
                 v-for="(image, index) in product.images"
@@ -204,14 +251,28 @@ const quantity = ref(1);
                 class="carousel-item"
                 :class="{ active: index === 0 }"
               >
-                <img :src="image" class="d-block w-100 img-fluid product-image" :alt="product.name + ' image ' + (index + 1)" />
+                <img
+                  :src="image"
+                  class="d-block w-100 img-fluid product-image"
+                  :alt="product.name + ' image ' + (index + 1)"
+                />
               </div>
             </div>
 
-            <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+            <button
+              class="carousel-control-prev"
+              type="button"
+              data-bs-target="#productCarousel"
+              data-bs-slide="prev"
+            >
               <span>&#10094;</span>
             </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+            <button
+              class="carousel-control-next"
+              type="button"
+              data-bs-target="#productCarousel"
+              data-bs-slide="next"
+            >
               <span>&#10095;</span>
             </button>
           </div>
@@ -222,12 +283,25 @@ const quantity = ref(1);
         <h2 class="h4 fw-bold mb-3">{{ product.name }}</h2>
 
         <div class="mb-4">
-          <p class="text-uppercase text-muted small mb-1" style="letter-spacing: 0.05em;">Price</p>
+          <p
+            class="text-uppercase text-muted small mb-1"
+            style="letter-spacing: 0.05em"
+          >
+            Price
+          </p>
           <div class="d-flex align-items-center gap-2">
             <p class="h4 fw-semibold text-dark mb-0">IDR {{ product.price }}</p>
-            <span v-if="product.discount" class="badge rounded-pill bg-danger small py-1 px-2">-{{ product.discount }}%</span>
+            <span
+              v-if="product.discount"
+              class="badge rounded-pill bg-danger small py-1 px-2"
+              >-{{ product.discount }}%</span
+            >
           </div>
-          <p v-if="product.originalPrice" class="text-muted text-decoration-line-through mt-1 mb-0" style="font-size: 0.9rem;">
+          <p
+            v-if="product.originalPrice"
+            class="text-muted text-decoration-line-through mt-1 mb-0"
+            style="font-size: 0.9rem"
+          >
             IDR {{ product.originalPrice }}
           </p>
         </div>
@@ -240,7 +314,7 @@ const quantity = ref(1);
               :key="size"
               :class="[
                 'btn size-button',
-                selectedSize === size ? 'active-size' : 'inactive-size'
+                selectedSize === size ? 'active-size' : 'inactive-size',
               ]"
               @click="selectedSize = size"
             >
@@ -249,54 +323,88 @@ const quantity = ref(1);
           </div>
         </div>
 
-        <button
-  @click="handleAddToCart"
-  class="btn btn-dark w-100 py-2 rounded-pill"
-  :disabled="isAddingToCart || isBuyingNow || !selectedSize"
->
-  <span v-if="isAddingToCart" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-  <span v-else>Add to Cart</span>
-</button>
+        <div class="d-flex justify-content-between mt-3" style="gap: 1rem">
+          <!-- Add to Cart Button -->
+          <button
+            @click="handleAddToCart"
+            class="btn w-50 rounded-pill py-2 custom-add-to-cart"
+            :disabled="isAddingToCart"
+          >
+            <span
+              v-if="isAddingToCart"
+              class="spinner-border spinner-border-sm me-2"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            Add to Cart
+          </button>
 
-<button
-  @click="handleBuyNow"
-  class="btn btn-warning w-100 py-2 rounded-pill text-dark fw-semibold mt-2"
-  :disabled="isAddingToCart || isBuyingNow || !selectedSize"
->
-  <span v-if="isBuyingNow" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-  <span v-else>Buy Now</span>
-</button>
+          <!-- Buy Now Button -->
+          <button
+            @click="handleBuyNow"
+            class="btn w-50 rounded-pill py-2 custom-buy-now"
+            :disabled="isAddingToCart"
+          >
+            <span
+              v-if="isAddingToCart"
+              class="spinner-border spinner-border-sm me-2"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            Buy Now
+          </button>
+        </div>
 
-
-<p v-if="!selectedSize" class="text-danger small mt-2">
-  Please select a size first.
-  </p>
+        <p v-if="!selectedSize" class="text-danger small mt-2">
+          Please select a size first.
+        </p>
 
         <div class="accordion" id="accordionInfo">
-            <div class="accordion-item border-0 border-bottom">
-              <h2 class="accordion-header">
-                <button class="accordion-button collapsed custom-accordion-btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
-                  Please Make Sure The Size Fits You.
-                </button>
-              </h2>
-              <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionInfo">
-                <div class="accordion-body small text-muted">
-                  If you are unsure about your size, please click the size chart button and browse through the chart. Our company policy does not accept refunds or returns for sizing-related issues.
-                </div>
+          <div class="accordion-item border-0 border-bottom">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button collapsed custom-accordion-btn"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseOne"
+              >
+                Please Make Sure The Size Fits You.
+              </button>
+            </h2>
+            <div
+              id="collapseOne"
+              class="accordion-collapse collapse"
+              data-bs-parent="#accordionInfo"
+            >
+              <div class="accordion-body small text-muted">
+                If you are unsure about your size, please click the size chart
+                button and browse through the chart. Our company policy does not
+                accept refunds or returns for sizing-related issues.
               </div>
             </div>
-            <div class="accordion-item border-0 border-bottom">
-              <h2 class="accordion-header">
-                <button class="accordion-button collapsed custom-accordion-btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
-                  Authentic. Guaranteed.
-                </button>
-              </h2>
-              <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionInfo">
-                <div class="accordion-body small text-muted">
-                  All products sold are 100% authentic and verified by our team of experts. We guarantee original items only.
-                </div>
+          </div>
+          <div class="accordion-item border-0 border-bottom">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button collapsed custom-accordion-btn"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseTwo"
+              >
+                Authentic. Guaranteed.
+              </button>
+            </h2>
+            <div
+              id="collapseTwo"
+              class="accordion-collapse collapse"
+              data-bs-parent="#accordionInfo"
+            >
+              <div class="accordion-body small text-muted">
+                All products sold are 100% authentic and verified by our team of
+                experts. We guarantee original items only.
               </div>
             </div>
+          </div>
         </div>
       </div>
     </div>
@@ -304,30 +412,37 @@ const quantity = ref(1);
     <div class="mt-5 border-top pt-4">
       <h3 class="h5 fw-bold">Description</h3>
       <p class="text-muted">{{ product.description }}</p>
-      <div class="row bg-light rounded p-3 g-3 md-4 mt-4">
+      <div class="row bg-white rounded shadow-sm p-4 g-4 mt-4 border">
         <div class="col-6 col-md-3 mb-3">
-          <p class="fw-bold mt-3 mb-1">Brand</p>
-          <p class="text-muted">{{ product.details.brand }}</p>
-          <p class="fw-bold mt-3 mb-1">SKU</p>
-          <p class="text-muted">{{ product.details.sku }}</p>
+          <p class="text-secondary fw-semibold mb-1">Brand</p>
+          <p class="text-dark mb-3">{{ product.details.brand }}</p>
+
+          <p class="text-secondary fw-semibold mb-1">SKU</p>
+          <p class="text-dark">{{ product.details.sku }}</p>
         </div>
+
         <div class="col-6 col-md-3 mb-3">
-          <p class="fw-bold mt-3 mb-1">Material</p>
-          <p class="text-muted">{{ product.details.material }}</p>
-          <p class="fw-bold mt-3 mb-1">Release Date</p>
-          <p class="text-muted">{{ product.details.release }}</p>
+          <p class="text-secondary fw-semibold mb-1">Material</p>
+          <p class="text-dark mb-3">{{ product.details.material }}</p>
+
+          <p class="text-secondary fw-semibold mb-1">Release Date</p>
+          <p class="text-dark">{{ product.details.release }}</p>
         </div>
+
         <div class="col-6 col-md-3 mb-3">
-          <p class="fw-bold mt-3 mb-1">Gender</p>
-          <p class="text-muted">{{ product.details.gender }}</p>
-          <p class="fw-bold mb-1">Color</p>
-          <p class="text-muted">{{ product.details.color }}</p>
+          <p class="text-secondary fw-semibold mb-1">Gender</p>
+          <p class="text-dark mb-3">{{ product.details.gender }}</p>
+
+          <p class="text-secondary fw-semibold mb-1">Color</p>
+          <p class="text-dark">{{ product.details.color }}</p>
         </div>
+
         <div class="col-6 col-md-3 mb-3">
-          <p class="fw-bold mt-3 mb-1">Dimension</p>
-          <p class="text-muted">{{ product.details.dimension }}</p>
-          <p class="fw-bold mt-3 mb-1">Retail (approx.)</p>
-          <p class="text-muted">{{ product.details.retail }}</p>
+          <p class="text-secondary fw-semibold mb-1">Dimension</p>
+          <p class="text-dark mb-3">{{ product.details.dimension }}</p>
+
+          <p class="text-secondary fw-semibold mb-1">Retail (approx.)</p>
+          <p class="text-dark">{{ product.details.retail }}</p>
         </div>
       </div>
     </div>
@@ -335,10 +450,20 @@ const quantity = ref(1);
     <div class="container mt-5">
       <h3 class="text-center fw-bold mb-4">Similar Products</h3>
       <div class="row row-cols-2 row-cols-md-4 g-4">
-        <div class="col" v-for="(item, idx) in similarProducts.slice(0, 8)" :key="idx">
-          <div class="product-card-similar text-start p-3 d-flex flex-column h-100">
+        <div
+          class="col"
+          v-for="(item, idx) in similarProducts.slice(0, 8)"
+          :key="idx"
+        >
+          <div
+            class="product-card-similar text-start p-3 d-flex flex-column h-100"
+          >
             <div class="image-wrapper-similar mb-3">
-              <img :src="item.image" alt="Product Image" class="product-image-similar" />
+              <img
+                :src="item.image"
+                alt="Product Image"
+                class="product-image-similar"
+              />
             </div>
             <div class="product-text-wrapper mt-auto">
               <p class="product-name">{{ item.name }}</p>
@@ -348,31 +473,37 @@ const quantity = ref(1);
         </div>
       </div>
       <div class="text-center mt-5 mb-5">
-        <router-link to="/ViewMore" class="btn btn-dark rounded-pill px-5 py-2 shadow-sm">
+        <router-link
+          to="/ViewMore"
+          class="btn btn-dark rounded-pill px-5 py-2 shadow-sm"
+        >
           View More
         </router-link>
       </div>
     </div>
   </div>
-<div v-if="showLoginModal" class="modal-backdrop fade show"></div>
-<div v-if="showLoginModal" class="modal d-block" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content text-center">
-      <div class="modal-body py-4 px-3">
-        <p class="fs-6 mb-0">{{ loginMessage }}</p>
-      </div>
-      <div class="modal-footer justify-content-center border-0 pt-0 pb-4">
-        <button class="btn btn-secondary px-4" @click="showLoginModal = false">Batal</button>
-        <button class="btn btn-dark px-4" @click="redirectToLogin">Login</button>
+  <div v-if="showLoginModal" class="modal-backdrop fade show"></div>
+  <div v-if="showLoginModal" class="modal d-block" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center">
+        <div class="modal-body py-4 px-3">
+          <p class="fs-6 mb-0">{{ loginMessage }}</p>
+        </div>
+        <div class="modal-footer justify-content-center border-0 pt-0 pb-4">
+          <button
+            class="btn btn-secondary px-4"
+            @click="showLoginModal = false"
+          >
+            Batal
+          </button>
+          <button class="btn btn-dark px-4" @click="redirectToLogin">
+            Login
+          </button>
+        </div>
       </div>
     </div>
   </div>
-</div>
-
-
-  
 </template>
-
 
 <style scoped>
 /*
@@ -586,5 +717,43 @@ const quantity = ref(1);
 .product-price-similar {
   color: #28a745;
   font-weight: bold;
+}
+
+.custom-add-to-cart {
+  background-color: #3b4754; /* Slate */
+  color: white;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.custom-add-to-cart:hover {
+  background-color: #2f3844;
+  transform: scale(1.02);
+}
+
+.custom-add-to-cart:active {
+  background-color: #232c34;
+  transform: scale(0.97);
+}
+
+.custom-buy-now {
+  background-color: #7d5a50; /* Muted Mocha */
+  color: white;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.custom-buy-now:hover {
+  background-color: #6b4f46;
+  transform: scale(1.02);
+}
+
+.custom-buy-now:active {
+  background-color: #5a443c;
+  transform: scale(0.97);
 }
 </style>
