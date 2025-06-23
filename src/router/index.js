@@ -18,6 +18,7 @@ import Address from '@/components/UserSetting/Address.vue'
 import Help from '@/components/UserSetting/Help.vue'
 import AddAddress from '@/components/UserSetting/AddAddress.vue'
 import EditAddress from '@/components/UserSetting/EditAddress.vue'
+import SetAddress from '@/components/UserSetting/SetAddress.vue'
 
 // Halaman Payment Flow
 import Bag from '@/views/payment/Bag.vue'
@@ -79,6 +80,7 @@ const routes = [
       { path: '/help', name: 'Help', component: Help },
       { path: '/addAddress', name: 'Add Address', component: AddAddress },
       { path: '/editAddress', name: 'Edit Address', component: EditAddress },
+      { path: '/setAddress', name: 'Set Address', component: SetAddress },
       { path: '/userProfile', name: 'Profile', component: UserProfile }
           
       

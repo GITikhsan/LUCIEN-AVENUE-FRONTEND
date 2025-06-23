@@ -106,7 +106,7 @@ async function submitAddress() {
 
 <template>
   <div class="container py-5">
-    <h2 class="fw-bold mb-4 text-center">EDIT ADDRESS</h2>
+    <h2 class="fw-bold mb-4 text-center">SET ADDRESS</h2>
 
     <div v-if="errorMessage" class="alert alert-danger" style="white-space: pre-line;">{{ errorMessage }}</div>
 
@@ -143,7 +143,7 @@ async function submitAddress() {
 
       <button type="submit" class="btn btn-dark w-100" :disabled="isLoadingSubmit">
         <span v-if="isLoadingSubmit" class="spinner-border spinner-border-sm me-2"></span>
-        {{ isLoadingSubmit ? 'Saving...' : 'Update Address' }}
+        {{ isLoadingSubmit ? 'Saving...' : 'Set Address' }}
       </button>
     </form>
   </div>

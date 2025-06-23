@@ -361,7 +361,7 @@ onMounted(async () => {
               <p class="text-muted">No primary shipping address found.</p>
             </div>
             <router-link
-              to="/addaddress"
+              to="/SetAddress"
               class="btn btn-outline-dark mt-3 m-3 px-4 py-2 fw-bold"
               >Set Address</router-link
             >
