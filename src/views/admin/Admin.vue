@@ -159,6 +159,7 @@ const saveProduct = async () => {
   }
 };
 
+// === PROMO MANAGEMENT ===
 const props = defineProps({
   activePanel: String
 });
@@ -269,6 +270,7 @@ const isPromoActive = (promo) => {
   return promo.mulai_tanggal <= today && promo.selesai_tanggal >= today;
 };
 
+// Home
 const totalProducts = ref(0);
 const totalPromotions = ref(0);
 const stockPerBrand = ref({});
@@ -309,6 +311,43 @@ const renderStockChart = () => {
     }
   });
 };
+
+
+// === 4. ORDERS MANAGEMENT ===
+
+const orders = ref([]);
+
+const getOrders = async () => {
+  try {
+    const res = await axios.get('http://localhost:8000/api/orders');
+    const responseData = Array.isArray(res.data) ? res.data : res.data.data ?? [];
+
+    orders.value = responseData.map((order) => ({
+      order_id: order.id,
+      nama_pemesan: order.user?.name ?? '(Tidak diketahui)',
+      created_at: new Date(order.created_at).toLocaleString('id-ID'),
+
+      produk_id: order.products?.[0]?.id ?? '-',
+      nama_produk: order.products?.[0]?.name ?? '(Produk Tidak Ditemukan)',
+      harga_produk: order.products?.[0]?.pivot?.price ?? 0,
+      jumlah: order.products?.[0]?.pivot?.quantity ?? 0,
+      total_harga:
+        (order.products?.[0]?.pivot?.price ?? 0) *
+        (order.products?.[0]?.pivot?.quantity ?? 0),
+    }));
+  } catch (error) {
+    console.error('Gagal ambil order:', error);
+  }
+};
+
+const formatRupiah = (val) => {
+  if (!val) return '0';
+  return new Intl.NumberFormat('id-ID').format(Math.round(val));
+};
+
+watch(activePanel, (val) => {
+  if (val === 'Orders') getOrders();
+});
 
 
 // === 4. LIFECYCLE HOOK ===
@@ -531,50 +570,87 @@ const fetchCustomers = async () => {
           </div>
         </div>
                 
-        <div v-if="activePanel === 'Orders'">... Konten Orders di sini ...</div>
+        <div v-if="activePanel === 'Orders'">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="fw-semibold mb-3">Riwayat Pemesanan</h5>
+
+              <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-hover align-middle small">
+                  <thead>
+                    <tr>
+                      <th>Nama Akun</th>
+                      <th>Nama Produk (ID)</th>
+                      <th>Harga Produk</th>
+                      <th>Kuantitas</th>
+                      <th>Total Harga</th>
+                      <th>Tanggal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-if="orders.length === 0">
+                      <td colspan="6" class="text-center text-muted py-4">Tidak ada data order.</td>
+                    </tr>
+                    <tr v-for="order in orders" :key="order.order_id">
+                      <td class="fw-semibold">{{ order.nama_pemesan }}</td>
+                      <td>
+                        <div>{{ order.nama_produk }}</div>
+                        <small class="text-muted">ID: {{ order.produk_id }}</small>
+                      </td>
+                      <td>Rp {{ formatRupiah(order.harga_produk) }}</td>
+                      <td>{{ order.jumlah }}</td>
+                      <td class="fw-bold">Rp {{ formatRupiah(order.total_harga) }}</td>
+                      <td>{{ order.created_at }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
         <div v-if="activePanel === 'promo'">
-<div class="card mx-auto mb-5" style="max-width: 700px;">
-  <div class="card-body">
-    <h5 class="mb-4 fw-semibold">Promo Input</h5>
-    <form @submit.prevent="savePromo">
-      <div class="row">
-        <div class="col-md-6 form-floating mb-2">
-          <input v-model="newPromo.nama_promo" type="text" id="nama_promo" class="form-control" placeholder="x" required>
-          <label for="nama_promo" class="ms-2">Promo Name</label>
-        </div>
-        <div class="col-md-6 form-floating mb-2">
-          <input v-model="newPromo.kode" type="text" id="kode" class="form-control" placeholder="x" required>
-          <label for="kode" class="ms-2">Code</label>
-        </div>
-      </div>
+          <div class="card mx-auto mb-5" style="max-width: 700px;">
+            <div class="card-body">
+              <h5 class="mb-4 fw-semibold">Promo Input</h5>
+              <form @submit.prevent="savePromo">
+                <div class="row">
+                  <div class="col-md-6 form-floating mb-2">
+                    <input v-model="newPromo.nama_promo" type="text" id="nama_promo" class="form-control" placeholder="x" required>
+                    <label for="nama_promo" class="ms-2">Promo Name</label>
+                  </div>
+                  <div class="col-md-6 form-floating mb-2">
+                    <input v-model="newPromo.kode" type="text" id="kode" class="form-control" placeholder="x" required>
+                    <label for="kode" class="ms-2">Code</label>
+                  </div>
+                </div>
 
-      <div class="row">
-        <div class="col-md-6 form-floating mb-2">
-          <input v-model="newPromo.diskonP" type="number" id="diskonP" class="form-control" placeholder="x" min="1" max="100" required>
-          <label for="diskonP" class="ms-2">Discount (%)</label>
-        </div>
-        <div class="col-md-6 form-floating mb-2">
-          <input v-model="newPromo.mulai_tanggal" type="datetime-local" class="form-control" required>
-          <label for="mulai_tanggal" class="ms-2">Start Date</label>
-        </div>
-      </div>
+                <div class="row">
+                  <div class="col-md-6 form-floating mb-2">
+                    <input v-model="newPromo.diskonP" type="number" id="diskonP" class="form-control" placeholder="x" min="1" max="100" required>
+                    <label for="diskonP" class="ms-2">Discount (%)</label>
+                  </div>
+                  <div class="col-md-6 form-floating mb-2">
+                    <input v-model="newPromo.mulai_tanggal" type="datetime-local" class="form-control" required>
+                    <label for="mulai_tanggal" class="ms-2">Start Date</label>
+                  </div>
+                </div>
 
-      <div class="row">
-        <div class="col-md-6 form-floating mb-2">
-          <input v-model="newPromo.selesai_tanggal" type="datetime-local" class="form-control" required>
-          <label for="selesai_tanggal" class="ms-2">End Date</label>
-        </div>
-      </div>
+                <div class="row">
+                  <div class="col-md-6 form-floating mb-2">
+                    <input v-model="newPromo.selesai_tanggal" type="datetime-local" class="form-control" required>
+                    <label for="selesai_tanggal" class="ms-2">End Date</label>
+                  </div>
+                </div>
 
-      <div class="d-grid gap-2 mt-3">
-        <button type="submit" class="btn btn-success">Save Promo</button>
-      </div>
-      <p v-if="formMessage" class="mt-2 text-sm" :class="{ 'text-success': formSuccess, 'text-danger': !formSuccess }">
-        {{ formMessage }}
-      </p>
-    </form>
-  </div>
-</div>
+                <div class="d-grid gap-2 mt-3">
+                  <button type="submit" class="btn btn-success">Save Promo</button>
+                </div>
+                <p v-if="formMessage" class="mt-2 text-sm" :class="{ 'text-success': formSuccess, 'text-danger': !formSuccess }">
+                  {{ formMessage }}
+                </p>
+              </form>
+            </div>
+          </div>
 
 <!-- Promo Table -->
 <div class="card">
@@ -669,5 +745,15 @@ const fetchCustomers = async () => {
 .nav-link.active {
     background-color: #e9f5e9;
     border-right: 3px solid #28a745;
+}
+
+/* Tambahkan di sini */
+.d-flex.min-vh-100 {
+  overflow: hidden;
+}
+
+main.flex-grow-1 {
+  height: 100vh;
+  overflow-y: auto;
 }
 </style>
