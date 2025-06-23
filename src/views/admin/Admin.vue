@@ -316,6 +316,7 @@ onMounted(() => {
   fetchProducts();
   fetchPromotions();
   fetchDashboardSummary();
+  fetchCustomers();
   });
 
 watch(() => activePanel.value, (newVal) => {
@@ -326,6 +327,26 @@ watch(() => activePanel.value, (newVal) => {
   }
 });
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+const customers = ref([]);
+const isLoadingCustomers = ref(true);
+
+const fetchCustomers = async () => {
+  console.log('Fetching customer...'); // DEBUG
+  isLoadingCustomers.value = true;
+  try {
+    const response = await api.get('/customers');
+    console.log('Customer data:', response.data); // DEBUG
+    customers.value = response.data?.data ?? [];
+  } catch (error) {
+    console.error("Gagal mengambil data customer:", error);
+    customers.value = [];
+  } finally {
+    isLoadingCustomers.value = false;
+  }
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 </script>
 
 <template>
@@ -341,6 +362,7 @@ watch(() => activePanel.value, (newVal) => {
           <a href="#" @click.prevent="activePanel = 'Product'" class="nav-link" :class="{'active text-success fw-bold': activePanel === 'Product', 'text-dark': activePanel !== 'Product'}">Product</a>
           <a href="#" @click.prevent="activePanel = 'Orders'" class="nav-link" :class="{'active text-success fw-bold': activePanel === 'Orders', 'text-dark': activePanel !== 'Orders'}">Orders</a>
           <a href="#" @click.prevent="activePanel = 'promo'" class="nav-link" :class="{'active text-success fw-bold': activePanel === 'promo', 'text-dark': activePanel !== 'promo'}">Promo</a>
+          <a href="#" @click.prevent="activePanel = 'Customer'" class="nav-link" :class="{'active text-success fw-bold': activePanel === 'Customer', 'text-dark': activePanel !== 'Customer'}">Customer</a>
         </nav>
       </aside>
 
@@ -596,11 +618,51 @@ watch(() => activePanel.value, (newVal) => {
     </div>
   </div>
 </div>
-      
+  <!---------//////////////////////////////////////////////////////////////////////////////----------------------------------->    
         </div>
-      </main>
+      <div v-if="activePanel === 'Customer'">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="fw-semibold mb-3">Customer List</h5>
+            <div v-if="isLoadingCustomers" class="text-center p-4">
+              <div class="spinner-border text-success" role="status"><span class="visually-hidden">Loading...</span></div>
+            </div>
+            <div v-else class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+              <table class="table table-hover align-middle small">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Gender</th>
+                    <th>Phone</th>
+                    <th>Birthdate</th>
+                    <th>Address</th>
+                    <th>Registered At</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="customers.length === 0">
+                    <td colspan="7" class="text-center text-muted py-4">No customers found.</td>
+                  </tr>
+                  <tr v-for="user in customers" :key="user.user_id">
+                    <td>{{ user.first_name }} {{ user.last_name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.jenis_kelamin }}</td>
+                    <td>{{ user.no_telepon }}</td>
+                    <td>{{ user.tanggal_lahir }}</td>
+                    <td>{{ user.alamat }}</td>
+                    <td>{{ user.created_at }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
     </div>
   </div>
+<!---------//////////////////////////////////////////////////////////////////////////////-----------------------------------> 
 </template>
 
 <style scoped>
