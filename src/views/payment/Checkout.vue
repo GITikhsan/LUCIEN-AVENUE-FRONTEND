@@ -188,8 +188,6 @@ const applyPromoCode = async () => {
   }
 };
 
-
-
 // =================================================================
 // Lifecycle Hook
 // =================================================================
@@ -214,69 +212,68 @@ onMounted(async () => {
 </script>
 
 <template>
-  
   <div class="bg-light py-5">
     <div class="container">
       <div v-if="isLoading" class="text-center">
         <div class="spinner-border" role="status">
           <span class="visually-hidden">Loading...</span>
         </div>
-        <p class="mt-2">Memuat data pesanan...</p>
+        <p class="mt-2">Loading order data...</p>
       </div>
 
       <div v-else-if="error" class="alert alert-danger">
-        <strong>Terjadi Kesalahan:</strong> {{ error }}
+        <strong>Error:</strong> {{ error }}
       </div>
       
       <div v-else class="row">
         <div class="col-lg-7 order-lg-2 mb-4">
           <div v-if="order" class="card">
             <div class="card-header bg-white">
-              <h5 class="mb-0">Ringkasan Pesanan</h5>
+              <h5 class="mb-0">Order Summary</h5>
             </div>
             <div class="card-body">
               <div v-for="product in order.products" :key="product.productId" class="d-flex mb-3">
                 <img v-if="product.images && product.images.length > 0"
-     :src="backendUrl + product.images[0].image_path"
-     alt="Product image"
-     class="img-fluid rounded me-3"
-     style="width: 60px; height: 60px; object-fit: contain;">
+                     :src="backendUrl + product.images[0].image_path"
+                     alt="Product image"
+                     class="img-fluid rounded me-3"
+                     style="width: 60px; height: 60px; object-fit: contain;">
                 <div>
                   <h6 class="mb-1">{{ product.nama_sepatu }}</h6>
-                  <small v-if="product.size">Ukuran: {{ product.size }}</small><br>
-                  <small>Jumlah: {{ product.quantity }}</small>
+                  <small v-if="product.size">Size: {{ product.size }}</small><br>
+                  <small>Quantity: {{ product.quantity }}</small>
                 </div>
                 <div class="ms-auto text-end">
                   <p class="mb-0">Rp {{ formatCurrency(product.price) }}</p>
                 </div>
               </div>
-            
+
               <hr>
 
               <div class="mb-3">
-                 <label for="promoCode" class="form-label">Kode Promo</label>
-                 <div class="input-group">
-                   <input 
-                     type="text" 
-                     id="promoCode"
-                     class="form-control" 
-                     placeholder="Masukkan kode promo" 
-                     v-model="promoCode"
-                     :disabled="isApplyingPromo">
-                   <button 
-                     class="btn btn-outline-dark" 
-                     type="button" 
-                     @click="applyPromoCode" 
-                     :disabled="isApplyingPromo || !promoCode.trim()">
-                     <span v-if="isApplyingPromo" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                     <span v-else>Apply</span>
-                   </button>
-                 </div>
-                 <div v-if="promoMessage" :class="`mt-2 small text-${promoMessageType === 'success' ? 'success' : 'danger'}`">
-                   {{ promoMessage }}
-                 </div>
+                <label for="promoCode" class="form-label">Promo Code</label>
+                <div class="input-group">
+                  <input 
+                    type="text" 
+                    id="promoCode"
+                    class="form-control" 
+                    placeholder="Enter promo code" 
+                    v-model="promoCode"
+                    :disabled="isApplyingPromo">
+                  <button 
+                    class="btn btn-outline-dark" 
+                    type="button" 
+                    @click="applyPromoCode" 
+                    :disabled="isApplyingPromo || !promoCode.trim()">
+                    <span v-if="isApplyingPromo" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span v-else>Apply</span>
+                  </button>
+                </div>
+                <div v-if="promoMessage" :class="`mt-2 small text-${promoMessageType === 'success' ? 'success' : 'danger'}`">
+                  {{ promoMessage }}
+                </div>
               </div>
-              
+
               <hr>
 
               <div class="d-flex justify-content-between">
@@ -284,7 +281,7 @@ onMounted(async () => {
                 <span>Rp {{ formatCurrency(order.subtotal) }}</span>
               </div>
               <div v-if="order.discount > 0" class="d-flex justify-content-between text-success">
-                <span>Diskon</span>
+                <span>Discount</span>
                 <span>- Rp {{ formatCurrency(order.discount) }}</span>
               </div>
 
@@ -301,7 +298,7 @@ onMounted(async () => {
         <div class="col-lg-5 order-lg-1">
           <div class="card text-start border p-1 rounded bg-white">
             <div class="card-header bg-white">
-              <h5 class="mb-0 fw-bold">Alamat Pengiriman</h5>
+              <h5 class="mb-0 fw-bold">Shipping Address</h5>
             </div>
             <div v-if="address" class="d-flex justify-content-between mb-2 p-1 m-2">
               <div>
@@ -309,30 +306,31 @@ onMounted(async () => {
                 <p class="mb-1 text-muted">{{ address.email }}</p>
                 <p class="mb-1 text-muted">{{ address.phoneNumber }}</p>
                 <p class="mb-1">{{ address.fullAddress }}</p>
-                <span v-if="address.isDefault" class="badge bg-dark border mt-2">Alamat pengiriman default</span>
+                <span v-if="address.isDefault" class="badge bg-dark border mt-2">Default shipping address</span>
               </div>
               <div>
                 <router-link to="/edit-address" class="text-decoration-underline small">Edit</router-link>
               </div>
             </div>
             <div v-else class="p-3">
-                <p class="text-muted">Alamat pengiriman utama tidak ditemukan.</p>
+              <p class="text-muted">No primary shipping address found.</p>
             </div>
-            <router-link to="/addaddress" class="btn btn-outline-dark mt-3 m-3 px-4 py-2 fw-bold">Atur Alamat</router-link>
+            <router-link to="/addaddress" class="btn btn-outline-dark mt-3 m-3 px-4 py-2 fw-bold">Set Address</router-link>
           </div>
-          
+
           <button 
-  class="btn btn-dark w-100 mt-4 py-2 fw-bold text-white"
-  @click="startPayment"
-  :disabled="!order || !address"
->
-  Pay now
-</button>
+            class="btn btn-dark w-100 mt-4 py-2 fw-bold text-white"
+            @click="startPayment"
+            :disabled="!order || !address"
+          >
+            Pay Now
+          </button>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <style scoped>
 /* Styling khusus untuk komponen ini jika diperlukan */

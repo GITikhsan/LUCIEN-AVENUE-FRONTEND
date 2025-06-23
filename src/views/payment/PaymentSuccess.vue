@@ -8,21 +8,21 @@
         </svg>
       </div>
       
-      <h1>Pembayaran Berhasil!</h1>
-      <p class="subtitle">Terima kasih telah berbelanja bersama kami. Pesanan Anda telah kami terima dan akan segera kami proses.</p>
+      <h1>Payment Successful!</h1>
+      <p class="subtitle">Thank you for shopping with us. We have received your order and will process it shortly.</p>
       
       <div class="button-group">
-        <router-link to="/myPurchases" class="btn btn-primary">Lihat Riwayat Pembelian</router-link>
-        <router-link to="/" class="btn btn-secondary">Kembali ke Beranda</router-link>
+        <router-link to="/myPurchases" class="btn btn-primary">View Purchase History</router-link>
+        <router-link to="/" class="btn btn-secondary">Back to Homepage</router-link>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-// Tidak perlu logika JavaScript khusus untuk halaman ini,
-// kecuali jika Anda ingin mengambil data pesanan terakhir.
-// Untuk sekarang, kita buat statis saja.
+// No special JavaScript logic is needed for this page,
+// unless you want to fetch the latest order data.
+// For now, we'll keep it static.
 </script>
 
 <style scoped>
@@ -87,7 +87,7 @@ h1 {
   background-color: #5a6268;
 }
 
-/* Animasi untuk ikon centang */
+/* Animation for checkmark icon */
 .success-icon {
   width: 80px;
   height: 80px;
