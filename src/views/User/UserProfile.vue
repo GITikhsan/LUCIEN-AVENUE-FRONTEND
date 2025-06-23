@@ -57,10 +57,10 @@ const menuItems = [
       <div class="text-start mx-auto" style="max-width: 520px">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <strong class="text-uppercase small">Help</strong>
-          <a href="#" class="text-decoration-underline small fw-medium">See more</a>
+          <a href="Help" class="text-decoration-underline small fw-medium">See more</a>
         </div>
-        <p class="mb-1">How can I pay for my online purchases?</p>
-        <p class="mb-4">What is my size?</p>
+        <p class="mb-1">Help or questions about our services or just want to talk to us?</p>
+        <p class="mb-4">or just want to talk to us?</p>
       </div>
 
       <div class="mx-auto text-start" style="max-width: 520px">
