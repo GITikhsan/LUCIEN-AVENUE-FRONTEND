@@ -33,6 +33,8 @@ async function fetchUserProfile() {
       { key: 'last_name', label: 'Nama Belakang', value: user.last_name || '' },
       { key: 'email', label: 'E-mail', value: user.email },
       { key: 'no_telepon', label: 'Mobile', value: user.no_telepon || '' },
+      { key: 'jenis_kelamin', label: 'Gender', value: user.jenis_kelamin || '' },
+      { key: 'tanggal_lahir', label: 'date of birth', value: user.tanggal_lahir || '' },
       { key: 'password', label: 'Kata Sandi', value: '••••••••' }
     ];
     editing.value = profileFields.value.map(() => false);
@@ -111,6 +113,7 @@ async function deleteAccount() {
 </script>
 
 <template>
+  
   <div class="container py-5 text-center">
     <h2 class="fw-bold mb-4">My Data</h2>
 
@@ -127,7 +130,7 @@ async function deleteAccount() {
                 <p class="mb-0">{{ item.value }}</p>
               </div>
               <div v-else>
-                <input v-model="item.value" :type="item.key === 'password' ? 'password' : 'text'" class="form-control form-control-sm" />
+                <input v-model="item.value":type="item.key === 'password' ? 'password' : (item.key === 'tanggal_lahir' ? 'date' : 'text')" class="form-control form-control-sm"/>
               </div>
             </div>
             <a href="#" class="text-decoration-underline small ms-2 flex-shrink-0" @click.prevent="toggleEdit(index)">
