@@ -266,9 +266,14 @@ const deletePromo = async (id) => {
 };
 
 const isPromoActive = (promo) => {
-  const today = new Date().toISOString().slice(0, 10);
-  return promo.mulai_tanggal <= today && promo.selesai_tanggal >= today;
+  const now = new Date(); // waktu sekarang
+
+  const startDate = new Date(promo.mulai_tanggal);
+  const endDate = new Date(promo.selesai_tanggal);
+
+  return now >= startDate && now <= endDate;
 };
+
 
 // Home
 const totalProducts = ref(0);
