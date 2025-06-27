@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import api from "@/api/axios"; // Pastikan path ini benar
+import axios from 'axios'
 
 const showLoginModal = ref(false);
 const loginMessage = ref("Silakan login terlebih dahulu untuk melanjutkan.");
@@ -99,48 +100,48 @@ const isLoading = ref(true);
 const error = ref(null);
 
 // Data similarProducts kita biarkan statis sesuai kodemu
-const similarProducts = ref([
-  {
-    name: "Air Jordan 1 Low Year of the Dragon (2024) (Women's)",
-    price: "2,260,000",
-    image: "/images/2JT/2260.webp",
-  },
-  {
-    name: "Air Jordan 1 Retro Low OG Swarovski Stealth (Women)",
-    price: "21,510,000",
-    image: "/images/21JT/21510.webp",
-  },
-  {
-    name: "Nike Zoom Field Jaxx Travis Scott Leche Blue",
-    price: "2,000,000",
-    image: "/images/2JT/2000.webp",
-  },
-  {
-    name: "Air Jordan 1 Low SB Midnight Navy",
-    price: "6,500,000",
-    image: "/images/6JT/6500.webp",
-  },
-  {
-    name: "Air Jordan 1 Low Sail Rattan (Women's)",
-    price: "1,890,000",
-    image: "/images/1JT/1890.webp",
-  },
-  {
-    name: "Air Jordan 1 Low Premium Pale Ivory Off Noir Baroque Brown",
-    price: "2,500,000",
-    image: "/images/2JT/2500.webp",
-  },
-  {
-    name: "Air Jordan 1 Retro High OG Rare Air Deep Royal Blue",
-    price: "1,600,000",
-    image: "/images/1JT/1600.webp",
-  },
-  {
-    name: "Air Jordan 1 Retro High OG Rare Air Cinnabar (Women's)",
-    price: "2,400,000",
-    image: "/images/2JT/2400.webp",
-  },
-]);
+// const similarProducts = ref([
+//   {
+//     name: "Air Jordan 1 Low Year of the Dragon (2024) (Women's)",
+//     price: "2,260,000",
+//     image: "/images/2JT/2260.webp",
+//   },
+//   {
+//     name: "Air Jordan 1 Retro Low OG Swarovski Stealth (Women)",
+//     price: "21,510,000",
+//     image: "/images/21JT/21510.webp",
+//   },
+//   {
+//     name: "Nike Zoom Field Jaxx Travis Scott Leche Blue",
+//     price: "2,000,000",
+//     image: "/images/2JT/2000.webp",
+//   },
+//   {
+//     name: "Air Jordan 1 Low SB Midnight Navy",
+//     price: "6,500,000",
+//     image: "/images/6JT/6500.webp",
+//   },
+//   {
+//     name: "Air Jordan 1 Low Sail Rattan (Women's)",
+//     price: "1,890,000",
+//     image: "/images/1JT/1890.webp",
+//   },
+//   {
+//     name: "Air Jordan 1 Low Premium Pale Ivory Off Noir Baroque Brown",
+//     price: "2,500,000",
+//     image: "/images/2JT/2500.webp",
+//   },
+//   {
+//     name: "Air Jordan 1 Retro High OG Rare Air Deep Royal Blue",
+//     price: "1,600,000",
+//     image: "/images/1JT/1600.webp",
+//   },
+//   {
+//     name: "Air Jordan 1 Retro High OG Rare Air Cinnabar (Women's)",
+//     price: "2,400,000",
+//     image: "/images/2JT/2400.webp",
+//   },
+// ]);
 
 // --- ROUTER & API CALL ---
 
@@ -215,6 +216,27 @@ onMounted(() => {
 // Logika UI lainnya (tidak diubah)
 const selectedSize = ref(null);
 const quantity = ref(1);
+
+
+
+const featuredProducts = ref([]);
+const products = ref([]);
+
+onMounted(async () => {
+  try {
+    const response = await axios.get('http://127.0.0.1:8000/api/products', {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
+    // Ambil maksimal 8 produk saja
+    products.value = response.data.data.data.slice(0, 8);
+    featuredProducts.value = products.value.slice(0, 4);
+  } catch (error) {
+    console.error('❌ Gagal mengambil produk:', error);
+  }
+});
 </script>
 
 <template>
@@ -449,29 +471,47 @@ const quantity = ref(1);
 
     <div class="container mt-5">
       <h3 class="text-center fw-bold mb-4">Similar Products</h3>
-      <div class="row row-cols-2 row-cols-md-4 g-4">
-        <div
-          class="col"
-          v-for="(item, idx) in similarProducts.slice(0, 8)"
-          :key="idx"
+      <h2 v-if="title" class="mb-5 fw-bold">{{ title }}</h2>
+
+    <div class="row g-4">
+      <div 
+        v-for="(product, index) in products" 
+        :key="index"
+        class="col-12 col-sm-6 col-md-3 mb-4"
+      >
+        <div 
+          class="product-card card border-0 rounded-4 overflow-hidden h-100 position-relative"
+          style="transition: transform 0.3s ease; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);"
         >
-          <div
-            class="product-card-similar text-start p-3 d-flex flex-column h-100"
-          >
-            <div class="image-wrapper-similar mb-3">
-              <img
-                :src="item.image"
-                alt="Product Image"
-                class="product-image-similar"
-              />
+          <router-link :to="`/product/${product.produk_id}`" class="stretched-link"></router-link>
+          
+          <!-- Gambar -->
+          <div class="position-relative bg-white d-flex align-items-center justify-content-center" style="aspect-ratio: 4/3; padding: 1rem;">
+            <img 
+              v-if="product.images && product.images.length > 0"
+              :src="backendUrl + product.images[0].image_path"
+              alt="Product image" 
+              class="img-fluid" 
+              style="object-fit: contain; max-height: 100%; max-width: 100%;" 
+            />
+          </div>
+          
+          <!-- Konten -->
+          <div class="card-body text-start px-3 py-3 d-flex flex-column justify-content-between">
+            <div>
+              <h6 class="fw-semibold mb-1" style="font-size: 0.95rem; line-height: 1.2em;">
+                {{ product.nama_sepatu }}
+              </h6>
             </div>
-            <div class="product-text-wrapper mt-auto">
-              <p class="product-name">{{ item.name }}</p>
-              <p class="product-price-similar">IDR {{ item.price }}</p>
+            <div>
+              <p class="fw-bold mb-0 text-success" style="font-size: 1rem;">
+                Rp {{ Number(product.harga_retail).toLocaleString('id-ID') }}
+              </p>
             </div>
           </div>
         </div>
       </div>
+    </div>
       <div class="text-center mt-5 mb-5">
         <router-link
           to="/ViewMore"
