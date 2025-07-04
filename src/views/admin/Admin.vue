@@ -2,6 +2,7 @@
 import { ref, reactive, onMounted, computed, watch, nextTick } from 'vue';
 import api from '@/api/axios';
 import Chart from 'chart.js/auto';
+import axios from 'axios';
 
 const backendUrl = 'http://127.0.0.1:8000';
 
@@ -175,7 +176,7 @@ const newPromo = reactive({
 const formMessage = ref('');
 const formSuccess = ref(false);
 const promotions = ref([]);
-const editingPromoId = ref(null); // ⬅️ Tambahkan ini
+const editingPromoId = ref(null);
 
 
 const fetchPromotions = async () => {
@@ -194,13 +195,13 @@ const fetchPromotions = async () => {
 
 const formatToDateTime = (input) => {
   const date = new Date(input);
-  const yyyy = date.getFullYear();
+  const terrazzo = date.getFullYear();
   const mm = String(date.getMonth() + 1).padStart(2, '0');
   const dd = String(date.getDate()).padStart(2, '0');
   const hh = String(date.getHours()).padStart(2, '0');
   const min = String(date.getMinutes()).padStart(2, '0');
   const ss = String(date.getSeconds()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+  return `${terrazzo}-${mm}-${dd} ${hh}:${min}:${ss}`;
 };
 
 const savePromo = async () => {
@@ -266,7 +267,7 @@ const deletePromo = async (id) => {
 };
 
 const isPromoActive = (promo) => {
-  const now = new Date(); // waktu sekarang
+  const now = new Date();
 
   const startDate = new Date(promo.mulai_tanggal);
   const endDate = new Date(promo.selesai_tanggal);
@@ -299,7 +300,6 @@ const renderStockChart = () => {
   const canvas = document.getElementById('stockChart');
   if (!canvas) return;
 
-  // Hapus chart lama jika ada
   if (Chart.getChart(canvas)) {
     Chart.getChart(canvas).destroy();
   }
@@ -324,63 +324,98 @@ const orders = ref([]);
 
 const getOrders = async () => {
   try {
-    const res = await axios.get('http://localhost:8000/api/orders');
-    const responseData = Array.isArray(res.data) ? res.data : res.data.data ?? [];
+    const res = await api.get('/admin/orders');
+    const responseData = res.data.data ?? [];
+    
+    orders.value = responseData.flatMap((order) => {
+        if (!order.items || order.items.length === 0) {
+            return [{
+                order_id: order.pesanan_id,
+                nama_pemesan: order.user ? `${order.user.first_name} ${order.user.last_name}` : '(User Tidak Diketahui)',
+                created_at: new Date(order.created_at).toLocaleString('id-ID'),
+                status: order.status_pesanan,
+                produk_id: '-',
+                nama_produk: '(Tidak ada item dalam pesanan)',
+                harga_produk: 0,
+                jumlah: 0,
+                total_harga: order.jumlah_total,
+            }];
+        }
 
-    orders.value = responseData.map((order) => ({
-      order_id: order.id,
-      nama_pemesan: order.user?.name ?? '(Tidak diketahui)',
-      created_at: new Date(order.created_at).toLocaleString('id-ID'),
+        return order.items.map(item => ({
+            order_id: order.pesanan_id,
+            nama_pemesan: order.user ? `${order.user.first_name} ${order.user.last_name}` : '(User Tidak Diketahui)',
+            created_at: new Date(order.created_at).toLocaleString('id-ID'),
+            status: order.status_pesanan,
+            produk_id: item.product?.produk_id ?? '-',
+            nama_produk: item.product?.nama_sepatu ?? '(Produk Dihapus)',
+            harga_produk: item.harga ?? 0,
+            jumlah: item.quantity ?? 0,
+            total_harga: (item.harga ?? 0) * (item.quantity ?? 0),
+        }));
+    });
 
-      produk_id: order.products?.[0]?.id ?? '-',
-      nama_produk: order.products?.[0]?.name ?? '(Produk Tidak Ditemukan)',
-      harga_produk: order.products?.[0]?.pivot?.price ?? 0,
-      jumlah: order.products?.[0]?.pivot?.quantity ?? 0,
-      total_harga:
-        (order.products?.[0]?.pivot?.price ?? 0) *
-        (order.products?.[0]?.pivot?.quantity ?? 0),
-    }));
   } catch (error) {
-    console.error('Gagal ambil order:', error);
+    console.error('Gagal mengambil data order untuk admin:', error);
+    orders.value = [];
   }
 };
 
 const formatRupiah = (val) => {
-  if (!val) return '0';
-  return new Intl.NumberFormat('id-ID').format(Math.round(val));
+  if (val === null || val === undefined) return 'Rp 0';
+  return 'Rp ' + new Intl.NumberFormat('id-ID').format(Math.round(val));
+};
+
+const getStatusClass = (status) => {
+    if (!status) return 'text-muted';
+    status = status.toLowerCase();
+    switch (status) {
+        case 'pending':
+            return 'badge bg-warning text-dark text-capitalize';
+        case 'dibayar':
+        case 'selesai':
+            return 'badge bg-success text-capitalize';
+        case 'dibatalkan':
+            return 'badge bg-danger text-capitalize';
+        default:
+            return 'badge bg-secondary text-capitalize';
+    }
 };
 
 watch(activePanel, (val) => {
-  if (val === 'Orders') getOrders();
+  if (val === 'Orders') {
+      getOrders();
+  }
 });
 
 
-// === 4. LIFECYCLE HOOK ===
+// === 5. LIFECYCLE HOOK ===
 onMounted(() => {
   fetchProducts();
   fetchPromotions();
   fetchDashboardSummary();
   fetchCustomers();
-  });
+  if (activePanel.value === 'Orders') {
+      getOrders();
+  }
+});
 
 watch(() => activePanel.value, (newVal) => {
   if (newVal === 'Home') {
     nextTick(() => {
-      fetchDashboardSummary(); // refresh data & grafik
+      fetchDashboardSummary();
     });
   }
 });
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
+// === 6. CUSTOMER MANAGEMENT ===
 const customers = ref([]);
 const isLoadingCustomers = ref(true);
 
 const fetchCustomers = async () => {
-  console.log('Fetching customer...'); // DEBUG
   isLoadingCustomers.value = true;
   try {
     const response = await api.get('/customers');
-    console.log('Customer data:', response.data); // DEBUG
     customers.value = response.data?.data ?? [];
   } catch (error) {
     console.error("Gagal mengambil data customer:", error);
@@ -390,7 +425,6 @@ const fetchCustomers = async () => {
   }
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
 </script>
 
 <template>
@@ -514,61 +548,58 @@ const fetchCustomers = async () => {
               </div>
               <div v-else class="table-responsive">
                 <table class="table table-hover align-middle small">
-                  <!-- BUNGKUS DENGAN DIV SCROLL -->
-<div style="max-height: 400px; overflow-y: auto;">
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Image</th>
-        <th>Shoe Name</th>
-        <th>Brand</th>
-        <th>Price</th>
-        <th>SKU</th>
-        <th>Sizes</th>
-        <th>Color</th>
-        <th>Gender</th>
-        <th>Material</th>
-        <th>Dimension</th>
-        <th>Quantity</th>
-        <th>Release Date</th>
-        <th class="text-end">Actions</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      <tr v-if="filteredProducts.length === 0">
-        <td colspan="12" class="text-center text-muted py-4">No products found.</td>
-      </tr>
-      <tr v-for="product in filteredProducts" :key="product.produk_id">
-        <td>
-          <img
-            v-if="product.images && product.images.length > 0"
-            :src="backendUrl + product.images[0].image_path"
-            alt="Product image"
-            style="width: 50px; height: 50px; object-fit: cover;"
-            class="rounded"
-          />
-        </td>
-        <td class="fw-bold">{{ product.nama_sepatu }}</td>
-        <td>{{ product.brand }}</td>
-        <td>Rp {{ new Intl.NumberFormat('id-ID').format(product.harga_retail) }}</td>
-        <td>{{ product.sku }}</td>
-        <td>{{ product.ukuran }}</td>
-        <td>{{ product.warna }}</td>
-        <td>{{ product.gender }}</td>
-        <td>{{ product.material }}</td>
-        <td>{{ product.dimensi }}</td>
-        <td>{{ product.stok }}</td>
-        <td>{{ product.tanggal_rilis }}</td>
-        <td class="text-end">
-          <button @click="startEdit(product)" class="btn btn-sm btn-outline-primary me-1">Edit</button>
-          <button @click="deleteProduct(product.produk_id)" class="btn btn-sm btn-outline-danger">Delete</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
+                  <div style="max-height: 400px; overflow-y: auto;">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Image</th>
+                          <th>Shoe Name</th>
+                          <th>Brand</th>
+                          <th>Price</th>
+                          <th>SKU</th>
+                          <th>Sizes</th>
+                          <th>Color</th>
+                          <th>Gender</th>
+                          <th>Material</th>
+                          <th>Dimension</th>
+                          <th>Quantity</th>
+                          <th>Release Date</th>
+                          <th class="text-end">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-if="filteredProducts.length === 0">
+                          <td colspan="12" class="text-center text-muted py-4">No products found.</td>
+                        </tr>
+                        <tr v-for="product in filteredProducts" :key="product.produk_id">
+                          <td>
+                            <img
+                              v-if="product.images && product.images.length > 0"
+                              :src="backendUrl + product.images[0].image_path"
+                              alt="Product image"
+                              style="width: 50px; height: 50px; object-fit: cover;"
+                              class="rounded"
+                            />
+                          </td>
+                          <td class="fw-bold">{{ product.nama_sepatu }}</td>
+                          <td>{{ product.brand }}</td>
+                          <td>Rp {{ new Intl.NumberFormat('id-ID').format(product.harga_retail) }}</td>
+                          <td>{{ product.sku }}</td>
+                          <td>{{ product.ukuran }}</td>
+                          <td>{{ product.warna }}</td>
+                          <td>{{ product.gender }}</td>
+                          <td>{{ product.material }}</td>
+                          <td>{{ product.dimensi }}</td>
+                          <td>{{ product.stok }}</td>
+                          <td>{{ product.tanggal_rilis }}</td>
+                          <td class="text-end">
+                            <button @click="startEdit(product)" class="btn btn-sm btn-outline-primary me-1">Edit</button>
+                            <button @click="deleteProduct(product.produk_id)" class="btn btn-sm btn-outline-danger">Delete</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </table>
               </div>
             </div>
@@ -579,8 +610,7 @@ const fetchCustomers = async () => {
           <div class="card">
             <div class="card-body">
               <h5 class="fw-semibold mb-3">Riwayat Pemesanan</h5>
-
-              <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+              <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
                 <table class="table table-hover align-middle small">
                   <thead>
                     <tr>
@@ -590,22 +620,28 @@ const fetchCustomers = async () => {
                       <th>Kuantitas</th>
                       <th>Total Harga</th>
                       <th>Tanggal</th>
+                      <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-if="orders.length === 0">
-                      <td colspan="6" class="text-center text-muted py-4">Tidak ada data order.</td>
+                      <td colspan="7" class="text-center text-muted py-4">Tidak ada data order.</td>
                     </tr>
-                    <tr v-for="order in orders" :key="order.order_id">
+                    <tr v-for="(order, index) in orders" :key="`${order.order_id}-${index}`">
                       <td class="fw-semibold">{{ order.nama_pemesan }}</td>
                       <td>
                         <div>{{ order.nama_produk }}</div>
                         <small class="text-muted">ID: {{ order.produk_id }}</small>
                       </td>
-                      <td>Rp {{ formatRupiah(order.harga_produk) }}</td>
+                      <td>{{ formatRupiah(order.harga_produk) }}</td>
                       <td>{{ order.jumlah }}</td>
-                      <td class="fw-bold">Rp {{ formatRupiah(order.total_harga) }}</td>
+                      <td class="fw-bold">{{ formatRupiah(order.total_harga) }}</td>
                       <td>{{ order.created_at }}</td>
+                      <td>
+                        <span :class="getStatusClass(order.status)">
+                            {{ order.status }}
+                        </span>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -657,93 +693,90 @@ const fetchCustomers = async () => {
             </div>
           </div>
 
-<!-- Promo Table -->
-<div class="card">
-  <div class="card-body">
-    <h5 class="fw-semibold mb-3">Promo List</h5>
-    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-      <table class="table table-hover align-middle small">
-        <thead>
-          <tr>
-            <th>Code</th>
-            <th>Promo Name</th>
-            <th>Discount</th>
-            <th>Start</th>
-            <th>End</th>
-            <th>Status</th>
-            <th class="text-center">Actions</th>
-          </tr>
-        </thead>
-          <tbody>
-            <tr v-if="promotions.length === 0">
-              <td colspan="7" class="text-center text-muted py-4">No promotion available.</td>
-            </tr>
-            <tr v-for="promo in promotions.filter(p => p)" :key="promo.promo_id">
-              <td>{{ promo.kode }}</td>
-              <td>{{ promo.nama_promo }}</td>
-              <td>{{ promo.diskonP }}%</td>
-              <td>{{ promo.mulai_tanggal }}</td>
-              <td>{{ promo.selesai_tanggal }}</td>
-              <td>
-                <span :class="isPromoActive(promo) ? 'text-success' : 'text-muted'">
-                  {{ isPromoActive(promo) ? 'Active' : 'Expired' }}
-                </span>
-              </td>
-              <td>
-                <button class="btn btn-sm btn-outline-primary me-2" @click="startEditPromo(promo)"> Edit</button>
-                <button class="btn btn-sm btn-outline-danger" @click="deletePromo(promo.promo_id)">Delete</button>
-              </td>
-            </tr>
-          </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-  <!---------//////////////////////////////////////////////////////////////////////////////----------------------------------->    
-        </div>
-      <div v-if="activePanel === 'Customer'">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="fw-semibold mb-3">Customer List</h5>
-            <div v-if="isLoadingCustomers" class="text-center p-4">
-              <div class="spinner-border text-success" role="status"><span class="visually-hidden">Loading...</span></div>
-            </div>
-            <div v-else class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-              <table class="table table-hover align-middle small">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Gender</th>
-                    <th>Phone</th>
-                    <th>Birthdate</th>
-                    <th>Address</th>
-                    <th>Registered At</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-if="customers.length === 0">
-                    <td colspan="7" class="text-center text-muted py-4">No customers found.</td>
-                  </tr>
-                  <tr v-for="user in customers" :key="user.user_id">
-                    <td>{{ user.first_name }} {{ user.last_name }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.jenis_kelamin }}</td>
-                    <td>{{ user.no_telepon }}</td>
-                    <td>{{ user.tanggal_lahir }}</td>
-                    <td>{{ user.alamat }}</td>
-                    <td>{{ user.created_at }}</td>
-                  </tr>
-                </tbody>
-              </table>
+          <div class="card">
+            <div class="card-body">
+              <h5 class="fw-semibold mb-3">Promo List</h5>
+              <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-hover align-middle small">
+                  <thead>
+                    <tr>
+                      <th>Code</th>
+                      <th>Promo Name</th>
+                      <th>Discount</th>
+                      <th>Start</th>
+                      <th>End</th>
+                      <th>Status</th>
+                      <th class="text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-if="promotions.length === 0">
+                      <td colspan="7" class="text-center text-muted py-4">No promotion available.</td>
+                    </tr>
+                    <tr v-for="promo in promotions.filter(p => p)" :key="promo.promo_id">
+                      <td>{{ promo.kode }}</td>
+                      <td>{{ promo.nama_promo }}</td>
+                      <td>{{ promo.diskonP }}%</td>
+                      <td>{{ promo.mulai_tanggal }}</td>
+                      <td>{{ promo.selesai_tanggal }}</td>
+                      <td>
+                        <span :class="isPromoActive(promo) ? 'text-success' : 'text-muted'">
+                          {{ isPromoActive(promo) ? 'Active' : 'Expired' }}
+                        </span>
+                      </td>
+                      <td>
+                        <button class="btn btn-sm btn-outline-primary me-2" @click="startEditPromo(promo)"> Edit</button>
+                        <button class="btn btn-sm btn-outline-danger" @click="deletePromo(promo.promo_id)">Delete</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </main>
+        <div v-if="activePanel === 'Customer'">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="fw-semibold mb-3">Customer List</h5>
+              <div v-if="isLoadingCustomers" class="text-center p-4">
+                <div class="spinner-border text-success" role="status"><span class="visually-hidden">Loading...</span></div>
+              </div>
+              <div v-else class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-hover align-middle small">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Gender</th>
+                      <th>Phone</th>
+                      <th>Birthdate</th>
+                      <th>Address</th>
+                      <th>Registered At</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-if="customers.length === 0">
+                      <td colspan="7" class="text-center text-muted py-4">No customers found.</td>
+                    </tr>
+                    <tr v-for="user in customers" :key="user.user_id">
+                      <td>{{ user.first_name }} {{ user.last_name }}</td>
+                      <td>{{ user.email }}</td>
+                      <td>{{ user.jenis_kelamin }}</td>
+                      <td>{{ user.no_telepon }}</td>
+                      <td>{{ user.tanggal_lahir }}</td>
+                      <td>{{ user.alamat }}</td>
+                      <td>{{ new Date(user.created_at).toLocaleString('id-ID') }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
   </div>
-<!---------//////////////////////////////////////////////////////////////////////////////-----------------------------------> 
 </template>
 
 <style scoped>
@@ -752,7 +785,6 @@ const fetchCustomers = async () => {
     border-right: 3px solid #28a745;
 }
 
-/* Tambahkan di sini */
 .d-flex.min-vh-100 {
   overflow: hidden;
 }
@@ -760,5 +792,9 @@ const fetchCustomers = async () => {
 main.flex-grow-1 {
   height: 100vh;
   overflow-y: auto;
+}
+
+.badge.text-capitalize {
+    text-transform: capitalize;
 }
 </style>
