@@ -1,6 +1,6 @@
 # LUCIEN-AVENUE
 
-This template should help get you started developing with Vue 3 in Vite.
+Backend : https://github.com/GITikhsan/LUCIEN-AVENUE-BACKEND.git
 
 ## Recommended IDE Setup
 
