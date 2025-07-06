@@ -46,10 +46,6 @@ Repositori ini berisi prototype untuk proyek final. Tidak semua fitur yang terca
 
 - [x] Autentikasi Pengguna (Login & Register)
 - [x] Pelacakan Pemasukan & Pengeluaran (Tambah, Lihat)
-- [x] Manajemen Transaksi (Ubah, Hapus)
-- [x] Pemindaian Struk Otomatis (OCR)
-- [x] Penasihat Keuangan AI
-
 ---
 
 ## 💡 Fitur Aplikasi
